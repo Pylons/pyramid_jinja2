@@ -22,18 +22,18 @@ a repoze.bfg view function, you might do::
 Or::
 
   from repoze.bfg.jinja2 import render_template
-  s = render_template('templates/foo.jinja2')
+  s = render_template('templates/foo.jinja2', foo=1)
   return Response(s)
 
 Or::
 
   from repoze.bfg.jinja2 import render_template_to_response
-  return render_template_to_response('templates/foo.jinja2')
+  return render_template_to_response('templates/foo.jinja2', foo=1)
 
-All of these examples are equivalent.  The string passed in to each of
-them can be either a full system file path, or can be a file path
-relative to the package in which the view function is defined (as
-shown above).
+All of these examples are equivalent.  The first argument passed in to
+each of them (representing the template location) can be either a full
+system file path, or can be a file path relative to the package in
+which the view function is defined (as shown above).
 
 Installation
 ------------
