@@ -40,7 +40,7 @@ Installation
 
 Install using setuptools, e.g. (within a virtualenv)::
 
-  $ easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg.jinja2
+  $ easy_install -i http://dist.repoze.org/bfg/dev/simple repoze.bfg.jinja2
 
 Reporting Bugs / Development Versions
 -------------------------------------

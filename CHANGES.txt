@@ -1,4 +1,14 @@
-0.1
+Changelog
+=========
 
-  Initial release.
+0.2 (2009-05-02)
+----------------
+
+- Point setup.cfg index_url at http://dist.repoze.org/bfg/dev/simple
+
+0.1 (unknown date)
+------------------
+
+- Initial release.
+
 
