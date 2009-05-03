@@ -1,11 +1,11 @@
 Changelog
 =========
 
-Unreleased
-----------
+0.3 (2009-05-03)
+----------------
 
-Add a paster template for creating a Jinja2-based ``repoze.bfg``
-project.
+- Add a paster template for creating a Jinja2-based ``repoze.bfg``
+  project.  (e.g. ``paster create -t bfg_jinja2_starter``).
 
 0.2 (2009-05-02)
 ----------------
