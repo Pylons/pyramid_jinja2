@@ -42,6 +42,14 @@ Install using setuptools, e.g. (within a virtualenv)::
 
   $ easy_install -i http://dist.repoze.org/bfg/dev/simple repoze.bfg.jinja2
 
+Creating a Jinja2 ``repoze.bfg`` Project
+----------------------------------------
+
+After you've got ``repoze.bfg.jinja2`` installed, you can invoke the
+following command to create a Jinja2-based ``repoze.bfg`` project::
+
+  $ paster create -t bin/paster create -t bfg_jinja2_starter
+
 Reporting Bugs / Development Versions
 -------------------------------------
 

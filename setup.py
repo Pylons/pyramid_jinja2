@@ -50,6 +50,8 @@ setup(name='repoze.bfg.jinja2',
       install_requires=['repoze.bfg', 'Jinja2'],
       test_suite="repoze.bfg.jinja2",
       entry_points = """\
+        [paste.paster_create_template]
+        bfg_jinja2_starter=repoze.bfg.jinja2.paster:Jinja2ProjectTemplate
       """
       )
 
