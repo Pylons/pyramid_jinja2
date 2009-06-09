@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Next release
+------------
+
+- Respect ``reload_templates`` option in BFG.
+
 0.3 (2009-05-03)
 ----------------
 
