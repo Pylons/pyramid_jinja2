@@ -1,10 +1,18 @@
 Changelog
 =========
 
-Next release
-------------
+0.4 (2009-11-07)
+----------------
 
 - Respect ``reload_templates`` option in BFG.
+
+- Don't require ez_setup.py anymore.
+
+- Nosetests no longer does coverage by default.
+
+- This will be the last release will be the last release that will
+  operate under BFG 1.0.  Future versions will operate only under BFG
+  1.1.
 
 0.3 (2009-05-03)
 ----------------
