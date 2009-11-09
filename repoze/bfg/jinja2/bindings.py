@@ -18,15 +18,21 @@ def renderer_factory(path, level=4):
 
 class Jinja2TemplateRenderer(object):
     implements(ITemplateRenderer)
+    template = None
     def __init__(self, path):
         settings = get_settings()
         auto_reload = settings and settings['reload_templates']
         directory, filename = os.path.split(path)
         loader = FileSystemLoader(directory)
-        environment = Environment(loader=loader, auto_reload=auto_reload)
-        self.template = environment.get_template(filename)
+        self.filename = filename
+        self.environment = Environment(loader=loader, auto_reload=auto_reload)
+        if auto_reload is not None:
+            self.template = self.environment.get_template(self.filename)
  
     def implementation(self):
+        if self.template is None:
+            # autoreload in effect
+            return self.environment.get_template(self.filename)
         return self.template
    
     def __call__(self, value, system):
@@ -34,7 +40,11 @@ class Jinja2TemplateRenderer(object):
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
-        result = self.template.render(system)
+        template = self.template
+        if template is None:
+            # autoreload in effect
+            template = self.environment.get_template(self.filename)
+        result = template.render(system)
         return result
 
 def get_renderer(path):

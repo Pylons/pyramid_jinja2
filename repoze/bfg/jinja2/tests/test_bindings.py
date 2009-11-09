@@ -46,6 +46,14 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result, u'\nHello f\xf6\xf6')
 
+    def test_call_autoreload(self):
+        testing.registerSettings(reload_templates=True)
+        minimal = self._getTemplatePath('helloworld.jinja2')
+        instance = self._makeOne(minimal)
+        result = instance({}, {'system':1})
+        self.failUnless(isinstance(result, unicode))
+        self.assertEqual(result, u'\nHello f\xf6\xf6')
+
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('helloworld.jinja2')
         instance = self._makeOne(minimal)
@@ -58,6 +66,13 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result, u'\nHello f\xf6\xf6')
         
+    def test_implementation_autoreload(self):
+        testing.registerSettings(reload_templates=True)
+        minimal = self._getTemplatePath('helloworld.jinja2')
+        instance = self._makeOne(minimal)
+        result = instance.implementation().render()
+        self.failUnless(isinstance(result, unicode))
+        self.assertEqual(result, u'\nHello f\xf6\xf6')
 
 class RenderTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name, **kw):
