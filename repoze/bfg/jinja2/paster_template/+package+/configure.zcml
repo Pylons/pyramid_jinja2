@@ -1,17 +1,17 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
 
-  <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
+  <include package="repoze.bfg.jinja2"/>
 
   <view
      for=".models.MyModel"
      view=".views.my_view"
+     renderer="templates/mytemplate.jinja2"
      />
 
-  <view
-     for=".models.MyModel"
-     view=".views.static_view"
+  <static
      name="static"
+     path="templates/static"
      />
 
 </configure>

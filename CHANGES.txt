@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Next release
+------------
+
+- ``repoze.bfg`` 1.1 support including renderer support.  Changed
+  ``bfg_jinja2_start`` paster template to generate a view that uses
+   a renderer.
+
 0.4 (2009-11-07)
 ----------------
 
