@@ -25,7 +25,8 @@ class Jinja2TemplateRenderer(object):
         directory, filename = os.path.split(path)
         loader = FileSystemLoader(directory)
         self.filename = filename
-        self.environment = Environment(loader=loader, auto_reload=auto_reload)
+        self.environment = Environment(loader=loader, auto_reload=auto_reload,
+                                       autoescape=True)
         if not auto_reload:
             self.template = self.environment.get_template(self.filename)
  
