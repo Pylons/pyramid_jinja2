@@ -58,13 +58,9 @@ def render_template(path, **kw):
     return renderer(kw, {})
 
 def render_template_to_response(path, **kw):
-    """ Render a z3c.pt (ZPT) template at the package-relative path
+    """ Render a ``jinja2`` template at the package-relative path
     (may also be absolute) using the kwargs in ``*kw`` as top-level
     names and return a Response object. """
-    """ Render a ``chameleon.zpt`` template at the package-relative
-    path (may also be absolute) using the kwargs in ``*kw`` as
-    top-level names and return a Response object with the body as the
-    template result. """
     renderer = renderer_factory(path)
     result = renderer(kw, {})
     response_factory = queryUtility(IResponseFactory, default=Response)
