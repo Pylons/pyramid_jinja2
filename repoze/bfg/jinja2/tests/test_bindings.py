@@ -74,6 +74,14 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result, u'\nHello f\xf6\xf6')
 
+    def test_extends(self):
+        minimal = self._getTemplatePath('extends.jinja2')
+        instance = self._makeOne(minimal)
+        result = instance({}, {'system':1})
+        self.failUnless(isinstance(result, unicode))
+        self.assertEqual(result, u'\nHello f\xf6\xf6Yo!')
+        
+
 class RenderTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name, **kw):
         from repoze.bfg.jinja2 import render_template
