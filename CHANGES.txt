@@ -8,6 +8,9 @@ Next release
   ``bfg_jinja2_starter`` paster template to generate a view that uses
   a renderer.
 
+- This version is no longer compatible with ``repoze.bfg`` 1.0.X (use
+  0.4 for BFG 1.0.X compatibility).
+
 0.4 (2009-11-07)
 ----------------
 
