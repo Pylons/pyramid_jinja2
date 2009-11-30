@@ -7,6 +7,8 @@ Changelog
 - ``repoze.bfg`` 1.2 compatibility.  This package is no longer
   compatible with ``repoze.bfg`` 1.1
 
+- Take out dependency on private package index in setup.cfg.
+
 0.5 (2009-11-09)
 ----------------
 
