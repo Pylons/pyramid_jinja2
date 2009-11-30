@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.5'
+__version__ = '0.6'
 
 import os
 
@@ -27,12 +27,10 @@ setup(name='repoze.bfg.jinja2',
       description='Jinja2 template bindings for repoze.bfg',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
-        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Internet :: WWW/HTTP :: WSGI",
+        "Framework :: BFG",
+        "License :: Repoze Public License",
         ],
       keywords='web wsgi zope',
       author="Agendaless Consulting",
