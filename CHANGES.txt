@@ -1,5 +1,5 @@
-0.1
----
+Next release
+------------
 
 - First release.  *Not* backwards compatible with ``repoze.bfg.jinja2``: we use
   a filesystem loader (the directories to load from come from the
