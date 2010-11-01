@@ -2,6 +2,21 @@
 
 import unittest
 
+class Test_asbool(unittest.TestCase):
+    def _callFUT(self, value):
+        from pyramid_jinja2 import asbool
+        return asbool(value)
+
+    def test_str_true(self):
+        self.assertEqual(self._callFUT('true'), True)
+        
+    def test_str_false(self):
+        self.assertEqual(self._callFUT('false'), False)
+
+    def test_str_unrecognized(self):
+        self.assertRaises(ValueError, self._callFUT, '123')
+        
+
 class Base(object):
     def setUp(self):
         from pyramid.configuration import Configurator
@@ -84,7 +99,6 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(result, u'result')
 
     def test_call_with_system_context(self):
-        # lame
         environ = DummyEnvironment()
         info = {'name':'name'}
         instance = self._makeOne(info, environ)
@@ -92,6 +106,12 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result, u'result')
         self.assertEqual(environ.values, {'context':1})
+
+    def test_call_with_nondict_value(self):
+        environ = DummyEnvironment()
+        info = {'name':'name'}
+        instance = self._makeOne(info, environ)
+        self.assertRaises(ValueError, instance, None, {'context':1})
 
     def test_implementation(self):
         environ = DummyEnvironment()
