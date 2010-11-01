@@ -4,4 +4,4 @@
 These are bindings for the `Jinja2 templating system`_ for the `Pyramid
 <http://pylonshq.com/pyramid>`_ web framework.
 
-See the docs/ directory for documentation.
+See the http://docs.pylonshq.com/pyramid_jinja2/dev/ for documentation.
