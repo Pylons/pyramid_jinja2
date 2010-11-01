@@ -1,7 +1,7 @@
-<configure xmlns="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://pylonshq.com/pyramid">
 
-  <include package="repoze.bfg.includes" />
-  <include package="repoze.bfg.jinja2"/>
+  <include package="pyramid.includes" />
+  <include package="pyramid_jinja2"/>
 
   <view
      for=".models.MyModel"
