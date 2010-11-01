@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2008 Agendaless Consulting and Contributors.
+# Copyright (c) 2010 Agendaless Consulting and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.6'
+__version__ = '0.0'
 
 import os
 
@@ -22,14 +22,14 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-setup(name='repoze.bfg.jinja2',
+setup(name='pyramid_jinja2',
       version=__version__,
-      description='Jinja2 template bindings for repoze.bfg',
+      description='Jinja2 template bindings for the Pyramid web framework',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
-        "Framework :: BFG",
+        "Framework :: Pylons",
         "License :: Repoze Public License",
         ],
       keywords='web wsgi zope',
@@ -39,14 +39,13 @@ setup(name='repoze.bfg.jinja2',
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,
-      namespace_packages=['repoze', 'repoze.bfg'],
       zip_safe=False,
-      tests_require = ['repoze.bfg', 'Jinja2'],
-      install_requires=['repoze.bfg', 'Jinja2'],
-      test_suite="repoze.bfg.jinja2",
+      tests_require = ['pyramid', 'Jinja2'],
+      install_requires=['pyramid', 'Jinja2'],
+      test_suite="pyramid_jinja2",
       entry_points = """\
         [paste.paster_create_template]
-        bfg_jinja2_starter=repoze.bfg.jinja2.paster:Jinja2ProjectTemplate
+        pyramid_jinja2_starter=pyramid_jinja2.paster:Jinja2ProjectTemplate
       """
       )
 

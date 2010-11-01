@@ -1,48 +1,72 @@
-``repoze.bfg`` bindings for `Jinja2 <http:http://jinja.pocoo.org>`_
-===================================================================
+`Jinja2 <http:http://jinja.pocoo.org>`_ bindings for Pyramid
+============================================================
 
-These are bindings for the `Jinja2 templating system`_ for the
-``repoze.bfg`` web framework.
+These are bindings for the `Jinja2 templating system`_ for the `Pyramid
+<http://pylonshq.com/pyramid>`_ web framework.
+
+Ensuring the Jinja2 Renderer Extension is Active
+------------------------------------------------
+
+There are two ways to make sure that the ``pyramid_jinja2`` extension is
+active.  Both are completely equivalent.
+
+#) Ensure that some ZCML file with an analogue of the following
+   contents is executed::
+
+    <include package="pyramid_jinja2"/>
+
+#) Call the ``add_renderer`` method of a Configurator in your
+   application:
+
+   from pyramid_jinja2 import renderer_factory
+   config.add_renderer(.'jinja2', renderer_factory)
+
+In either case, files with the ``.jinja2`` extension are now considered to be
+Jinja2 templates.
 
 High-Level API
 --------------
 
-The API follows the pattern of the "default" template API for
-``repoze.bfg``, which includes three functions: ``get_template``,
-``render_template``, and ``render_template_to_response``.  From within
-a repoze.bfg view function, you might do::
+Once the extension is configured, to use the Jinja2 package for Pyramid, use
+any of the three Pyramid renderer-related functions : ``get_renderer``,
+``render``, and ``render_to_response``.
+
+From within a Pyramid view function, you might do::
 
   from webob import Response
 
-  from repoze.bfg.jinja2 import get_template
-  template = get_template('templates/foo.jinja2')
+  from pyramid.renderers import get_renderer
+  template = get_renderer('templates/foo.jinja2')
   return Response(template.render(foo=1))
 
 Or::
 
-  from repoze.bfg.jinja2 import render_template
-  s = render_template('templates/foo.jinja2', foo=1)
+  from pyramid.renderers import render
+  s = render_template('templates/foo.jinja2', {'foo':1})
   return Response(s)
 
 Or::
 
-  from repoze.bfg.jinja2 import render_template_to_response
-  return render_template_to_response('templates/foo.jinja2', foo=1)
+  from Pyramid.jinja2 import render_to_response
+  return render_to_response('templates/foo.jinja2', {'foo':1})
 
-All of these examples are equivalent.  The first argument passed in to
-each of them (representing the template location) can be either a full
-system file path, or can be a file path relative to the package in
-which the view function is defined (as shown above).
+All of these examples are equivalent.  The first argument passed in to each of
+``get_renderer``, ``render_template``, or ``render_to_response`` represents the
+template location.  It can be either a full system file path, or can be a file
+path relative to the package in which the view function is defined (as shown
+above).
 
-``repoze.bfg.jinja2`` can also act as a "renderer" for a view when its
-``configure.zcml`` file is included within the ``repoze.bfg``
-application you're developing::
+``pyramid_jinja2`` can also act as a "renderer" for a view when its
+``configure.zcml`` file is included within the Pyramid application you're
+developing::
 
-  @bfg_view(renderer='templates/foo.jinja2')
+  from pyramid.view import view_config
+
+  @view_config(renderer='templates/foo.jinja2')
   def aview(request):
       return {'foo':1}
 
-See the generated ``bfg_jinja2_starter`` paster template for an
+See the generated ``pyramid_jinja2_starter`` paster template for an
 example of using the renderer facility.
 
 Installation
@@ -50,15 +74,15 @@ Installation
 
 Install using setuptools, e.g. (within a virtualenv)::
 
-  $ easy_install -i http://dist.repoze.org/bfg/dev/simple repoze.bfg.jinja2
+  $ easy_install pyramid_jinja2
 
-Creating a Jinja2 ``repoze.bfg`` Project
+Creating a Jinja2 ``Pyramid`` Project
 ----------------------------------------
 
-After you've got ``repoze.bfg.jinja2`` installed, you can invoke the
-following command to create a Jinja2-based ``repoze.bfg`` project::
+After you've got ``pyramid_jinja2`` installed, you can invoke the following
+command to create a Jinja2-based Pyramid project::
 
-  $ paster create -t bin/paster create -t bfg_jinja2_starter
+  $ paster create -t bin/paster create -t pyramid_jinja2_starter
 
 Reporting Bugs / Development Versions
 -------------------------------------

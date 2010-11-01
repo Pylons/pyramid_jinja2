@@ -1,0 +1,10 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <include package="pyramid.includes" file="meta.zcml" />
+
+  <renderer
+     factory="pyramid.jinja2.renderer_factory"
+     name=".jinja2"
+     />
+
+</configure>
