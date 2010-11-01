@@ -36,15 +36,23 @@ class Test_renderer_factory(Base, unittest.TestCase):
 
     def test_no_directories(self):
         from pyramid.exceptions import ConfigurationError
-        info = {'name':'helloworld.jinja2', 'package':None,
-                'registry':self.config.registry, 'settings':None}
+        info = DummyRendererInfo({
+            'name':'helloworld.jinja2',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            })
         self.assertRaises(ConfigurationError, self._callFUT, info)
 
     def test_no_environment(self):
         from pyramid_jinja2 import IJinja2Environment
         settings = {'jinja2.directories':self.templates_dir}
-        info = {'name':'helloworld.jinja2', 'package':None,
-                'registry':self.config.registry, 'settings':settings}
+        info = DummyRendererInfo({
+            'name':'helloworld.jinja2',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
         renderer = self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.loader.searchpath, [self.templates_dir])
@@ -55,8 +63,12 @@ class Test_renderer_factory(Base, unittest.TestCase):
         from pyramid_jinja2 import IJinja2Environment
         twice = self.templates_dir + '\n' + self.templates_dir
         settings = {'jinja2.directories':twice}
-        info = {'name':'helloworld.jinja2', 'package':None,
-                'registry':self.config.registry, 'settings':settings}
+        info = DummyRendererInfo({
+            'name':'helloworld.jinja2',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.loader.searchpath, [self.templates_dir]*2)
@@ -65,8 +77,12 @@ class Test_renderer_factory(Base, unittest.TestCase):
         from pyramid_jinja2 import IJinja2Environment
         environ = dict()
         self.config.registry.registerUtility(environ, IJinja2Environment)
-        info = {'name':'helloworld.jinja2', 'package':None,
-                'registry':self.config.registry, 'settings':{}}
+        info = DummyRendererInfo({
+            'name':'helloworld.jinja2',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            })
         renderer = self._callFUT(info)
         self.assertEqual(renderer.environment, environ)
         self.assertEqual(renderer.info, info)
@@ -92,7 +108,9 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
 
     def test_call(self):
         environ = DummyEnvironment()
-        info = {'name':'name'}
+        info = DummyRendererInfo({
+            'name':'name',
+            })
         instance = self._makeOne(info, environ)
         result = instance({}, {'system':1})
         self.failUnless(isinstance(result, unicode))
@@ -100,7 +118,9 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
 
     def test_call_with_system_context(self):
         environ = DummyEnvironment()
-        info = {'name':'name'}
+        info = DummyRendererInfo({
+            'name':'name',
+            })
         instance = self._makeOne(info, environ)
         result = instance({}, {'context':1})
         self.failUnless(isinstance(result, unicode))
@@ -109,13 +129,17 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
 
     def test_call_with_nondict_value(self):
         environ = DummyEnvironment()
-        info = {'name':'name'}
+        info = DummyRendererInfo({
+            'name':'name',
+            })
         instance = self._makeOne(info, environ)
         self.assertRaises(ValueError, instance, None, {'context':1})
 
     def test_implementation(self):
         environ = DummyEnvironment()
-        info = {'name':'name'}
+        info = DummyRendererInfo({
+            'name':'name',
+            })
         instance = self._makeOne(info, environ)
         result = instance.implementation().render({})
         self.assertEqual(result, u'result')
@@ -147,4 +171,8 @@ class DummyEnvironment(object):
     def render(self, values):
         self.values = values
         return u'result'
+        
+class DummyRendererInfo(object):
+    def __init__(self, kw):
+        self.__dict__.update(kw)
         

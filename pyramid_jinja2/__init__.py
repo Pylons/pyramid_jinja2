@@ -26,8 +26,8 @@ def asbool(obj):
     return bool(obj)
 
 def renderer_factory(info):
-    registry = info['registry']
-    settings = info['settings'] or {}
+    registry = info.registry
+    settings = info.settings
     environment = registry.queryUtility(IJinja2Environment)
     if environment is None:
         reload_templates = settings.get('reload_templates', False)
@@ -59,7 +59,7 @@ class Jinja2TemplateRenderer(object):
 
     @reify
     def template(self):
-        return self.environment.get_template(self.info['name'])
+        return self.environment.get_template(self.info.name)
    
     def __call__(self, value, system):
         try:
