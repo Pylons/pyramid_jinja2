@@ -1,4 +1,5 @@
 from pyramid.configuration import Configurator
+from pyramid_jinja2 import renderer_factory
 from {{package}}.models import get_root
 
 def app(global_config, **settings):
@@ -7,9 +8,11 @@ def app(global_config, **settings):
     It is usually called by the PasteDeploy framework during 
     ``paster serve``.
     """
-    zcml_file = settings.get('configure_zcml', 'configure.zcml')
     config = Configurator(root_factory=get_root, settings=settings)
     config.begin()
-    config.load_zcml(zcml_file)
+    config.add_renderer('.jinja2', renderer_factory)
+    config.add_static_view('static', 'templates/static')
+    config.add_view('.views.my_view', context='.models.MyModel', 
+                    renderer="mytemplate.jinja2")
     config.end()
     return config.make_wsgi_app()
