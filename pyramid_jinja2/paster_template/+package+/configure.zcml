@@ -6,7 +6,7 @@
   <view
      for=".models.MyModel"
      view=".views.my_view"
-     renderer="templates/mytemplate.jinja2"
+     renderer="mytemplate.jinja2"
      />
 
   <static

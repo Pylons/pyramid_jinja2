@@ -19,7 +19,7 @@ active.  Both are completely equivalent.
    application during configuration::
 
     from pyramid_jinja2 import renderer_factory
-    config.add_renderer(.'jinja2', renderer_factory)
+    config.add_renderer('.jinja2', renderer_factory)
  
 In either case, files with the ``.jinja2`` extension are now considered to be
 Jinja2 templates.
