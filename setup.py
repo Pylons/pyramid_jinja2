@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.0'
+__version__ = '0.1'
 
 import os
 
@@ -33,7 +33,7 @@ setup(name='pyramid_jinja2',
         "License :: Repoze Public License",
         ],
       keywords='web wsgi bfg pylons pyramid',
-      author="Agendaless Consulting",
+      author="Chris McDonough, Agendaless Consulting",
       author_email="pylons-discuss@googlegroups.com",
       url="http://pylonshq.com",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",

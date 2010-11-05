@@ -2,6 +2,6 @@
 ============================================================
 
 These are bindings for the `Jinja2 templating system`_ for the `Pyramid
-<http://pylonshq.com/pyramid>`_ web framework.
+<http://docs.pylonshq.com/>`_ web framework.
 
 See the http://docs.pylonshq.com/pyramid_jinja2/dev/ for documentation.

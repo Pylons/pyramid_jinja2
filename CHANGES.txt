@@ -1,7 +1,7 @@
-Next release
-------------
+0.1
+---
 
-- First release.  *Not* backwards compatible with ``repoze.bfg.jinja2``: we use
-  a filesystem loader (the directories to load from come from the
-  ``jinja2.directories`` setting).  No attention is paid to the current package
-  when resolving a renderer= line.
+- First release.  *Not* backwards compatible with ``repoze.bfg.jinja2``: we
+  use a filesystem loader (the directories to load from come from the
+  ``jinja2.directories`` setting).  No attention is paid to the current
+  package when resolving a renderer= line.
