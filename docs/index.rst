@@ -63,7 +63,7 @@ Or::
 
 Or::
 
-  from Pyramid.jinja2 import render_to_response
+  from pyramid.jinja2 import render_to_response
   return render_to_response('foo.jinja2', {'foo':1})
 
 All of these examples are equivalent.  The first argument passed in to each of
