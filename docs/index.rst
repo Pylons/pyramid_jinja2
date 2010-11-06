@@ -97,7 +97,7 @@ Creating a Jinja2 ``Pyramid`` Project
 After you've got ``pyramid_jinja2`` installed, you can invoke the following
 command to create a Jinja2-based Pyramid project::
 
-  $ paster create -t bin/paster create -t pyramid_jinja2_starter
+  $ paster create -t bin/paster pyramid_jinja2_starter
 
 This is a good way to see a working Pyramid application that uses Jinja2, even
 if you wind up not using the result.
