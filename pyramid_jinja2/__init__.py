@@ -8,7 +8,6 @@ from pyramid.interfaces import ITemplateRenderer
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.resource import abspath_from_resource_spec
-from pyramid.decorator import reify
 
 class IJinja2Environment(Interface):
     pass
@@ -57,7 +56,7 @@ class Jinja2TemplateRenderer(object):
     def implementation(self):
         return self.template
 
-    @reify
+    @property
     def template(self):
         return self.environment.get_template(self.info.name)
    
