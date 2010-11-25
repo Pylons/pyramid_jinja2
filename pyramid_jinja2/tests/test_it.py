@@ -138,7 +138,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
 
 
         settings = {'jinja2.directories':self.templates_dir,
-            'jinja2.filters':{'dummy':'pyramid_jinja2.tests.test_it:dummy_filter'}}
+            'jinja2.filters':'dummy=pyramid_jinja2.tests.test_it:dummy_filter'}
         info = DummyRendererInfo({
             'name':'helloworld.jinja2',
             'package':None,
