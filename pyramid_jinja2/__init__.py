@@ -78,6 +78,7 @@ def renderer_factory(info):
         directories = settings.get('jinja2.directories')
         input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
         autoescape = settings.get('jinja2.autoescape', True)
+        extensions = settings.get('jinja2.extensions', '')
         if directories is None:
             raise ConfigurationError(
                 'Jinja2 template used without a ``jinja2.directories`` setting')
@@ -86,8 +87,10 @@ def renderer_factory(info):
         loader = FileSystemLoader(directories,
                                   encoding=input_encoding)
         autoescape = asbool(autoescape)
+        extensions = [e for e in (e.strip() for e in extensions.splitlines()) if e]
         environment = Environment(loader=loader, auto_reload=reload_templates,
-                                  autoescape=True)
+                                  autoescape=True,
+                                  extensions=extensions)
         filterreg = _get_filter_registry()
         filterreg.install(environment)
         registry.registerUtility(environment, IJinja2Environment)

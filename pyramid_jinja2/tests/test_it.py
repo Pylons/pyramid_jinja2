@@ -106,6 +106,28 @@ class Test_renderer_factory(Base, unittest.TestCase):
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.filters['dummy'], dummy_filter)
 
+    def test_with_extension(self):
+        from pyramid_jinja2 import IJinja2Environment
+        settings = {'jinja2.directories':self.templates_dir,
+                    'jinja2.extensions':"""
+                    pyramid_jinja2.tests.extensions.TestExtension
+                    """}
+        info = DummyRendererInfo({
+            'name':'helloworld.jinja2',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        renderer = self._callFUT(info)
+        environ = self.config.registry.getUtility(IJinja2Environment)
+        self.assertEqual(environ.loader.searchpath, [self.templates_dir])
+        self.assertEqual(renderer.info, info)
+        self.assertEqual(renderer.environment, environ)
+        import pyramid_jinja2.tests.extensions
+        self.assertTrue(isinstance(environ.extensions['pyramid_jinja2.tests.extensions.TestExtension'],
+            pyramid_jinja2.tests.extensions.TestExtension))
+
+
 class Jinja2TemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid_jinja2 import Jinja2TemplateRenderer
