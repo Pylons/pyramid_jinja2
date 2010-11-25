@@ -87,6 +87,25 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(renderer.environment, environ)
         self.assertEqual(renderer.info, info)
 
+    def test_with_filter_registry(self):
+        from pyramid_jinja2 import IJinja2Environment
+        from pyramid_jinja2 import register_filter
+
+        def dummy_filter(value):
+            return 'hoge'
+
+        register_filter('dummy', dummy_filter)
+        settings = {'jinja2.directories':self.templates_dir}
+        info = DummyRendererInfo({
+            'name':'helloworld.jinja2',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        renderer = self._callFUT(info)
+        environ = self.config.registry.getUtility(IJinja2Environment)
+        self.assertEqual(environ.filters['dummy'], dummy_filter)
+
 class Jinja2TemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid_jinja2 import Jinja2TemplateRenderer
