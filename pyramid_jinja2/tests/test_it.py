@@ -2,6 +2,9 @@
 
 import unittest
 
+def dummy_filter(value):
+    return 'hoge'
+
 class Test_asbool(unittest.TestCase):
     def _callFUT(self, value):
         from pyramid_jinja2 import asbool
@@ -16,6 +19,31 @@ class Test_asbool(unittest.TestCase):
     def test_str_unrecognized(self):
         self.assertRaises(ValueError, self._callFUT, '123')
         
+class Test_parse_filters(unittest.TestCase):
+    def _callFUT(self, value):
+        from pyramid_jinja2 import parse_filters
+        return parse_filters(value)
+
+    def test_parse_singile_line(self):
+        self.assertEqual(self._callFUT('dummy=dummy'), {'dummy':'dummy'})
+        
+    def test_parse_multi_line(self):
+        self.assertEqual(self._callFUT("""\
+            dummy=dummy
+            dummy2=dummy"""), 
+        {'dummy':'dummy', 'dummy2':'dummy'})
+
+    def test_parse_list(self):
+        self.assertEqual(self._callFUT(
+            [('dummy', 'dummy'),
+             ('dummy2', 'dummy')]), 
+        {'dummy':'dummy', 'dummy2':'dummy'})
+
+    def test_parse_dict(self):
+        self.assertEqual(self._callFUT(
+            {'dummy': 'dummy',
+             'dummy2': 'dummy'}), 
+        {'dummy':'dummy', 'dummy2':'dummy'})
 
 class Base(object):
     def setUp(self):
@@ -87,15 +115,30 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(renderer.environment, environ)
         self.assertEqual(renderer.info, info)
 
-    def test_with_filter_registry(self):
+    def test_with_filters_object(self):
         from pyramid_jinja2 import IJinja2Environment
-        from pyramid_jinja2 import register_filter
 
         def dummy_filter(value):
             return 'hoge'
 
-        register_filter('dummy', dummy_filter)
-        settings = {'jinja2.directories':self.templates_dir}
+        settings = {'jinja2.directories':self.templates_dir,
+            'jinja2.filters':{'dummy':dummy_filter}}
+        info = DummyRendererInfo({
+            'name':'helloworld.jinja2',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        renderer = self._callFUT(info)
+        environ = self.config.registry.getUtility(IJinja2Environment)
+        self.assertEqual(environ.filters['dummy'], dummy_filter)
+
+    def test_with_filters_string(self):
+        from pyramid_jinja2 import IJinja2Environment
+
+
+        settings = {'jinja2.directories':self.templates_dir,
+            'jinja2.filters':{'dummy':'pyramid_jinja2.tests.test_it:dummy_filter'}}
         info = DummyRendererInfo({
             'name':'helloworld.jinja2',
             'package':None,

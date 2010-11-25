@@ -2,6 +2,7 @@ from zope.interface import implements
 from zope.interface import Interface
 
 from jinja2.loaders import FileSystemLoader
+from jinja2.utils import import_string
 from jinja2 import Environment
 
 from pyramid.interfaces import ITemplateRenderer
@@ -11,50 +12,6 @@ from pyramid.resource import abspath_from_resource_spec
 
 class IJinja2Environment(Interface):
     pass
-
-class IJinja2FilterRegistry(Interface):
-    def register_filter(key, value):
-        """ register filter
-        """
-    def get_filter(key):
-        """ get registered filter
-        """
-
-    def install(environment):
-        """ install registered filters to environment
-        """
-
-class FilterRegistry(object):
-
-    implements(IJinja2FilterRegistry)
-
-    def __init__(self):
-        self.reg = {}
-
-    def register_filter(self, key, value):
-        self.reg[key] = value
-
-    def get_filter(key):
-        return self.reg[key]
-
-    def install(self, environment):
-        for key, func in self.reg.iteritems():
-            environment.filters[key] = func
-
-def _get_filter_registry():
-    from pyramid.threadlocal import get_current_registry
-    reg = get_current_registry()
-    filterreg = reg.queryUtility(IJinja2FilterRegistry)
-    if filterreg is None:
-        filterreg = FilterRegistry()
-        reg.registerUtility(filterreg)
-    return filterreg
-
-def register_filter(name, filterfunc):
-    filterreg = _get_filter_registry()
-    filterreg.register_filter(name, filterfunc)
-    return filterfunc
-
 
 
 def asbool(obj):
@@ -69,6 +26,16 @@ def asbool(obj):
                 "String is not true/false: %r" % obj)
     return bool(obj)
 
+def parse_filters(filters):
+    if isinstance(filters, basestring):
+        return dict([f.split('=', 1) for f in (f.strip() for f in filters.splitlines()) if f])
+    elif isinstance(filters, list) or isinstance(filters, tuple):
+        return dict(filters)
+    elif isinstance(filters, dict):
+        return filters
+    else:
+        raise ValueError("jinja2.filters is not formated string or list or dict.")
+
 def renderer_factory(info):
     registry = info.registry
     settings = info.settings
@@ -79,6 +46,7 @@ def renderer_factory(info):
         input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
         autoescape = settings.get('jinja2.autoescape', True)
         extensions = settings.get('jinja2.extensions', '')
+        filters = settings.get('jinja2.filters', '')
         if directories is None:
             raise ConfigurationError(
                 'Jinja2 template used without a ``jinja2.directories`` setting')
@@ -88,11 +56,12 @@ def renderer_factory(info):
                                   encoding=input_encoding)
         autoescape = asbool(autoescape)
         extensions = [e for e in (e.strip() for e in extensions.splitlines()) if e]
+        filters = parse_filters(filters)
         environment = Environment(loader=loader, auto_reload=reload_templates,
                                   autoescape=True,
                                   extensions=extensions)
-        filterreg = _get_filter_registry()
-        filterreg.install(environment)
+        for name, filter in filters.iteritems():
+            environment.filters[name] = import_string(filter) if isinstance(filter, basestring) else filter
         registry.registerUtility(environment, IJinja2Environment)
     return Jinja2TemplateRenderer(info, environment)
 
