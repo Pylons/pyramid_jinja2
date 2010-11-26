@@ -1,6 +1,14 @@
 Next release
 ------------
 
+0.3 (2010-11-26)
+----------------
+
+- Add ``jinja2.filters`` and ``jinja2.extensions`` settings (thanks to
+  aodag).
+
+- Document all known settings.
+
 0.2 (2010-11-06)
 ----------------
 
