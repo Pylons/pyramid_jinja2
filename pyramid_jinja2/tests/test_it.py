@@ -2,8 +2,7 @@
 
 import unittest
 
-def dummy_filter(value):
-    return 'hoge'
+def dummy_filter(value): return 'hoge'
 
 class Test_asbool(unittest.TestCase):
     def _callFUT(self, value):
@@ -25,25 +24,30 @@ class Test_parse_filters(unittest.TestCase):
         return parse_filters(value)
 
     def test_parse_singile_line(self):
-        self.assertEqual(self._callFUT('dummy=dummy'), {'dummy':'dummy'})
+        import pyramid_jinja2
+        self.assertEqual(self._callFUT('dummy=pyramid_jinja2'),
+                         {'dummy':pyramid_jinja2})
         
     def test_parse_multi_line(self):
+        import pyramid_jinja2
         self.assertEqual(self._callFUT("""\
-            dummy=dummy
-            dummy2=dummy"""), 
-        {'dummy':'dummy', 'dummy2':'dummy'})
+            dummy =  pyramid_jinja2
+            dummy2 =pyramid_jinja2"""), 
+        {'dummy':pyramid_jinja2, 'dummy2':pyramid_jinja2})
 
-    def test_parse_list(self):
+    def test_parse_dict_stringvals(self):
+        import pyramid_jinja2
         self.assertEqual(self._callFUT(
-            [('dummy', 'dummy'),
-             ('dummy2', 'dummy')]), 
-        {'dummy':'dummy', 'dummy2':'dummy'})
+            {'dummy': 'pyramid_jinja2',
+             'dummy2': 'pyramid_jinja2'}), 
+        {'dummy':pyramid_jinja2, 'dummy2':pyramid_jinja2})
 
-    def test_parse_dict(self):
+    def test_parse_dict_objvals(self):
+        import pyramid_jinja2
         self.assertEqual(self._callFUT(
-            {'dummy': 'dummy',
-             'dummy2': 'dummy'}), 
-        {'dummy':'dummy', 'dummy2':'dummy'})
+            {'dummy': pyramid_jinja2,
+             'dummy2': pyramid_jinja2}), 
+        {'dummy':pyramid_jinja2, 'dummy2':pyramid_jinja2})
 
 class Base(object):
     def setUp(self):
@@ -118,8 +122,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_with_filters_object(self):
         from pyramid_jinja2 import IJinja2Environment
 
-        def dummy_filter(value):
-            return 'hoge'
+        def dummy_filter(value): return 'hoge'
 
         settings = {'jinja2.directories':self.templates_dir,
             'jinja2.filters':{'dummy':dummy_filter}}
@@ -129,7 +132,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             'registry':self.config.registry,
             'settings':settings,
             })
-        renderer = self._callFUT(info)
+        self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.filters['dummy'], dummy_filter)
 
@@ -145,7 +148,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             'registry':self.config.registry,
             'settings':settings,
             })
-        renderer = self._callFUT(info)
+        self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.filters['dummy'], dummy_filter)
 
@@ -167,8 +170,9 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(renderer.info, info)
         self.assertEqual(renderer.environment, environ)
         import pyramid_jinja2.tests.extensions
-        self.assertTrue(isinstance(environ.extensions['pyramid_jinja2.tests.extensions.TestExtension'],
-            pyramid_jinja2.tests.extensions.TestExtension))
+        ext=environ.extensions['pyramid_jinja2.tests.extensions.TestExtension']
+        self.assertEqual(ext.__class__,
+                         pyramid_jinja2.tests.extensions.TestExtension)
 
 
 class Jinja2TemplateRendererTests(Base, unittest.TestCase):

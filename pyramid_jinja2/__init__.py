@@ -26,15 +26,30 @@ def asbool(obj):
                 "String is not true/false: %r" % obj)
     return bool(obj)
 
+def maybe_import_string(val):
+    if isinstance(val, basestring):
+        return import_string(val.strip())
+    return val
+
+def splitlines(s):
+    return filter(None, [x.strip() for x in s.splitlines()])
+
 def parse_filters(filters):
+    # input must be a string or dict
+    result = {}
     if isinstance(filters, basestring):
-        return dict([f.split('=', 1) for f in (f.strip() for f in filters.splitlines()) if f])
-    elif isinstance(filters, list) or isinstance(filters, tuple):
-        return dict(filters)
-    elif isinstance(filters, dict):
-        return filters
+        for f in splitlines(filters):
+            name, impl = f.split('=', 1)
+            result[name.strip()] = maybe_import_string(impl)
     else:
-        raise ValueError("jinja2.filters is not formated string or list or dict.")
+        for name, impl in filters.items():
+            result[name] = maybe_import_string(impl)
+    return result
+
+def parse_extensions(extensions):
+    if isinstance(extensions, basestring):
+        extensions = splitlines(extensions)
+    return [ maybe_import_string(x) for x in extensions ]
 
 def renderer_factory(info):
     registry = info.registry
@@ -50,18 +65,18 @@ def renderer_factory(info):
         if directories is None:
             raise ConfigurationError(
                 'Jinja2 template used without a ``jinja2.directories`` setting')
-        directories = directories.splitlines()
+        if isinstance(directories, basestring):
+            directories = splitlines(directories)
         directories = [ abspath_from_resource_spec(d) for d in directories ]
-        loader = FileSystemLoader(directories,
-                                  encoding=input_encoding)
+        loader = FileSystemLoader(directories, encoding=input_encoding)
         autoescape = asbool(autoescape)
-        extensions = [e for e in (e.strip() for e in extensions.splitlines()) if e]
+        extensions = parse_extensions(extensions)
         filters = parse_filters(filters)
-        environment = Environment(loader=loader, auto_reload=reload_templates,
-                                  autoescape=True,
+        environment = Environment(loader=loader,
+                                  auto_reload=reload_templates,
+                                  autoescape=autoescape,
                                   extensions=extensions)
-        for name, filter in filters.iteritems():
-            environment.filters[name] = import_string(filter) if isinstance(filter, basestring) else filter
+        environment.filters.update(filters)
         registry.registerUtility(environment, IJinja2Environment)
     return Jinja2TemplateRenderer(info, environment)
 

@@ -40,6 +40,48 @@ directory argument before the colon is a package name.  The remainder is a
 subpath within the package which houses Jinja2 templates.  Adding more than one
 directory forms a search path.
 
+Settings
+--------
+
+Jinja2 derives additional settings to configure its template renderer. Many
+of these settings are optional and only need to be set if they should be
+different from the default.  The below values can be present in the ``.ini``
+file used to configure the Pyramid application (in the ``app`` section
+representing your Pyramid app) or they can be passed directly within the
+``settings`` argument passed to a Pyramid Configurator.
+
+reload_templates
+
+  ``true`` or ``false`` representing whether Jinja2 templates should be
+  reloaded when they change on disk.  Useful for development to be ``true``.
+
+jinja2.directories
+
+  A list of directory names or a newline-delimited string with each line
+  representing a directory name.  These locations are where Jinja2 will
+  search for templates.  Each can optionally be an absolute resource
+  specification (e.g. ``package:subdirectory/``).
+
+jinja2.input_encoding
+
+  The input encoding of templates.  Defaults to ``utf-8``.
+
+jinja2.autoescape
+
+  ``true`` or ``false`` representing whether Jinja2 will autoescape rendered
+  blocks.
+
+jinja2.extensions
+
+  A list of extension objects or a newline-delimited set of dotted import
+  locations where each line represents an extension.
+
+jinja2.filters
+
+  A dictionary mapping filter name to filter object, or a newline-delimted
+  string with each line in the format ``name = dotted.name.to.filter``
+  representing Jinja2 filters.
+
 High-Level API
 --------------
 
