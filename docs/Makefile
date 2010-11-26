@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = ../../pyramid/env26/bin/sphinx-build
+SPHINXBUILD   = sphinx-build
 PAPER         =
 
 # Internal variables.
