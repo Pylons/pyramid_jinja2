@@ -61,6 +61,6 @@ class Test_route_url_filter(unittest.TestCase):
         rendered = self._callFUT({}, "{{'dummy_route1' | route_url }}")
         self.assertEqual(rendered, '/dummy/')
 
-    def test_filter_with_element(self):
-        rendered = self._callFUT({}, "{{'dummy_route2' | route_url(name='test') }}")
-        self.assertEqual(rendered, '/dummy/test/')
+    def test_filter_with_arguments(self):
+        rendered = self._callFUT({}, "{{'dummy_route2' | route_url('x', name='test') }}")
+        self.assertEqual(rendered, '/dummy/test/x')
