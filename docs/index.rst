@@ -126,6 +126,35 @@ developing::
 See the generated ``pyramid_jinja2_starter`` paster template for an
 example of using the renderer facility.
 
+Jinja2 Filters
+-------------------
+
+``pyramid_jinja2`` provides two filters.
+
+
+.. currentmodule:: pyramid_jinja2.filters
+.. autofunction:: model_url_filter
+.. autofunction:: route_url_filter
+
+To use these filters, configure the settings of ``jinja2.filters``:
+
+.. code-block:: ini
+ :linenos:
+
+ [app:yourapp]
+ # ... other stuff ...
+ jinja2.filters =
+     model_url = pyramid_jinja2.filters:model_url_filter
+     route_url = pyramid_jinja2.filters:route_url_filter
+
+And use the filters in template.
+
+.. code-block:: html
+
+ <a href="{{context|model_url('edit')}}">Edit</a>
+
+ <a href="{{'top'|route_url}}">Top</a>
+
 Installation
 ------------
 
