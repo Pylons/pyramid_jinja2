@@ -23,6 +23,11 @@ Features
 - Add ``model_url`` and ``route_url`` filter implementations (and
   documented).
 
+Documentation
+-------------
+
+- Use Makefile which pulls in Pylons theme automagically.
+
 0.3 (2010-11-26)
 ================
 
