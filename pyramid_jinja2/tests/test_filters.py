@@ -2,7 +2,6 @@
 
 import unittest
 from jinja2 import Environment
-from pyramid.configuration import Configurator
 
 class DummyRequest(object):
     application_url = ''
@@ -19,7 +18,8 @@ class Test_model_url_filter(unittest.TestCase):
         self.environment = Environment()
         from pyramid_jinja2.filters import model_url_filter
         self.environment.filters['model_url'] = model_url_filter
-        self.config = Configurator()
+        from pyramid.config import Configurator
+        self.config = Configurator(autocommit=True)
         self.config.begin(request=DummyRequest())
 
     def tearDown(self):
@@ -45,7 +45,8 @@ class Test_route_url_filter(unittest.TestCase):
         self.environment = Environment()
         from pyramid_jinja2.filters import route_url_filter
         self.environment.filters['route_url'] = route_url_filter
-        self.config = Configurator()
+        from pyramid.config import Configurator
+        self.config = Configurator(autocommit=True)
         self.config.begin(request=DummyRequest())
         self.config.add_route('dummy_route1', '/dummy/')
         self.config.add_route('dummy_route2', '/dummy/:name/')
