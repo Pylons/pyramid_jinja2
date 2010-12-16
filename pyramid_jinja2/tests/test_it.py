@@ -1,6 +1,7 @@
 ## come on python gimme some of that sweet, sweet -*- coding: utf-8 -*-
 
 import unittest
+from pyramid import testing
 
 def dummy_filter(value): return 'hoge'
 
@@ -51,15 +52,13 @@ class Test_parse_filters(unittest.TestCase):
 
 class Base(object):
     def setUp(self):
-        from pyramid.configuration import Configurator
-        self.config = Configurator()
-        self.config.begin()
+        self.config = testing.setUp()
         import os
         here = os.path.abspath(os.path.dirname(__file__))
         self.templates_dir = os.path.join(here, 'templates')
 
     def tearDown(self):
-        self.config.end()
+        testing.tearDown()
 
 class Test_renderer_factory(Base, unittest.TestCase):
     def _callFUT(self, info):
@@ -235,16 +234,15 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     def setUp(self):
         import pyramid_jinja2
-        from pyramid.configuration import Configurator
-        self.config = Configurator()
-        self.config.begin()
-        self.config.add_settings({'jinja2.directories':
-                                  'pyramid_jinja2.tests:templates'})
-        self.config.add_renderer('.jinja2',
-                                 pyramid_jinja2.renderer_factory)
+        config = testing.setUp()
+        config.add_settings({'jinja2.directories':
+                             'pyramid_jinja2.tests:templates'})
+        config.add_renderer('.jinja2',
+                            pyramid_jinja2.renderer_factory)
 
     def tearDown(self):
-        self.config.end()
+        testing.tearDown()
+        
 
     def test_render(self):
         from pyramid.renderers import render

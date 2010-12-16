@@ -1,9 +1,24 @@
 Next release
-------------
+============
 
+Paster Template
+---------------
+
+- Changes to normalize with default templates shipping with Pyramid core:
+  remove calls to ``config.begin()`` and ``config.end()`` from
+  ``__init__.main``, entry point name changed to ``main``, entry
+  ``__init__.py`` function name changed to ``main``, depend on WebError, use
+  ``paster_plugins`` argument to setup function in setup.py, depend on
+  Pyramid 1.0a6+ (use ``config`` rather than ``configurator``).
+
+Tests
+-----
+
+- Use ``testing.setUp`` and ``testing.tearDown`` rather than constructing a
+  Configurator (better fwd compat).
 
 0.3 (2010-11-26)
-----------------
+================
 
 - Add ``jinja2.filters`` and ``jinja2.extensions`` settings (thanks to
   aodag).
@@ -11,13 +26,13 @@ Next release
 - Document all known settings.
 
 0.2 (2010-11-06)
-----------------
+================
 
 - Template autoreloading did not function, even if ``reload_templates`` was
   set to ``True``.
 
 0.1 (2010-11-05)
-----------------
+================
 
 - First release.  *Not* backwards compatible with ``repoze.bfg.jinja2``: we
   use a filesystem loader (the directories to load from come from the
