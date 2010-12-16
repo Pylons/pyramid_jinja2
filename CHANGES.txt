@@ -17,6 +17,12 @@ Tests
 - Use ``testing.setUp`` and ``testing.tearDown`` rather than constructing a
   Configurator (better fwd compat).
 
+Features
+--------
+
+- Add ``model_url`` and ``route_url`` filter implementations (and
+  documented).
+
 0.3 (2010-11-26)
 ================
 
