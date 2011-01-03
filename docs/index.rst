@@ -15,8 +15,13 @@ active.  Both are completely equivalent.
 
     <include package="pyramid_jinja2"/>
 
-#) Call the ``add_renderer`` method of a Configurator in your
-   application during configuration::
+#) Use the ``includeme`` function via ``config.include``::
+
+    import pyramid_jinja2
+    config.include(pyramid_jinja2.includeme)
+
+You can also drive the oxcart by hand instead of either of the above two
+ways::
 
     from pyramid_jinja2 import renderer_factory
     config.add_renderer('.jinja2', renderer_factory)
@@ -168,7 +173,7 @@ Creating a Jinja2 ``Pyramid`` Project
 After you've got ``pyramid_jinja2`` installed, you can invoke the following
 command to create a Jinja2-based Pyramid project::
 
-  $ paster create -t bin/paster pyramid_jinja2_starter
+  $ paster create -t pyramid_jinja2_starter
 
 This is a good way to see a working Pyramid application that uses Jinja2, even
 if you wind up not using the result.

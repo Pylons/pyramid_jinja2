@@ -249,6 +249,16 @@ class TestIntegration(unittest.TestCase):
         result = render('helloworld.jinja2', {'a':1})
         self.assertEqual(result, u'\nHello föö')
 
+class Test_includeme(unittest.TestCase):
+    def test_it(self):
+        from pyramid.interfaces import IRendererFactory
+        from pyramid_jinja2 import includeme
+        from pyramid_jinja2 import renderer_factory
+        config = testing.setUp()
+        includeme(config)
+        utility = config.registry.getUtility(IRendererFactory, name='.jinja2')
+        self.assertEqual(utility, renderer_factory)
+
 class DummyEnvironment(object):
     def get_template(self, path):
         self.path = path

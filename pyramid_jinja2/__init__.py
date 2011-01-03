@@ -103,3 +103,6 @@ class Jinja2TemplateRenderer(object):
         return result
 
 
+def includeme(config):
+    config.add_renderer('.jinja2', renderer_factory)
+    
