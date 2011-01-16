@@ -9,6 +9,7 @@ from pyramid.interfaces import ITemplateRenderer
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.resource import abspath_from_resource_spec
+from pyramid.i18n import get_localizer
 
 class IJinja2Environment(Interface):
     pass
@@ -51,6 +52,7 @@ def parse_extensions(extensions):
         extensions = splitlines(extensions)
     return [ maybe_import_string(x) for x in extensions ]
 
+
 def renderer_factory(info):
     registry = info.registry
     settings = info.settings
@@ -86,9 +88,13 @@ class Jinja2TemplateRenderer(object):
     def __init__(self, info, environment):
         self.info = info
         self.environment = environment
+        self.jinja2_i18n_ext = self._check_i18n()
  
     def implementation(self):
         return self.template
+
+    def _check_i18n(self):
+       return 'jinja2.ext.i18n' in self.info.settings.get('jinja2.extensions','')
 
     @property
     def template(self):
@@ -99,6 +105,9 @@ class Jinja2TemplateRenderer(object):
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
+        if self.jinja2_i18n_ext:
+            localizer = get_localizer(system['request'])
+            self.environment.install_gettext_translations(localizer.translations, newstyle=True)
         result = self.template.render(system)
         return result
 
