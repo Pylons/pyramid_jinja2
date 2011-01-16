@@ -80,21 +80,18 @@ def renderer_factory(info):
                                   extensions=extensions)
         environment.filters.update(filters)
         registry.registerUtility(environment, IJinja2Environment)
-    return Jinja2TemplateRenderer(info, environment)
+    return Jinja2TemplateRenderer(info, environment, 'jinja2.ext.i18n' in settings.get('jinja2.extensions',''))
 
 class Jinja2TemplateRenderer(object):
     implements(ITemplateRenderer)
     template = None
-    def __init__(self, info, environment):
+    def __init__(self, info, environment, i18n_enabled=False):
         self.info = info
         self.environment = environment
-        self.jinja2_i18n_ext = self._check_i18n()
+        self.jinja2_i18n_ext = i18n_enabled
  
     def implementation(self):
         return self.template
-
-    def _check_i18n(self):
-       return 'jinja2.ext.i18n' in self.info.settings.get('jinja2.extensions','')
 
     @property
     def template(self):

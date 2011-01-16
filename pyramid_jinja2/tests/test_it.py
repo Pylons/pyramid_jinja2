@@ -186,11 +186,7 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
     def test_instance_implements_ITemplate(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import ITemplateRenderer
-        info = DummyRendererInfo({
-            'name':'name',
-            'settings':{},
-            })
-        verifyObject(ITemplateRenderer, self._makeOne(info, None))
+        verifyObject(ITemplateRenderer, self._makeOne(None, None))
 
     def test_class_implements_ITemplate(self):
         from zope.interface.verify import verifyClass
@@ -201,7 +197,6 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
             'name':'name',
-            'settings':{},
             })
         instance = self._makeOne(info, environ)
         result = instance({}, {'system':1})
@@ -212,7 +207,6 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
             'name':'name',
-            'settings':{}
             })
         instance = self._makeOne(info, environ)
         result = instance({}, {'context':1})
@@ -224,7 +218,6 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
             'name':'name',
-            'settings':{}
             })
         instance = self._makeOne(info, environ)
         self.assertRaises(ValueError, instance, None, {'context':1})
@@ -233,7 +226,6 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
             'name':'name',
-            'settings':{}
             })
         instance = self._makeOne(info, environ)
         result = instance.implementation().render({})
