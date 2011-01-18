@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'pyramid_jinja2'
-copyright = '2010, Agendaless Consulting <chrism@plope.com>'
+copyright = '2011, Agendaless Consulting <chrism@plope.com>'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -87,7 +87,7 @@ today_fmt = '%B %d, %Y'
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+#pygments_style = 'sphinx'
 
 
 # Options for HTML output
@@ -96,7 +96,7 @@ pygments_style = 'sphinx'
 # Add and use Pylons theme
 sys.path.append(os.path.abspath('_themes'))
 html_theme_path = ['_themes']
-html_theme = 'pylons'
+html_theme = 'pyramid'
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
@@ -124,7 +124,7 @@ html_theme = 'pylons'
 # here, relative to this directory. They are copied after the builtin
 # static files, so a file named "default.css" will overwrite the builtin
 # "default.css".
-html_static_path = ['.static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page
 # bottom, using the given strftime format.
