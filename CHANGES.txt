@@ -1,5 +1,5 @@
-Next release
-============
+0.5 (2011-01-18)
+================
 
 - Add ``includeme`` function (meant to be used via ``config.include``).
 

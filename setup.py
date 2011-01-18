@@ -12,8 +12,6 @@
 #
 ##############################################################################
 
-__version__ = '0.0'
-
 import os
 
 from setuptools import setup, find_packages
@@ -23,7 +21,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 setup(name='pyramid_jinja2',
-      version=__version__,
+      version='0.5',
       description='Jinja2 template bindings for the Pyramid web framework',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
