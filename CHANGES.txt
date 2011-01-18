@@ -6,6 +6,8 @@ Next release
 - Fix documentation bug related to ``paster create`` reported at
   https://github.com/Pylons/pyramid_jinja2/issues#issue/12
 
+- Depend upon Pyramid 1.0a10 + (to make ZCML work).
+
 0.4 (2010-12-16)
 ================
 

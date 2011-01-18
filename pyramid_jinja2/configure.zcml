@@ -1,6 +1,6 @@
 <configure xmlns="http://pylonshq.com/pyramid">
 
-  <include package="pyramid.includes" file="meta.zcml" />
+  <include package="pyramid_zcml" file="meta.zcml" />
 
   <renderer
      factory="pyramid_jinja2.renderer_factory"

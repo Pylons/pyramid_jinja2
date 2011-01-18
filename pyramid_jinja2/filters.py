@@ -1,4 +1,4 @@
-from pyramid.url import model_url, route_url
+from pyramid.url import resource_url, route_url
 from pyramid.threadlocal import get_current_request
 
 __all__ = [
@@ -8,10 +8,10 @@ __all__ = [
 
 def model_url_filter(model, *elements, **kw):
     """A filter from ``model`` to a string representing the absolute URL.
-    this filter call `pyramid.url.model_url`.
+    this filter call `pyramid.url.resource_url`.
     """
     request = get_current_request()
-    return model_url(model, request, *elements, **kw)
+    return resource_url(model, request, *elements, **kw)
 
 def route_url_filter(route_name, *elements, **kw):
     """A filter from ``route_name`` to a string representing the absolute URL.

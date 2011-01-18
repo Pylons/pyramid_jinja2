@@ -18,7 +18,7 @@ active.  Both are completely equivalent.
 #) Use the ``includeme`` function via ``config.include``::
 
     import pyramid_jinja2
-    config.include(pyramid_jinja2.includeme)
+    config.include('pyramid_jinja2')
 
 You can also drive the oxcart by hand instead of either of the above two
 ways::
