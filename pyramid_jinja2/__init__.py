@@ -10,6 +10,7 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.exceptions import ConfigurationError
 from pyramid.resource import abspath_from_resource_spec
 
+
 class IJinja2Environment(Interface):
     pass
 
@@ -26,13 +27,16 @@ def asbool(obj):
                 "String is not true/false: %r" % obj)
     return bool(obj)
 
+
 def maybe_import_string(val):
     if isinstance(val, basestring):
         return import_string(val.strip())
     return val
 
+
 def splitlines(s):
     return filter(None, [x.strip() for x in s.splitlines()])
+
 
 def parse_filters(filters):
     # input must be a string or dict
@@ -46,10 +50,12 @@ def parse_filters(filters):
             result[name] = maybe_import_string(impl)
     return result
 
+
 def parse_extensions(extensions):
     if isinstance(extensions, basestring):
         extensions = splitlines(extensions)
-    return [ maybe_import_string(x) for x in extensions ]
+    return [maybe_import_string(x) for x in extensions]
+
 
 def renderer_factory(info):
     registry = info.registry
@@ -63,11 +69,11 @@ def renderer_factory(info):
         extensions = settings.get('jinja2.extensions', '')
         filters = settings.get('jinja2.filters', '')
         if directories is None:
-            raise ConfigurationError(
-                'Jinja2 template used without a ``jinja2.directories`` setting')
+            raise ConfigurationError('Jinja2 template used without a '
+                                     '``jinja2.directories`` setting')
         if isinstance(directories, basestring):
             directories = splitlines(directories)
-        directories = [ abspath_from_resource_spec(d) for d in directories ]
+        directories = [abspath_from_resource_spec(d) for d in directories]
         loader = FileSystemLoader(directories, encoding=input_encoding)
         autoescape = asbool(autoescape)
         extensions = parse_extensions(extensions)
@@ -80,20 +86,22 @@ def renderer_factory(info):
         registry.registerUtility(environment, IJinja2Environment)
     return Jinja2TemplateRenderer(info, environment)
 
+
 class Jinja2TemplateRenderer(object):
     implements(ITemplateRenderer)
     template = None
+
     def __init__(self, info, environment):
         self.info = info
         self.environment = environment
- 
+
     def implementation(self):
         return self.template
 
     @property
     def template(self):
         return self.environment.get_template(self.info.name)
-   
+
     def __call__(self, value, system):
         try:
             system.update(value)
@@ -105,4 +113,3 @@ class Jinja2TemplateRenderer(object):
 
 def includeme(config):
     config.add_renderer('.jinja2', renderer_factory)
-    

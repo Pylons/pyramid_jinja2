@@ -23,7 +23,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 setup(name='pyramid_jinja2',
       version='0.5',
       description='Jinja2 template bindings for the Pyramid web framework',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
@@ -38,12 +38,11 @@ setup(name='pyramid_jinja2',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      tests_require = ['pyramid>=1.0a10', 'pyramid_zcml', 'Jinja2'],
+      tests_require=['pyramid>=1.0a10', 'pyramid_zcml', 'Jinja2'],
       install_requires=['pyramid>=1.0a10', 'pyramid_zcml', 'Jinja2'],
       test_suite="pyramid_jinja2",
-      entry_points = """\
+      entry_points="""
         [paste.paster_create_template]
         pyramid_jinja2_starter=pyramid_jinja2.paster:Jinja2ProjectTemplate
       """
       )
-

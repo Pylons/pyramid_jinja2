@@ -17,7 +17,8 @@
 # make it absolute, like shown here.
 #sys.path.append(os.path.abspath('some/directory'))
 
-import sys, os
+import sys
+import os
 
 parent = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(os.path.abspath(parent))
