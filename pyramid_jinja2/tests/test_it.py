@@ -255,6 +255,7 @@ class Test_includeme(unittest.TestCase):
         from pyramid_jinja2 import includeme
         from pyramid_jinja2 import renderer_factory
         config = testing.setUp()
+        config.registry.settings['jinja2.directories'] = 'foobar'
         includeme(config)
         utility = config.registry.getUtility(IRendererFactory, name='.jinja2')
         self.assertEqual(utility, renderer_factory)

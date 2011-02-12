@@ -57,9 +57,7 @@ def parse_extensions(extensions):
     return [maybe_import_string(x) for x in extensions]
 
 
-def renderer_factory(info):
-    registry = info.registry
-    settings = info.settings
+def _ensure_environment(settings, registry):
     environment = registry.queryUtility(IJinja2Environment)
     if environment is None:
         reload_templates = settings.get('reload_templates', False)
@@ -68,7 +66,7 @@ def renderer_factory(info):
         autoescape = settings.get('jinja2.autoescape', True)
         extensions = settings.get('jinja2.extensions', '')
         filters = settings.get('jinja2.filters', '')
-        if directories is None:
+        if directories is None or directories.strip() == '':
             raise ConfigurationError('Jinja2 template used without a '
                                      '``jinja2.directories`` setting')
         if isinstance(directories, basestring):
@@ -84,6 +82,11 @@ def renderer_factory(info):
                                   extensions=extensions)
         environment.filters.update(filters)
         registry.registerUtility(environment, IJinja2Environment)
+    return environment
+
+
+def renderer_factory(info):
+    environment = _ensure_environment(info.settings, info.registry)
     return Jinja2TemplateRenderer(info, environment)
 
 
@@ -113,3 +116,4 @@ class Jinja2TemplateRenderer(object):
 
 def includeme(config):
     config.add_renderer('.jinja2', renderer_factory)
+    _ensure_environment(config.registry.settings, config.registry)
