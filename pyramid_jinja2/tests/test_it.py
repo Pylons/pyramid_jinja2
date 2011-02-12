@@ -255,10 +255,29 @@ class Test_includeme(unittest.TestCase):
         from pyramid_jinja2 import includeme
         from pyramid_jinja2 import renderer_factory
         config = testing.setUp()
-        config.registry.settings['jinja2.directories'] = 'foobar'
+        config.registry.settings['jinja2.directories'] = '/foobar'
         includeme(config)
         utility = config.registry.getUtility(IRendererFactory, name='.jinja2')
         self.assertEqual(utility, renderer_factory)
+
+
+class Test_add_jinja2_assetdirs(unittest.TestCase):
+    def test_it(self):
+        from pyramid_jinja2 import add_jinja2_assetdirs
+        from pyramid_jinja2 import includeme
+        from pyramid_jinja2 import IJinja2Environment
+        import os
+        config = testing.setUp()
+        config.registry.settings['jinja2.directories'] = 'foobar'
+        includeme(config)
+        utility = config.registry.getUtility(IJinja2Environment)
+        self.assertEqual([x.split(os.sep)[-1]
+                          for x in utility.loader.searchpath], ['foobar'])
+        add_jinja2_assetdirs(config, 'grrr')
+        self.assertEqual([x.split(os.sep)[-1]
+                          for x in utility.loader.searchpath],
+                         ['foobar', 'grrr'])
+
 
 class DummyEnvironment(object):
     def get_template(self, path):

@@ -61,11 +61,11 @@ def _ensure_environment(settings, registry):
     environment = registry.queryUtility(IJinja2Environment)
     if environment is None:
         reload_templates = settings.get('reload_templates', False)
-        directories = settings.get('jinja2.directories')
         input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
         autoescape = settings.get('jinja2.autoescape', True)
         extensions = settings.get('jinja2.extensions', '')
         filters = settings.get('jinja2.filters', '')
+        directories = settings.get('jinja2.directories')
         if directories is None or directories.strip() == '':
             raise ConfigurationError('Jinja2 template used without a '
                                      '``jinja2.directories`` setting')
@@ -112,6 +112,17 @@ class Jinja2TemplateRenderer(object):
             raise ValueError('renderer was passed non-dictionary as value')
         result = self.template.render(system)
         return result
+
+
+def add_jinja2_assetdirs(config_or_registry, assetdirs):
+    registry = config_or_registry
+    if hasattr(registry, 'registry'):
+        registry = registry.registry
+    env = _ensure_environment(registry.settings, registry)
+    if isinstance(assetdirs, basestring):
+        assetdirs = [assetdirs]
+    for d in assetdirs:
+        env.loader.searchpath.append(abspath_from_resource_spec(d))
 
 
 def includeme(config):
