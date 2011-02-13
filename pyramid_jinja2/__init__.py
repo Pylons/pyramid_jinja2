@@ -70,16 +70,17 @@ def directory_loader_factory(settings):
     return loader
 
 
-def get_or_build_default_environment(settings, registry):
+def _get_or_build_default_environment(registry):
     environment = registry.queryUtility(IJinja2Environment)
     if environment is not None:
         return environment
 
-    _setup_environments(settings, registry)
+    _setup_environments(registry)
     return registry.queryUtility(IJinja2Environment)
 
 
-def _setup_environments(settings, registry):
+def _setup_environments(registry):
+    settings = registry.settings
     reload_templates = settings.get('reload_templates', False)
     autoescape = settings.get('jinja2.autoescape', True)
     extensions = settings.get('jinja2.extensions', '')
@@ -96,8 +97,7 @@ def _setup_environments(settings, registry):
 
 
 def renderer_factory(info):
-    environment = get_or_build_default_environment(
-        info.settings, info.registry)
+    environment = _get_or_build_default_environment(info.registry)
     return Jinja2TemplateRenderer(info, environment)
 
 
@@ -125,19 +125,16 @@ class Jinja2TemplateRenderer(object):
         return result
 
 
-def add_jinja2_assetdirs(config_or_registry, assetdirs):
-    registry = config_or_registry
-    if hasattr(registry, 'registry'):
-        registry = registry.registry
-    env = get_or_build_default_environment(
-        registry.settings, registry)
-    if isinstance(assetdirs, basestring):
-        assetdirs = [assetdirs]
-    for d in assetdirs:
+def _add_jinja2_search_path(config, searchpath):
+    registry = config.registry
+    env = _get_or_build_default_environment(registry)
+    if isinstance(searchpath, basestring):
+        searchpath = [x.strip() for x in searchpath.split('\n') if x.strip()]
+    for d in searchpath:
         env.loader.searchpath.append(abspath_from_resource_spec(d))
 
 
 def includeme(config):
+    _get_or_build_default_environment(config.registry)
     config.add_renderer('.jinja2', renderer_factory)
-    get_or_build_default_environment(
-        config.registry.settings, config.registry)
+    config.add_directive('add_jinja2_search_path', _add_jinja2_search_path)

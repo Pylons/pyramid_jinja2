@@ -59,6 +59,7 @@ class Base(object):
 
     def tearDown(self):
         testing.tearDown()
+        del self.config
 
 class Test_renderer_factory(Base, unittest.TestCase):
     def _callFUT(self, info):
@@ -68,21 +69,20 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_no_directories(self):
         from pyramid.exceptions import ConfigurationError
         info = DummyRendererInfo({
-            'name':'helloworld.jinja2',
-            'package':None,
-            'registry':self.config.registry,
-            'settings':{},
+            'name': 'helloworld.jinja2',
+            'package': None,
+            'registry': self.config.registry,
             })
         self.assertRaises(ConfigurationError, self._callFUT, info)
 
     def test_no_environment(self):
         from pyramid_jinja2 import IJinja2Environment
-        settings = {'jinja2.directories':self.templates_dir}
+        self.config.registry.settings.update(
+            {'jinja2.directories': self.templates_dir})
         info = DummyRendererInfo({
-            'name':'helloworld.jinja2',
-            'package':None,
-            'registry':self.config.registry,
-            'settings':settings,
+            'name': 'helloworld.jinja2',
+            'package': None,
+            'registry': self.config.registry,
             })
         renderer = self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
@@ -93,12 +93,11 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_composite_directories_path(self):
         from pyramid_jinja2 import IJinja2Environment
         twice = self.templates_dir + '\n' + self.templates_dir
-        settings = {'jinja2.directories':twice}
+        self.config.registry.settings['jinja2.directories'] = twice
         info = DummyRendererInfo({
-            'name':'helloworld.jinja2',
-            'package':None,
-            'registry':self.config.registry,
-            'settings':settings,
+            'name': 'helloworld.jinja2',
+            'package': None,
+            'registry': self.config.registry,
             })
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
@@ -109,10 +108,9 @@ class Test_renderer_factory(Base, unittest.TestCase):
         environ = dict()
         self.config.registry.registerUtility(environ, IJinja2Environment)
         info = DummyRendererInfo({
-            'name':'helloworld.jinja2',
-            'package':None,
-            'registry':self.config.registry,
-            'settings':{},
+            'name': 'helloworld.jinja2',
+            'package': None,
+            'registry': self.config.registry,
             })
         renderer = self._callFUT(info)
         self.assertEqual(renderer.environment, environ)
@@ -123,13 +121,13 @@ class Test_renderer_factory(Base, unittest.TestCase):
 
         def dummy_filter(value): return 'hoge'
 
-        settings = {'jinja2.directories':self.templates_dir,
-            'jinja2.filters':{'dummy':dummy_filter}}
+        self.config.registry.settings.update(
+            {'jinja2.directories' :self.templates_dir,
+             'jinja2.filters': {'dummy':dummy_filter}})
         info = DummyRendererInfo({
-            'name':'helloworld.jinja2',
-            'package':None,
-            'registry':self.config.registry,
-            'settings':settings,
+            'name': 'helloworld.jinja2',
+            'package': None,
+            'registry': self.config.registry,
             })
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
@@ -138,14 +136,13 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_with_filters_string(self):
         from pyramid_jinja2 import IJinja2Environment
 
-
-        settings = {'jinja2.directories':self.templates_dir,
-            'jinja2.filters':'dummy=pyramid_jinja2.tests.test_it:dummy_filter'}
+        self.config.registry.settings.update(
+            {'jinja2.directories': self.templates_dir,
+             'jinja2.filters': 'dummy=pyramid_jinja2.tests.test_it:dummy_filter'})
         info = DummyRendererInfo({
-            'name':'helloworld.jinja2',
-            'package':None,
-            'registry':self.config.registry,
-            'settings':settings,
+            'name': 'helloworld.jinja2',
+            'package': None,
+            'registry': self.config.registry,
             })
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
@@ -153,15 +150,15 @@ class Test_renderer_factory(Base, unittest.TestCase):
 
     def test_with_extension(self):
         from pyramid_jinja2 import IJinja2Environment
-        settings = {'jinja2.directories':self.templates_dir,
-                    'jinja2.extensions':"""
+        self.config.registry.settings.update(
+            {'jinja2.directories': self.templates_dir,
+             'jinja2.extensions': """
                     pyramid_jinja2.tests.extensions.TestExtension
-                    """}
+                    """})
         info = DummyRendererInfo({
-            'name':'helloworld.jinja2',
-            'package':None,
-            'registry':self.config.registry,
-            'settings':settings,
+            'name': 'helloworld.jinja2',
+            'package': None,
+            'registry': self.config.registry,
             })
         renderer = self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
@@ -263,7 +260,6 @@ class Test_includeme(unittest.TestCase):
 
 class Test_add_jinja2_assetdirs(unittest.TestCase):
     def test_it(self):
-        from pyramid_jinja2 import add_jinja2_assetdirs
         from pyramid_jinja2 import includeme
         from pyramid_jinja2 import IJinja2Environment
         import os
@@ -273,7 +269,7 @@ class Test_add_jinja2_assetdirs(unittest.TestCase):
         utility = config.registry.getUtility(IJinja2Environment)
         self.assertEqual([x.split(os.sep)[-1]
                           for x in utility.loader.searchpath], ['foobar'])
-        add_jinja2_assetdirs(config, 'grrr')
+        config.add_jinja2_search_path('grrr')
         self.assertEqual([x.split(os.sep)[-1]
                           for x in utility.loader.searchpath],
                          ['foobar', 'grrr'])
@@ -287,8 +283,10 @@ class DummyEnvironment(object):
     def render(self, values):
         self.values = values
         return u'result'
-        
+
+
 class DummyRendererInfo(object):
     def __init__(self, kw):
         self.__dict__.update(kw)
-        
+        if 'registry' in self.__dict__:
+            self.settings = self.registry.settings
