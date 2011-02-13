@@ -57,36 +57,47 @@ def parse_extensions(extensions):
     return [maybe_import_string(x) for x in extensions]
 
 
-def _ensure_environment(settings, registry):
+def directory_loader_factory(settings):
+    input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
+    directories = settings.get('jinja2.directories')
+    if directories is None or directories.strip() == '':
+        raise ConfigurationError('Jinja2 template used without a '
+                                 '``jinja2.directories`` setting')
+    if isinstance(directories, basestring):
+        directories = splitlines(directories)
+    directories = [abspath_from_resource_spec(d) for d in directories]
+    loader = FileSystemLoader(directories, encoding=input_encoding)
+    return loader
+
+
+def get_or_build_default_environment(settings, registry):
     environment = registry.queryUtility(IJinja2Environment)
-    if environment is None:
-        reload_templates = settings.get('reload_templates', False)
-        input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
-        autoescape = settings.get('jinja2.autoescape', True)
-        extensions = settings.get('jinja2.extensions', '')
-        filters = settings.get('jinja2.filters', '')
-        directories = settings.get('jinja2.directories')
-        if directories is None or directories.strip() == '':
-            raise ConfigurationError('Jinja2 template used without a '
-                                     '``jinja2.directories`` setting')
-        if isinstance(directories, basestring):
-            directories = splitlines(directories)
-        directories = [abspath_from_resource_spec(d) for d in directories]
-        loader = FileSystemLoader(directories, encoding=input_encoding)
-        autoescape = asbool(autoescape)
-        extensions = parse_extensions(extensions)
-        filters = parse_filters(filters)
-        environment = Environment(loader=loader,
-                                  auto_reload=reload_templates,
-                                  autoescape=autoescape,
-                                  extensions=extensions)
-        environment.filters.update(filters)
-        registry.registerUtility(environment, IJinja2Environment)
-    return environment
+    if environment is not None:
+        return environment
+
+    _setup_environments(settings, registry)
+    return registry.queryUtility(IJinja2Environment)
+
+
+def _setup_environments(settings, registry):
+    reload_templates = settings.get('reload_templates', False)
+    autoescape = settings.get('jinja2.autoescape', True)
+    extensions = settings.get('jinja2.extensions', '')
+    filters = settings.get('jinja2.filters', '')
+    autoescape = asbool(autoescape)
+    extensions = parse_extensions(extensions)
+    filters = parse_filters(filters)
+    environment = Environment(loader=directory_loader_factory(settings),
+                              auto_reload=reload_templates,
+                              autoescape=autoescape,
+                              extensions=extensions)
+    environment.filters.update(filters)
+    registry.registerUtility(environment, IJinja2Environment)
 
 
 def renderer_factory(info):
-    environment = _ensure_environment(info.settings, info.registry)
+    environment = get_or_build_default_environment(
+        info.settings, info.registry)
     return Jinja2TemplateRenderer(info, environment)
 
 
@@ -118,7 +129,8 @@ def add_jinja2_assetdirs(config_or_registry, assetdirs):
     registry = config_or_registry
     if hasattr(registry, 'registry'):
         registry = registry.registry
-    env = _ensure_environment(registry.settings, registry)
+    env = get_or_build_default_environment(
+        registry.settings, registry)
     if isinstance(assetdirs, basestring):
         assetdirs = [assetdirs]
     for d in assetdirs:
@@ -127,4 +139,5 @@ def add_jinja2_assetdirs(config_or_registry, assetdirs):
 
 def includeme(config):
     config.add_renderer('.jinja2', renderer_factory)
-    _ensure_environment(config.registry.settings, config.registry)
+    get_or_build_default_environment(
+        config.registry.settings, config.registry)
