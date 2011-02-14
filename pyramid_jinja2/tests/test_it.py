@@ -275,6 +275,46 @@ class Test_add_jinja2_assetdirs(unittest.TestCase):
                          ['foobar', 'grrr'])
 
 
+class TestSmartAssetSpecLoader(unittest.TestCase):
+
+    def test_list_templates(self):
+        from pyramid_jinja2 import SmartAssetSpecLoader
+        loader = SmartAssetSpecLoader()
+        self.assertRaises(TypeError, loader.list_templates)
+
+    def test_get_source(self):
+        from pyramid_jinja2 import SmartAssetSpecLoader
+        from jinja2.exceptions import TemplateNotFound
+
+        loader = SmartAssetSpecLoader()
+
+        def get():
+            return loader.get_source(None, 'asset:foobar.jinja2')
+        self.assertRaises(TemplateNotFound, get)
+        asset = 'asset:pyramid_jinja2.tests:templates/helloworld.jinja2'
+        loader.get_source(None, asset)
+
+
+class TestFileInfo(unittest.TestCase):
+
+    def test_mtime(self):
+        from pyramid_jinja2 import FileInfo
+        from pyramid.asset import abspath_from_asset_spec
+
+        filename = abspath_from_asset_spec('templates/helloworld.jinja2',
+                                           'pyramid_jinja2.tests')
+
+        fi = FileInfo(filename)
+        assert '_mtime' not in fi.__dict__
+        assert fi.mtime is not None
+        assert fi.mtime == fi._mtime
+
+    def test_uptodate(self):
+        from pyramid_jinja2 import FileInfo
+        fi = FileInfo('foobar')
+        assert fi.uptodate() is False
+
+
 class DummyEnvironment(object):
     def get_template(self, path):
         self.path = path

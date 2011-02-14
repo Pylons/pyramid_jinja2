@@ -1,13 +1,22 @@
-from zope.interface import implements
-from zope.interface import Interface
+import os
 
-from jinja2.loaders import FileSystemLoader
-from jinja2.utils import import_string
+from zope.interface import (
+    implements,
+    Interface,
+    )
+
 from jinja2 import Environment
+from jinja2.exceptions import TemplateNotFound
+from jinja2.loaders import FileSystemLoader
+from jinja2.utils import (
+    import_string,
+    open_if_exists
+    )
 
-from pyramid.interfaces import ITemplateRenderer
-
+from pyramid.asset import abspath_from_asset_spec
 from pyramid.exceptions import ConfigurationError
+from pyramid.interfaces import ITemplateRenderer
+from pyramid.path import caller_package
 from pyramid.resource import abspath_from_resource_spec
 
 
@@ -57,6 +66,70 @@ def parse_extensions(extensions):
     return [maybe_import_string(x) for x in extensions]
 
 
+class FileInfo(object):
+
+    def __init__(self, filename, encoding='utf-8'):
+        self.filename = filename
+        self.encoding = encoding
+
+    def _delay_init(self):
+        if '_mtime' in self.__dict__:
+            return
+
+        f = open_if_exists(self.filename)
+        if f is None:
+            raise TemplateNotFound(self.filename)
+        self._mtime = os.path.getmtime(self.filename)
+        try:
+            self._contents = f.read().decode(self.encoding)
+        finally:
+            f.close()
+
+    @property
+    def contents(self):
+        self._delay_init()
+        return self._contents
+
+    @property
+    def mtime(self):
+        self._delay_init()
+        return self._mtime
+
+    def uptodate(self):
+        try:
+            return os.path.getmtime(self.filename) == self.mtime
+        except OSError:
+            return False
+
+
+def lookup_asset(asset_spec):
+    package = caller_package()
+    pname = None
+    if package is not None:
+        pname = package.__name__
+    return abspath_from_asset_spec(asset_spec, pname)
+
+
+class SmartAssetSpecLoader(FileSystemLoader):
+
+    def __init__(self, searchpath=(), encoding='utf-8'):
+        FileSystemLoader.__init__(self, searchpath, encoding)
+
+    def list_templates(self):
+        raise TypeError('this loader cannot iterate over all templates')
+
+    def _get_asset_source(self, environment, template):
+        filename = lookup_asset(template)
+        fileinfo = FileInfo(filename, self.encoding)
+        return fileinfo.contents, fileinfo.filename, fileinfo.uptodate
+
+    def get_source(self, environment, template):
+        if template.startswith('asset:'):
+            newtemplate = template.split(':', 1)[1]
+            return self._get_asset_source(environment, newtemplate)
+        return FileSystemLoader.get_source(self, environment, template)
+
+
 def directory_loader_factory(settings):
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
     directories = settings.get('jinja2.directories')
@@ -66,7 +139,7 @@ def directory_loader_factory(settings):
     if isinstance(directories, basestring):
         directories = splitlines(directories)
     directories = [abspath_from_resource_spec(d) for d in directories]
-    loader = FileSystemLoader(directories, encoding=input_encoding)
+    loader = SmartAssetSpecLoader(directories, encoding=input_encoding)
     return loader
 
 
@@ -75,11 +148,11 @@ def _get_or_build_default_environment(registry):
     if environment is not None:
         return environment
 
-    _setup_environments(registry)
+    _setup_environment(registry)
     return registry.queryUtility(IJinja2Environment)
 
 
-def _setup_environments(registry):
+def _setup_environment(registry):
     settings = registry.settings
     reload_templates = settings.get('reload_templates', False)
     autoescape = settings.get('jinja2.autoescape', True)
