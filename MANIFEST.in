@@ -1,0 +1,3 @@
+recursive-include pyramid_jinja2 *.*_tmpl *.jinja2 *.ico *.png *.py
+recursive-include docs *.css Makefile *.gif *.rst *.py *.gitignore
+include *.txt
