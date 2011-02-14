@@ -1,3 +1,9 @@
+0.6 (unreleased)
+================
+
+- Add new directive ``add_jinja2_search_path`` to the configurator
+  when ``includeme`` is used.
+
 0.5 (2011-01-18)
 ================
 
