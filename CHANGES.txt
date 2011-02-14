@@ -1,6 +1,9 @@
 0.6 (unreleased)
 ================
 
+- Updated paster template to more closely relate to changes made
+  to paster templmates in Pyramid core.
+
 - Add new directive ``add_jinja2_search_path`` to the configurator
   when ``includeme`` is used.
 
