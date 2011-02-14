@@ -4,3 +4,4 @@ env26/
 *.pyc
 .coverage
 dist/
+*~
