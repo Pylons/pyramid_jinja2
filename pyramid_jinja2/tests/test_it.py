@@ -73,7 +73,8 @@ class Test_renderer_factory(Base, unittest.TestCase):
             'package': None,
             'registry': self.config.registry,
             })
-        self.assertRaises(ConfigurationError, self._callFUT, info)
+        renderer = self._callFUT(info)
+        self.assertRaises(ConfigurationError, lambda: renderer({}, {}))
 
     def test_no_environment(self):
         from pyramid_jinja2 import IJinja2Environment

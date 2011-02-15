@@ -130,15 +130,15 @@ class SmartAssetSpecLoader(FileSystemLoader):
         if template.startswith('asset:'):
             newtemplate = template.split(':', 1)[1]
             return self._get_asset_source(environment, newtemplate)
+        if not self.searchpath:
+            raise ConfigurationError('Jinja2 template used without a '
+                                     '``jinja2.directories`` setting')
         return FileSystemLoader.get_source(self, environment, template)
 
 
 def directory_loader_factory(settings):
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
-    directories = settings.get('jinja2.directories')
-    if directories is None or directories.strip() == '':
-        raise ConfigurationError('Jinja2 template used without a '
-                                 '``jinja2.directories`` setting')
+    directories = settings.get('jinja2.directories') or ''
     if isinstance(directories, basestring):
         directories = splitlines(directories)
     directories = [abspath_from_resource_spec(d) for d in directories]
