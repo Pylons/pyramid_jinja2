@@ -1,52 +1,129 @@
+==============
 pyramid_jinja2
 ==============
 
-``pyramid_jinja2`` is a set of bindings that make templates written for the
+Overview
+========
+
+:term:`pyramid_jinja2` is a set of bindings that make templates written for the
 :term:`Jinja2` templating system work under the :term:`Pyramid` web framework.
 
-Activating the Extension
-------------------------
+Installation
+============
 
-There are two ways to make sure that the ``pyramid_jinja2`` extension is
-active.  Both are completely equivalent.
+Install using setuptools, e.g. (within a virtualenv)::
+
+  $ easy_install pyramid_jinja2
+
+Setup
+=====
+
+There are two ways to make sure that ``pyramid_jinja2`` is active.  Both
+are completely equivalent:
+
+#) Use the ``includeme`` function via ``config.include``::
+
+    config.include('pyramid_jinja2')
 
 #) Ensure that some ZCML file with an analogue of the following
    contents is executed by your Pyramid application::
 
     <include package="pyramid_jinja2"/>
 
-#) Use the ``includeme`` function via ``config.include``::
+Once activated either of these says, the following happens:
 
-    import pyramid_jinja2
-    config.include('pyramid_jinja2')
+#) Files with the ``.jinja2`` extension are considered to be
+   :term:`Jinja2` templates.
 
-You can also drive the oxcart by hand instead of either of the above two
-ways::
+#) The ``add_jinja2_search_path`` method/directive is added to
+   the :term:`configurator` instance. 
 
-    from pyramid_jinja2 import renderer_factory
-    config.add_renderer('.jinja2', renderer_factory)
+Usage
+=====
+
+Once :term:`pyramid_jinja2` been activated ``.jinja2`` templates
+can be loaded either by looking up names that would be found on
+the :term:`Jinja2` search path or by looking up asset specifications.
+
+Template Lookups
+----------------
+
+The default lookup mechanism for templates uses the :term:`Jinja2`
+search path (specified with ``jinja2.directories``.
+
+
+Rendering :term:`Jinja2` templates with a view like this is typically
+done as follows (where the ``templates`` directory is expected to
+live in the search path):
+
+.. code-block:: python
+ :linenos:
+
+ from pyramid.view import view_config
  
-In either case, files with the ``.jinja2`` extension are now considered to be
-Jinja2 templates.
+ @view_config(renderer='templates/mytemplate.jinja2')
+ def myview(request):
+     return {'foo':1, 'bar':2}
 
-Once the extension is active, add the following to the application section of
-your Pyramid application's ``.ini`` file:
+Rendering templates outside of a view (and without a request) can be
+done using the renderer api:
 
-.. code-block:: ini
-   :linenos:
+.. code-block:: python
+ :linenos:
 
-   [app:yourapp]
-   # ... other stuff ...
-   jinja2.directories = myapp:templates
-                        anotherpackage:templates
+ from pyramid.renderers import render_to_response
+ render_to_response('templates/mytemplate.jinja2', {'foo':1, 'bar':2})
 
-This configures the set of directories searched by Jinja.  The portion of each
-directory argument before the colon is a package name.  The remainder is a
-subpath within the package which houses Jinja2 templates.  Adding more than one
-directory forms a search path.
+:term:`Template Inheritance`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:term:`Template inheritance` can use asset specs in the same manner as regular
+template lookups.  An example:
+
+.. code-block:: html+django
+ :linenos:
+
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+ <!-- templates/layout.jinja2 -->
+
+ <html lang="en">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+   <link rel="stylesheet" href="style.css" />
+ </head>
+ <body>
+   <div id="content">{% block content %}{% endblock %}</div>
+ </body>
+
+.. code-block:: html+django
+ :linenos:
+
+ <!-- templates/root.jinja2 -->
+ {% extends "templates/layout.jinja2" %}
+ {% block content %}
+ <h1>Yes</h1>
+ <p>
+   Some random paragraph.
+ </p>
+ {% endblock %}
+
+For further information on :term:`template inheritance` in Jinja2
+templates please see http://jinja.pocoo.org/docs/templates/#template-inheritance.
+
+Asset Specification Lookups
+---------------------------
+
+Looking up templates via asset specification is a feature specific
+to :term:`Pyramid`.  For further info please see `Understanding
+Asset Specifications
+<http://docs.pylonsproject.org/projects/pyramid/1.0/narr/assets.html#understanding-asset-specifications>`_.
+The difference with asset lookups here is that all asset lookups must
+be prefixed with ``asset:``.  Overriding templates in this style
+uses the standard `pyramid asset overriding technique
+<http://docs.pylonsproject.org/projects/pyramid/1.0/narr/assets.html#overriding-assets>`_.
 
 Settings
---------
+========
 
 Jinja2 derives additional settings to configure its template renderer. Many
 of these settings are optional and only need to be set if they should be
@@ -87,52 +164,9 @@ jinja2.filters
   string with each line in the format ``name = dotted.name.to.filter``
   representing Jinja2 filters.
 
-High-Level API
---------------
-
-Once the extension is configured, to use Jinja2 templates, use any of the three
-Pyramid renderer-related functions : ``pyramid.renderers.get_renderer``,
-``pyramid.renderers.render``, or ``pyramid.renderers.render_to_response``.
-
-From within a Pyramid view function, you might do::
-
-  from webob import Response
-
-  from pyramid.renderers import get_renderer
-  template = get_renderer('foo.jinja2')
-  return Response(template.render(foo=1))
-
-Or::
-
-  from pyramid.renderers import render
-  s = render_template('foo.jinja2', {'foo':1})
-  return Response(s)
-
-Or::
-
-  from pyramid.renderers import render_to_response
-  return render_to_response('foo.jinja2', {'foo':1})
-
-All of these examples are equivalent.  The first argument passed in to each of
-``get_renderer``, ``render_template``, or ``render_to_response`` represents the
-template location.  It can be either a full system file path, or can be a file
-path relative to one of the directories named by ``jinja2.directories``.
-
-``pyramid_jinja2`` can also act as a "renderer" for a view when its
-``configure.zcml`` file is included within the Pyramid application you're
-developing::
-
-  from pyramid.view import view_config
-
-  @view_config(renderer='foo.jinja2')
-  def aview(request):
-      return {'foo':1}
-
-See the generated ``pyramid_jinja2_starter`` paster template for an
-example of using the renderer facility.
 
 Jinja2 Filters
--------------------
+==============
 
 ``pyramid_jinja2`` provides two filters.
 
@@ -160,15 +194,8 @@ And use the filters in template.
 
  <a href="{{'top'|route_url}}">Top</a>
 
-Installation
-------------
-
-Install using setuptools, e.g. (within a virtualenv)::
-
-  $ easy_install pyramid_jinja2
-
 Creating a Jinja2 ``Pyramid`` Project
-----------------------------------------
+=====================================
 
 After you've got ``pyramid_jinja2`` installed, you can invoke the following
 command to create a Jinja2-based Pyramid project::
@@ -178,8 +205,17 @@ command to create a Jinja2-based Pyramid project::
 This is a good way to see a working Pyramid application that uses Jinja2, even
 if you wind up not using the result.
 
+More Information
+================
+
+.. toctree::
+ :maxdepth: 1
+
+ api.rst
+ glossary.rst
+
 Reporting Bugs / Development Versions
--------------------------------------
+=====================================
 
 Visit http://github.com/Pylons/pyramid_jinja2 to download development or tagged
 versions.

@@ -111,6 +111,9 @@ def lookup_asset(asset_spec):
 
 
 class SmartAssetSpecLoader(FileSystemLoader):
+    '''A Jinja2 template loader that knows how to handle
+    asset specifications starting with the ``asset:`` prefix.
+    '''
 
     def __init__(self, searchpath=(), encoding='utf-8'):
         FileSystemLoader.__init__(self, searchpath, encoding)
@@ -175,6 +178,7 @@ def renderer_factory(info):
 
 
 class Jinja2TemplateRenderer(object):
+    '''Renderer for a jinja2 template'''
     implements(ITemplateRenderer)
     template = None
 
@@ -208,6 +212,7 @@ def _add_jinja2_search_path(config, searchpath):
 
 
 def includeme(config):
+    '''Setup standard configurator registrations.'''
     _get_or_build_default_environment(config.registry)
     config.add_renderer('.jinja2', renderer_factory)
     config.add_directive('add_jinja2_search_path', _add_jinja2_search_path)

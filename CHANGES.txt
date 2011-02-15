@@ -1,6 +1,8 @@
 0.6 (unreleased)
 ================
 
+- Documentation overhauled.
+
 - Templates can now be looked up by asset spec completely bypassing
   the search path by specifying a prefix of ``asset:``.
 
