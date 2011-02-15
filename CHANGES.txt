@@ -1,6 +1,9 @@
 0.6 (unreleased)
 ================
 
+- Templates can now be looked up by asset spec completely bypassing
+  the search path by specifying a prefix of ``asset:``.
+
 - Updated paster template to more closely relate to changes made
   to paster templmates in Pyramid core.
 
