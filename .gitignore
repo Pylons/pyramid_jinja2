@@ -5,3 +5,6 @@ env26/
 .coverage
 dist/
 *~
+.tox
+nosetests.xml
+pyramid_jinja2/coverage.xml
