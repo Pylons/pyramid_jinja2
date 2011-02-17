@@ -2,6 +2,7 @@ env26/
 *.egg
 *.egg-info
 *.pyc
+*$py.class
 .coverage
 dist/
 *~
