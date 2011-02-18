@@ -20,6 +20,12 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
+requires = [
+    'pyramid>=1.0a10',
+    'pyramid_zcml',
+    'Jinja2'
+]
+
 setup(name='pyramid_jinja2',
       version='0.6',
       description='Jinja2 template bindings for the Pyramid web framework',
@@ -38,8 +44,8 @@ setup(name='pyramid_jinja2',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      tests_require=['pyramid>=1.0a10', 'pyramid_zcml', 'Jinja2'],
-      install_requires=['pyramid>=1.0a10', 'pyramid_zcml', 'Jinja2'],
+      tests_require=requires + ['WebTest'],
+      install_requires=requires,
       test_suite="pyramid_jinja2",
       entry_points="""
         [paste.paster_create_template]

@@ -316,6 +316,40 @@ class TestFileInfo(unittest.TestCase):
         assert fi.uptodate() is False
 
 
+class TestJinja2SearchPathIntegration(unittest.TestCase):
+
+    def test_it(self):
+        from pyramid.config import Configurator
+        from pyramid_jinja2 import includeme
+        from webtest import TestApp
+        import os
+
+        here = os.path.abspath(os.path.dirname(__file__))
+        templates_dir = os.path.join(here, 'templates')
+
+        def myview(request):
+            return {}
+
+        config1 = Configurator(settings={
+                'jinja2.directories': os.path.join(templates_dir, 'foo')})
+        includeme(config1)
+        config1.add_view(view=myview, renderer='mytemplate.jinja2')
+        config2 = Configurator(settings={
+                'jinja2.directories': os.path.join(templates_dir, 'bar')})
+        includeme(config2)
+        config2.add_view(view=myview, renderer='mytemplate.jinja2')
+        self.assertNotEqual(config1.registry.settings,
+                            config2.registry.settings)
+
+        app1 = config1.make_wsgi_app()
+        testapp = TestApp(app1)
+        self.assertEqual(testapp.get('/').body, 'foo')
+
+        app2 = config2.make_wsgi_app()
+        testapp = TestApp(app2)
+        self.assertEqual(testapp.get('/').body, 'bar')
+
+
 class DummyEnvironment(object):
     def get_template(self, path):
         self.path = path
