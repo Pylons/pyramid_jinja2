@@ -4,8 +4,7 @@ import unittest
 from pyramid import testing
 
 
-def dummy_filter(value):
-    return 'hoge'
+def dummy_filter(value): return 'hoge'
 
 
 class Test_asbool(unittest.TestCase):
@@ -126,8 +125,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_with_filters_object(self):
         from pyramid_jinja2 import IJinja2Environment
 
-        def dummy_filter(value):
-            return 'hoge'
+        def dummy_filter(value): return 'hoge'
 
         self.config.registry.settings.update(
             {'jinja2.directories': self.templates_dir,
