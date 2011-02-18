@@ -3,7 +3,10 @@
 import unittest
 from pyramid import testing
 
-def dummy_filter(value): return 'hoge'
+
+def dummy_filter(value):
+    return 'hoge'
+
 
 class Test_asbool(unittest.TestCase):
     def _callFUT(self, value):
@@ -12,13 +15,14 @@ class Test_asbool(unittest.TestCase):
 
     def test_str_true(self):
         self.assertEqual(self._callFUT('true'), True)
-        
+
     def test_str_false(self):
         self.assertEqual(self._callFUT('false'), False)
 
     def test_str_unrecognized(self):
         self.assertRaises(ValueError, self._callFUT, '123')
-        
+
+
 class Test_parse_filters(unittest.TestCase):
     def _callFUT(self, value):
         from pyramid_jinja2 import parse_filters
@@ -27,28 +31,29 @@ class Test_parse_filters(unittest.TestCase):
     def test_parse_singile_line(self):
         import pyramid_jinja2
         self.assertEqual(self._callFUT('dummy=pyramid_jinja2'),
-                         {'dummy':pyramid_jinja2})
-        
+                         {'dummy': pyramid_jinja2})
+
     def test_parse_multi_line(self):
         import pyramid_jinja2
-        self.assertEqual(self._callFUT("""\
-            dummy =  pyramid_jinja2
-            dummy2 =pyramid_jinja2"""), 
-        {'dummy':pyramid_jinja2, 'dummy2':pyramid_jinja2})
+        self.assertEqual(self._callFUT("""
+            dummy = pyramid_jinja2
+            dummy2 = pyramid_jinja2"""),
+        {'dummy': pyramid_jinja2, 'dummy2': pyramid_jinja2})
 
     def test_parse_dict_stringvals(self):
         import pyramid_jinja2
         self.assertEqual(self._callFUT(
             {'dummy': 'pyramid_jinja2',
-             'dummy2': 'pyramid_jinja2'}), 
-        {'dummy':pyramid_jinja2, 'dummy2':pyramid_jinja2})
+             'dummy2': 'pyramid_jinja2'}),
+        {'dummy': pyramid_jinja2, 'dummy2': pyramid_jinja2})
 
     def test_parse_dict_objvals(self):
         import pyramid_jinja2
         self.assertEqual(self._callFUT(
             {'dummy': pyramid_jinja2,
-             'dummy2': pyramid_jinja2}), 
-        {'dummy':pyramid_jinja2, 'dummy2':pyramid_jinja2})
+             'dummy2': pyramid_jinja2}),
+        {'dummy': pyramid_jinja2, 'dummy2': pyramid_jinja2})
+
 
 class Base(object):
     def setUp(self):
@@ -60,6 +65,7 @@ class Base(object):
     def tearDown(self):
         testing.tearDown()
         del self.config
+
 
 class Test_renderer_factory(Base, unittest.TestCase):
     def _callFUT(self, info):
@@ -102,7 +108,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             })
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.loader.searchpath, [self.templates_dir]*2)
+        self.assertEqual(environ.loader.searchpath, [self.templates_dir] * 2)
 
     def test_with_environ(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -120,11 +126,12 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_with_filters_object(self):
         from pyramid_jinja2 import IJinja2Environment
 
-        def dummy_filter(value): return 'hoge'
+        def dummy_filter(value):
+            return 'hoge'
 
         self.config.registry.settings.update(
-            {'jinja2.directories' :self.templates_dir,
-             'jinja2.filters': {'dummy':dummy_filter}})
+            {'jinja2.directories': self.templates_dir,
+             'jinja2.filters': {'dummy': dummy_filter}})
         info = DummyRendererInfo({
             'name': 'helloworld.jinja2',
             'package': None,
@@ -137,9 +144,10 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_with_filters_string(self):
         from pyramid_jinja2 import IJinja2Environment
 
+        m = 'pyramid_jinja2.tests.test_it'
         self.config.registry.settings.update(
             {'jinja2.directories': self.templates_dir,
-             'jinja2.filters': 'dummy=pyramid_jinja2.tests.test_it:dummy_filter'})
+             'jinja2.filters': 'dummy=%s:dummy_filter' % m})
         info = DummyRendererInfo({
             'name': 'helloworld.jinja2',
             'package': None,
@@ -167,7 +175,8 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(renderer.info, info)
         self.assertEqual(renderer.environment, environ)
         import pyramid_jinja2.tests.extensions
-        ext=environ.extensions['pyramid_jinja2.tests.extensions.TestExtension']
+        ext = environ.extensions[
+            'pyramid_jinja2.tests.extensions.TestExtension']
         self.assertEqual(ext.__class__,
                          pyramid_jinja2.tests.extensions.TestExtension)
 
@@ -194,41 +203,42 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
     def test_call(self):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
-            'name':'name',
+            'name': 'name',
             })
         instance = self._makeOne(info, environ)
-        result = instance({}, {'system':1})
+        result = instance({}, {'system': 1})
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result, u'result')
 
     def test_call_with_system_context(self):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
-            'name':'name',
+            'name': 'name',
             })
         instance = self._makeOne(info, environ)
-        result = instance({}, {'context':1})
+        result = instance({}, {'context': 1})
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result, u'result')
-        self.assertEqual(environ.values, {'context':1})
+        self.assertEqual(environ.values, {'context': 1})
 
     def test_call_with_nondict_value(self):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
-            'name':'name',
+            'name': 'name',
             })
         instance = self._makeOne(info, environ)
-        self.assertRaises(ValueError, instance, None, {'context':1})
+        self.assertRaises(ValueError, instance, None, {'context': 1})
 
     def test_implementation(self):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
-            'name':'name',
+            'name': 'name',
             })
         instance = self._makeOne(info, environ)
         result = instance.implementation().render({})
         self.assertEqual(result, u'result')
-        
+
+
 class TestIntegration(unittest.TestCase):
     def setUp(self):
         import pyramid_jinja2
@@ -240,12 +250,12 @@ class TestIntegration(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        
 
     def test_render(self):
         from pyramid.renderers import render
-        result = render('helloworld.jinja2', {'a':1})
+        result = render('helloworld.jinja2', {'a': 1})
         self.assertEqual(result, u'\nHello föö')
+
 
 class Test_includeme(unittest.TestCase):
     def test_it(self):
