@@ -7,21 +7,6 @@ from pyramid import testing
 def dummy_filter(value): return 'hoge'
 
 
-class Test_asbool(unittest.TestCase):
-    def _callFUT(self, value):
-        from pyramid_jinja2 import asbool
-        return asbool(value)
-
-    def test_str_true(self):
-        self.assertEqual(self._callFUT('true'), True)
-
-    def test_str_false(self):
-        self.assertEqual(self._callFUT('false'), False)
-
-    def test_str_unrecognized(self):
-        self.assertRaises(ValueError, self._callFUT, '123')
-
-
 class Test_parse_filters(unittest.TestCase):
     def _callFUT(self, value):
         from pyramid_jinja2 import parse_filters

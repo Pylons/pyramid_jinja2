@@ -18,23 +18,11 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.path import caller_package
 from pyramid.resource import abspath_from_resource_spec
+from pyramid.settings import asbool
 
 
 class IJinja2Environment(Interface):
     pass
-
-
-def asbool(obj):
-    if isinstance(obj, (str, unicode)):
-        obj = obj.strip().lower()
-        if obj in ['true', 'yes', 'on', 'y', 't', '1']:
-            return True
-        elif obj in ['false', 'no', 'off', 'n', 'f', '0']:
-            return False
-        else:
-            raise ValueError(
-                "String is not true/false: %r" % obj)
-    return bool(obj)
 
 
 def maybe_import_string(val):
