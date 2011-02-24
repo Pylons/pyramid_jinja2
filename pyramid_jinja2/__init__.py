@@ -18,23 +18,11 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.path import caller_package
 from pyramid.resource import abspath_from_resource_spec
+from pyramid.settings import asbool
 
 
 class IJinja2Environment(Interface):
     pass
-
-
-def asbool(obj):
-    if isinstance(obj, (str, unicode)):
-        obj = obj.strip().lower()
-        if obj in ['true', 'yes', 'on', 'y', 't', '1']:
-            return True
-        elif obj in ['false', 'no', 'off', 'n', 'f', '0']:
-            return False
-        else:
-            raise ValueError(
-                "String is not true/false: %r" % obj)
-    return bool(obj)
 
 
 def maybe_import_string(val):
@@ -196,10 +184,10 @@ class Jinja2TemplateRenderer(object):
     def __call__(self, value, system):
         try:
             system.update(value)
-        except (TypeError, ValueError):
-            raise ValueError('renderer was passed non-dictionary as value')
-        result = self.template.render(system)
-        return result
+        except (TypeError, ValueError), ex:
+            raise ValueError('renderer was passed non-dictionary '
+                             'as value: %s' % str(ex))
+        return self.template.render(system)
 
 
 def _add_jinja2_search_path(config, searchpath):
