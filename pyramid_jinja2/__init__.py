@@ -1,4 +1,6 @@
+import inspect
 import os
+import sys
 
 from zope.interface import (
     implements,
@@ -16,7 +18,6 @@ from jinja2.utils import (
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import ITemplateRenderer
-from pyramid.path import caller_package
 from pyramid.resource import abspath_from_resource_spec
 from pyramid.settings import asbool
 
@@ -90,12 +91,25 @@ class FileInfo(object):
             return False
 
 
-def lookup_asset(asset_spec):
-    package = caller_package()
-    pname = None
-    if package is not None:
-        pname = package.__name__
-    return abspath_from_asset_spec(asset_spec, pname)
+def _caller_package(allowed=()):
+    f = None
+    for t in inspect.stack():
+        f = t[0]
+        if f.f_globals.get('__name__') not in allowed:
+            break
+
+    if f is None:
+        return None
+
+    pname = f.f_globals.get('__name__') or '__main__'
+    m = sys.modules[pname]
+    f = getattr(m, '__file__', '')
+    if (('__init__.py' in f) or ('__init__$py' in f)):  # empty at >>>
+        return m
+
+    pname = m.__name__.rsplit('.', 1)[0]
+
+    return sys.modules[pname]
 
 
 class SmartAssetSpecLoader(FileSystemLoader):
@@ -110,7 +124,10 @@ class SmartAssetSpecLoader(FileSystemLoader):
         raise TypeError('this loader cannot iterate over all templates')
 
     def _get_asset_source(self, environment, template):
-        filename = lookup_asset(template)
+        pname = None
+        if getattr(environment, '_default_package', None) is not None:
+            pname = environment._default_package
+        filename = abspath_from_asset_spec(template, pname)
         fileinfo = FileInfo(filename, self.encoding)
         return fileinfo.contents, fileinfo.filename, fileinfo.uptodate
 
@@ -156,6 +173,9 @@ def _setup_environment(registry):
                               auto_reload=reload_templates,
                               autoescape=autoescape,
                               extensions=extensions)
+    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
+    if package is not None:
+        environment._default_package = package.__name__
     environment.filters.update(filters)
     registry.registerUtility(environment, IJinja2Environment)
 
