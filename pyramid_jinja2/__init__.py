@@ -114,7 +114,7 @@ def _caller_package(allowed=()):
 
 class SmartAssetSpecLoader(FileSystemLoader):
     '''A Jinja2 template loader that knows how to handle
-    asset specifications starting with the ``asset:`` prefix.
+    asset specifications.
     '''
 
     def __init__(self, searchpath=(), encoding='utf-8'):
@@ -123,19 +123,27 @@ class SmartAssetSpecLoader(FileSystemLoader):
     def list_templates(self):
         raise TypeError('this loader cannot iterate over all templates')
 
-    def _get_asset_source(self, environment, template):
+    def _get_asset_source_fileinfo(self, environment, template):
         if getattr(environment, '_default_package', None) is not None:
             pname = environment._default_package
             filename = abspath_from_asset_spec(template, pname)
         else:
             filename = abspath_from_asset_spec(template)
         fileinfo = FileInfo(filename, self.encoding)
-        return fileinfo.contents, fileinfo.filename, fileinfo.uptodate
+        return fileinfo
 
     def get_source(self, environment, template):
+        # keep legacy asset: prefix checking that bypasses
+        # source path checking altogether
         if template.startswith('asset:'):
             newtemplate = template.split(':', 1)[1]
-            return self._get_asset_source(environment, newtemplate)
+            fi = self._get_asset_source_fileinfo(environment, newtemplate)
+            return fi.contents, fi.filename, fi.uptodate
+
+        fi = self._get_asset_source_fileinfo(environment, template)
+        if os.path.isfile(fi.filename):
+            return fi.contents, fi.filename, fi.uptodate
+
         if not self.searchpath:
             raise ConfigurationError('Jinja2 template used without a '
                                      '``jinja2.directories`` setting')

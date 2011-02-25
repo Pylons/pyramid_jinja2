@@ -1,6 +1,9 @@
 0.6.1 (unreleased)
 ==================
 
+- Asset-based loading now takes precedance and does not require
+  "asset:" prefix
+
 - Fixed the "current" package mechanism of asset: loading so that
   it more accurately finds the current package
 

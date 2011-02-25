@@ -282,11 +282,21 @@ class TestSmartAssetSpecLoader(unittest.TestCase):
 
         loader = SmartAssetSpecLoader()
 
-        def get():
-            return loader.get_source(None, 'asset:foobar.jinja2')
-        self.assertRaises(TemplateNotFound, get)
+        self.assertRaises(TemplateNotFound,
+                          loader.get_source, None, 'asset:foobar.jinja2')
         asset = 'asset:pyramid_jinja2.tests:templates/helloworld.jinja2'
-        loader.get_source(None, asset)
+        self.assertNotEqual(loader.get_source(None, asset), None)
+
+        # make sure new non-prefixed asset spec based loading works
+        asset = 'pyramid_jinja2.tests:templates/helloworld.jinja2'
+        self.assertNotEqual(loader.get_source(None, asset), None)
+
+        # make sure new non-prefixed asset spec based loading works
+        # without the leading package name
+        class MockEnv(object):
+            _default_package = 'pyramid_jinja2.tests'
+        asset = 'templates/helloworld.jinja2'
+        self.assertNotEqual(loader.get_source(MockEnv, asset), None)
 
 
 class TestFileInfo(unittest.TestCase):
