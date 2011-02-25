@@ -124,10 +124,11 @@ class SmartAssetSpecLoader(FileSystemLoader):
         raise TypeError('this loader cannot iterate over all templates')
 
     def _get_asset_source(self, environment, template):
-        pname = None
         if getattr(environment, '_default_package', None) is not None:
             pname = environment._default_package
-        filename = abspath_from_asset_spec(template, pname)
+            filename = abspath_from_asset_spec(template, pname)
+        else:
+            filename = abspath_from_asset_spec(template)
         fileinfo = FileInfo(filename, self.encoding)
         return fileinfo.contents, fileinfo.filename, fileinfo.uptodate
 
