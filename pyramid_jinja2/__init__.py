@@ -91,25 +91,30 @@ class FileInfo(object):
             return False
 
 
-def _caller_package(allowed=()):
-    f = None
-    for t in inspect.stack():
-        f = t[0]
-        if f.f_globals.get('__name__') not in allowed:
-            break
+class _PackageFinder(object):
+    inspect = staticmethod(inspect)
 
-    if f is None:
-        return None
+    def caller_package(self, allowed=()):
+        f = None
+        for t in self.inspect.stack():
+            f = t[0]
+            if f.f_globals.get('__name__') not in allowed:
+                break
 
-    pname = f.f_globals.get('__name__') or '__main__'
-    m = sys.modules[pname]
-    f = getattr(m, '__file__', '')
-    if (('__init__.py' in f) or ('__init__$py' in f)):  # empty at >>>
-        return m
+        if f is None:
+            return None
 
-    pname = m.__name__.rsplit('.', 1)[0]
+        pname = f.f_globals.get('__name__') or '__main__'
+        m = sys.modules[pname]
+        f = getattr(m, '__file__', '')
+        if (('__init__.py' in f) or ('__init__$py' in f)):  # empty at >>>
+            return m
 
-    return sys.modules[pname]
+        pname = m.__name__.rsplit('.', 1)[0]
+
+        return sys.modules[pname]
+
+_caller_package = _PackageFinder().caller_package
 
 
 class SmartAssetSpecLoader(FileSystemLoader):

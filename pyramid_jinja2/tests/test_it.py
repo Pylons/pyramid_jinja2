@@ -293,10 +293,9 @@ class TestSmartAssetSpecLoader(unittest.TestCase):
 
         # make sure new non-prefixed asset spec based loading works
         # without the leading package name
-        class MockEnv(object):
-            _default_package = 'pyramid_jinja2.tests'
         asset = 'templates/helloworld.jinja2'
-        self.assertNotEqual(loader.get_source(MockEnv, asset), None)
+        env = Mock(_default_package='pyramid_jinja2.tests')
+        self.assertNotEqual(loader.get_source(env, asset), None)
 
 
 class TestFileInfo(unittest.TestCase):
@@ -353,6 +352,26 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         self.assertEqual(testapp.get('/').body, 'bar')
 
 
+class TestPackageFinder(unittest.TestCase):
+
+    def test_caller_package(self):
+        from pyramid_jinja2 import _PackageFinder
+        pf = _PackageFinder()
+
+        class MockInspect(object):
+            def __init__(self, items=()):
+                self.items = items
+
+            def stack(self):
+                return self.items
+        pf.inspect = MockInspect()
+        self.assertEqual(pf.caller_package(), None)
+
+        import xml
+        pf.inspect.items = [(Mock(f_globals={'__name__': 'xml'}),)]
+        self.assertEqual(pf.caller_package(), xml)
+
+
 class DummyEnvironment(object):
     def get_template(self, path):
         self.path = path
@@ -368,3 +387,8 @@ class DummyRendererInfo(object):
         self.__dict__.update(kw)
         if 'registry' in self.__dict__:
             self.settings = self.registry.settings
+
+
+class Mock(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
