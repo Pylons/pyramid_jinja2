@@ -1,3 +1,8 @@
+0.6.2 (unreleased)
+==================
+
+- Fixed docs to indicate using asset: prefix is no longer necessary
+
 0.6.1 (2011-03-03)
 ==================
 

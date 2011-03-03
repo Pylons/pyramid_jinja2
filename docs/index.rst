@@ -117,9 +117,8 @@ Looking up templates via asset specification is a feature specific
 to :term:`Pyramid`.  For further info please see `Understanding
 Asset Specifications
 <http://docs.pylonsproject.org/projects/pyramid/1.0/narr/assets.html#understanding-asset-specifications>`_.
-The difference with asset lookups here is that all asset lookups must
-be prefixed with ``asset:``.  Overriding templates in this style
-uses the standard `pyramid asset overriding technique
+Overriding templates in this style uses the standard
+`pyramid asset overriding technique
 <http://docs.pylonsproject.org/projects/pyramid/1.0/narr/assets.html#overriding-assets>`_.
 
 Settings
