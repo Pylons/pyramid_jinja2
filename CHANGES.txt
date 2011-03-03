@@ -1,4 +1,4 @@
-0.6.1 (unreleased)
+0.6.1 (2011-03-03)
 ==================
 
 - Asset-based loading now takes precedance and does not require
