@@ -1,7 +1,8 @@
-0.6.2 (unreleased)
+0.6.2 (2011-04-06)
 ==================
 
-- ``jinja2.ext.i18n`` is now added by default
+- ``jinja2.ext.i18n`` is now added by default, see ``i18n.rst``
+  for details
 
 - Added ``add_jinja2_extension`` directive to the Configurator
 
