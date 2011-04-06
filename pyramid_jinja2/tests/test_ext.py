@@ -41,4 +41,5 @@ class TestI18n(Base, unittest.TestCase):
         self.config.add_translation_dirs('pyramid_jinja2.tests:locale/')
         self.request.locale_name = 'en'
         template = u.get_template('pyramid_jinja2.tests:templates/i18n.jinja2')
-        self.assertEqual(template.render(), '')
+        self.assertEqual(template.render(),
+                         u'some untranslated text here\nyay it worked!')

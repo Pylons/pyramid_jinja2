@@ -183,7 +183,6 @@ class GetTextHook(object):
         return i18n.get_localizer(get_current_request())
 
     def gettext(self, message):
-        import pdb; pdb.set_trace()
         return self.localizer.translate(message)
 
     def ngettext(self, singular, plural, n):
