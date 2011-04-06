@@ -2,6 +2,8 @@
 
 import unittest
 from pyramid import testing
+from pyramid_jinja2.tests.base import (
+    Base, DummyRendererInfo, DummyEnvironment, Mock)
 
 
 def dummy_filter(value): return 'hoge'
@@ -37,18 +39,6 @@ class Test_parse_filters(unittest.TestCase):
             {'dummy': pyramid_jinja2,
              'dummy2': pyramid_jinja2}),
         {'dummy': pyramid_jinja2, 'dummy2': pyramid_jinja2})
-
-
-class Base(object):
-    def setUp(self):
-        self.config = testing.setUp()
-        import os
-        here = os.path.abspath(os.path.dirname(__file__))
-        self.templates_dir = os.path.join(here, 'templates')
-
-    def tearDown(self):
-        testing.tearDown()
-        del self.config
 
 
 class Test_renderer_factory(Base, unittest.TestCase):
@@ -139,29 +129,6 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.filters['dummy'], dummy_filter)
-
-    def test_with_extension(self):
-        from pyramid_jinja2 import IJinja2Environment
-        self.config.registry.settings.update(
-            {'jinja2.directories': self.templates_dir,
-             'jinja2.extensions': """
-                    pyramid_jinja2.tests.extensions.TestExtension
-                    """})
-        info = DummyRendererInfo({
-            'name': 'helloworld.jinja2',
-            'package': None,
-            'registry': self.config.registry,
-            })
-        renderer = self._callFUT(info)
-        environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.loader.searchpath, [self.templates_dir])
-        self.assertEqual(renderer.info, info)
-        self.assertEqual(renderer.environment, environ)
-        import pyramid_jinja2.tests.extensions
-        ext = environ.extensions[
-            'pyramid_jinja2.tests.extensions.TestExtension']
-        self.assertEqual(ext.__class__,
-                         pyramid_jinja2.tests.extensions.TestExtension)
 
 
 class Jinja2TemplateRendererTests(Base, unittest.TestCase):
@@ -370,25 +337,3 @@ class TestPackageFinder(unittest.TestCase):
         import xml
         pf.inspect.items = [(Mock(f_globals={'__name__': 'xml'}),)]
         self.assertEqual(pf.caller_package(), xml)
-
-
-class DummyEnvironment(object):
-    def get_template(self, path):
-        self.path = path
-        return self
-
-    def render(self, values):
-        self.values = values
-        return u'result'
-
-
-class DummyRendererInfo(object):
-    def __init__(self, kw):
-        self.__dict__.update(kw)
-        if 'registry' in self.__dict__:
-            self.settings = self.registry.settings
-
-
-class Mock(object):
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)

@@ -52,7 +52,7 @@ def parse_filters(filters):
 def parse_extensions(extensions):
     if isinstance(extensions, basestring):
         extensions = splitlines(extensions)
-    return [maybe_import_string(x) for x in extensions]
+    return extensions
 
 
 class FileInfo(object):
@@ -176,17 +176,15 @@ def _get_or_build_default_environment(registry):
 
 def _setup_environment(registry):
     settings = registry.settings
-    reload_templates = settings.get('reload_templates', False)
-    autoescape = settings.get('jinja2.autoescape', True)
-    extensions = settings.get('jinja2.extensions', '')
-    filters = settings.get('jinja2.filters', '')
-    autoescape = asbool(autoescape)
-    extensions = parse_extensions(extensions)
-    filters = parse_filters(filters)
+    reload_templates = asbool(settings.get('reload_templates', False))
+    autoescape = asbool(settings.get('jinja2.autoescape', True))
+    extensions = parse_extensions(settings.get('jinja2.extensions', ''))
+    filters = parse_filters(settings.get('jinja2.filters', ''))
     environment = Environment(loader=directory_loader_factory(settings),
                               auto_reload=reload_templates,
                               autoescape=autoescape,
                               extensions=extensions)
+    environment.pyramid_jinja2_extensions = extensions
     package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
     if package is not None:
         environment._default_package = package.__name__
@@ -233,8 +231,25 @@ def _add_jinja2_search_path(config, searchpath):
         env.loader.searchpath.append(abspath_from_resource_spec(d))
 
 
+def _add_jinja2_extension(config, ext):
+    registry = config.registry
+    settings = registry.settings
+
+    settings['jinja2.extensions'] = parse_extensions(
+        settings.get('jinja2.extensions', ''))
+    lst = settings['jinja2.extensions']
+    if ext not in lst:
+        lst.append(ext)
+        environment = registry.queryUtility(IJinja2Environment)
+        if environment is not None:
+            registry.unregisterUtility(environment,
+                                       provided=IJinja2Environment)
+            _setup_environment(registry)
+
+
 def includeme(config):
     '''Setup standard configurator registrations.'''
-    _get_or_build_default_environment(config.registry)
     config.add_renderer('.jinja2', renderer_factory)
     config.add_directive('add_jinja2_search_path', _add_jinja2_search_path)
+    config.add_directive('add_jinja2_extension', _add_jinja2_extension)
+    _get_or_build_default_environment(config.registry)

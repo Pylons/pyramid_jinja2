@@ -1,6 +1,10 @@
 0.6.2 (unreleased)
 ==================
 
+- Added ``add_jinja2_extension`` directive to the Configurator
+
+- Updated jinja2.extensions parsing mechanism
+
 - Fixed docs to indicate using asset: prefix is no longer necessary
 
 0.6.1 (2011-03-03)
