@@ -210,8 +210,9 @@ More Information
 .. toctree::
  :maxdepth: 1
 
- api.rst
+ i18n.rst
  glossary.rst
+ api.rst
 
 Reporting Bugs / Development Versions
 =====================================
