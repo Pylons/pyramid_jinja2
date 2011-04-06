@@ -49,5 +49,5 @@ setup(name='pyramid_jinja2',
       entry_points="""
         [paste.paster_create_template]
         pyramid_jinja2_starter=pyramid_jinja2.paster:Jinja2ProjectTemplate
-      """
+      """,
       )

@@ -25,7 +25,8 @@ class Mock(object):
 
 class Base(object):
     def setUp(self):
-        self.config = testing.setUp()
+        self.request = testing.DummyRequest()
+        self.config = testing.setUp(request=self.request)
         import os
         here = os.path.abspath(os.path.dirname(__file__))
         self.templates_dir = os.path.join(here, 'templates')

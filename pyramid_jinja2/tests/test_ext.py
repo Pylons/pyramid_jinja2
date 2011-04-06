@@ -31,14 +31,14 @@ class Test_renderer_factory(Base, unittest.TestCase):
                          pyramid_jinja2.tests.extensions.TestExtension)
 
 
-class TestI18n(unittest.TestCase):
+class TestI18n(Base, unittest.TestCase):
 
     def test_it(self):
-        from pyramid.config import Configurator
         from pyramid_jinja2 import _get_or_build_default_environment
-
-        c = Configurator(settings={})
-        c.include('pyramid_jinja2')
-        c.add_jinja2_extension('jinja2.ext.i18n')
-        u = _get_or_build_default_environment(c.registry)
+        u = _get_or_build_default_environment(self.config.registry)
         self.assertTrue(hasattr(u, 'install_gettext_translations'))
+
+        self.config.add_translation_dirs('pyramid_jinja2.tests:locale/')
+        self.request.locale_name = 'en'
+        template = u.get_template('pyramid_jinja2.tests:templates/i18n.jinja2')
+        self.assertEqual(template.render(), '')

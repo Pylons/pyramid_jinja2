@@ -20,6 +20,8 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.resource import abspath_from_resource_spec
 from pyramid.settings import asbool
+from pyramid import i18n 
+from pyramid.threadlocal import get_current_request
 
 
 class IJinja2Environment(Interface):
@@ -174,6 +176,20 @@ def _get_or_build_default_environment(registry):
     return registry.queryUtility(IJinja2Environment)
 
 
+class GetTextHook(object):
+
+    @property
+    def localizer(self):
+        return i18n.get_localizer(get_current_request())
+
+    def gettext(self, message):
+        import pdb; pdb.set_trace()
+        return self.localizer.translate(message)
+
+    def ngettext(self, singular, plural, n):
+        return self.localizer.pluralize(singular, plural, n)
+
+
 def _setup_environment(registry):
     settings = registry.settings
     reload_templates = asbool(settings.get('reload_templates', False))
@@ -184,6 +200,8 @@ def _setup_environment(registry):
                               auto_reload=reload_templates,
                               autoescape=autoescape,
                               extensions=extensions)
+    hook = GetTextHook()
+    environment.install_gettext_callables(hook.gettext, hook.ngettext)
     environment.pyramid_jinja2_extensions = extensions
     package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
     if package is not None:
