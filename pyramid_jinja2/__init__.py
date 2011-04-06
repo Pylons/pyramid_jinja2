@@ -178,7 +178,7 @@ def _setup_environment(registry):
     settings = registry.settings
     reload_templates = asbool(settings.get('reload_templates', False))
     autoescape = asbool(settings.get('jinja2.autoescape', True))
-    extensions = parse_extensions(settings.get('jinja2.extensions', ''))
+    extensions = _get_extensions(registry)
     filters = parse_filters(settings.get('jinja2.filters', ''))
     environment = Environment(loader=directory_loader_factory(settings),
                               auto_reload=reload_templates,
@@ -233,11 +233,8 @@ def _add_jinja2_search_path(config, searchpath):
 
 def _add_jinja2_extension(config, ext):
     registry = config.registry
-    settings = registry.settings
 
-    settings['jinja2.extensions'] = parse_extensions(
-        settings.get('jinja2.extensions', ''))
-    lst = settings['jinja2.extensions']
+    lst = _get_extensions(config)
     if ext not in lst:
         lst.append(ext)
         environment = registry.queryUtility(IJinja2Environment)
@@ -245,6 +242,17 @@ def _add_jinja2_extension(config, ext):
             registry.unregisterUtility(environment,
                                        provided=IJinja2Environment)
             _setup_environment(registry)
+
+
+def _get_extensions(config_or_registry):
+    registry = getattr(config_or_registry, 'registry', config_or_registry)
+    settings = registry.settings
+    settings['jinja2.extensions'] = parse_extensions(
+        settings.get('jinja2.extensions', ''))
+    exts = settings['jinja2.extensions']
+    if 'jinja2.ext.i18n' not in exts:
+        exts.append('jinja2.ext.i18n')
+    return exts
 
 
 def includeme(config):

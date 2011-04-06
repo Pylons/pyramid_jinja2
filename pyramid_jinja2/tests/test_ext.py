@@ -39,9 +39,6 @@ class TestI18n(unittest.TestCase):
 
         c = Configurator(settings={})
         c.include('pyramid_jinja2')
-        u = _get_or_build_default_environment(c.registry)
-        self.assertFalse(hasattr(u, 'install_gettext_translations'))
-
         c.add_jinja2_extension('jinja2.ext.i18n')
         u = _get_or_build_default_environment(c.registry)
         self.assertTrue(hasattr(u, 'install_gettext_translations'))
