@@ -1,6 +1,8 @@
 0.6.2 (unreleased)
 ==================
 
+- ``jinja2.ext.i18n`` is now added by default
+
 - Added ``add_jinja2_extension`` directive to the Configurator
 
 - Updated jinja2.extensions parsing mechanism
