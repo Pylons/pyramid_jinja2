@@ -47,14 +47,14 @@ class Test_renderer_factory(Base, unittest.TestCase):
         return renderer_factory(info)
 
     def test_no_directories(self):
-        from pyramid.exceptions import ConfigurationError
+        from jinja2.exceptions import TemplateNotFound
         info = DummyRendererInfo({
             'name': 'helloworld.jinja2',
             'package': None,
             'registry': self.config.registry,
             })
         renderer = self._callFUT(info)
-        self.assertRaises(ConfigurationError, lambda: renderer({}, {}))
+        self.assertRaises(TemplateNotFound, lambda: renderer({}, {}))
 
     def test_no_environment(self):
         from pyramid_jinja2 import IJinja2Environment
