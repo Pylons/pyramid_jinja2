@@ -124,8 +124,9 @@ class SmartAssetSpecLoader(FileSystemLoader):
     asset specifications.
     '''
 
-    def __init__(self, searchpath=(), encoding='utf-8'):
+    def __init__(self, searchpath=(), encoding='utf-8', debug=False):
         FileSystemLoader.__init__(self, searchpath, encoding)
+        self.debug = debug
 
     def list_templates(self):
         raise TypeError('this loader cannot iterate over all templates')
@@ -151,10 +152,13 @@ class SmartAssetSpecLoader(FileSystemLoader):
         if os.path.isfile(fi.filename):
             return fi.contents, fi.filename, fi.uptodate
 
-        if not self.searchpath:
-            raise ConfigurationError('Jinja2 template used without a '
-                                     '``jinja2.directories`` setting')
-        return FileSystemLoader.get_source(self, environment, template)
+        try:
+            return FileSystemLoader.get_source(self, environment, template)
+        except TemplateNotFound, ex:
+            message = ex.message
+            message += ('; asset=%s; searchpath=%r'
+                        % (fi.filename, self.searchpath))
+            raise TemplateNotFound(name=ex.name, message=message)
 
 
 def directory_loader_factory(settings):
@@ -163,7 +167,9 @@ def directory_loader_factory(settings):
     if isinstance(directories, basestring):
         directories = splitlines(directories)
     directories = [abspath_from_resource_spec(d) for d in directories]
-    loader = SmartAssetSpecLoader(directories, encoding=input_encoding)
+    loader = SmartAssetSpecLoader(
+        directories, encoding=input_encoding,
+        debug=asbool(settings.get('debug_templates', False)))
     return loader
 
 
