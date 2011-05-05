@@ -43,7 +43,7 @@ setup(name='pyramid_jinja2',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=['pyramid>=1.0a10', 'Jinja2'],
+      install_requires=['pyramid>=1.0a10', 'Jinja2>=2.5.0'],
       tests_require=requires + ['WebTest'],
       test_suite="pyramid_jinja2",
       entry_points="""
