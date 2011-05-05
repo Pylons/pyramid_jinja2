@@ -22,7 +22,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'pyramid>=1.0',
-    'Jinja2'
+    'Jinja2>=2.5.0'
 ]
 
 setup(name='pyramid_jinja2',
