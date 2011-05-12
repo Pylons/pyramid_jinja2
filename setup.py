@@ -25,6 +25,12 @@ requires = [
     'Jinja2>=2.5.0'
 ]
 
+try:
+    import wsgiref
+except ImportError:
+    requires.append('wsgiref')
+
+
 setup(name='pyramid_jinja2',
       version='0.6.3',
       description='Jinja2 template bindings for the Pyramid web framework',
