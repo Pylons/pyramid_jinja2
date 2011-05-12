@@ -5,6 +5,12 @@
 
 - Paster template now sets up starter locale pot/po/mo files
 
+- pyramid_jinja2 now depends on Jinja2 >= 2.5.0 due to
+  ``jinja2.Environment.install_gettext_callables`` use
+  https://github.com/Pylons/pyramid_jinja2/pull/21
+
+- Added demo app just to visualize i18n work
+
 0.6.2 (2011-04-06)
 ==================
 
