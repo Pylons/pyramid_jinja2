@@ -86,16 +86,21 @@ class FileInfo(object):
         if f is None:
             raise TemplateNotFound(self.filename)
         self._mtime = self.getmtime(self.filename)
+
+        data = ''
         try:
-            self._contents = f.read().decode(self.encoding)
+            data = f.read()
+        finally:
+            f.close()
+
+        try:
+            self._contents = data.decode(self.encoding)
         except UnicodeDecodeError, orig:
             trace = sys.exc_info()[2]
             ex = TemplateRenderingError(
                 self.filename,
                 'problem handling unicode decoding: ' + str(orig))
             raise ex, None, trace
-        finally:
-            f.close()
 
     @property
     def contents(self):
