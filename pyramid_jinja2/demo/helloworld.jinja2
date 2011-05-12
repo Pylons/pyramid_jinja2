@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Demo App</title>
+  <style>
+    body { font-family: Ubuntu, Verdana, Arial, Helvetica, Sans-Serif; }
+    legend { font-weight: bold; }
+    dt { font-weight: bold; }
+    dd { margin-bottom: 0.4em; }
+  </style>
+</head>
+<body>
+  <fieldset>
+    <legend>Metadata</legend>
+    <dl>
+      <dt>Locale Name</dt>
+      <dd>{{ locale_name }}</dd>
+    </dl>
+  </fieldset>
+
+  <fieldset>
+    <legend>I18N Demo</legend>
+    <dl>
+      <dt>No Translation (english)</dt> 
+      <dd>Hello World</dd>
+      <dt>Translated using Pyramid directly</dt>
+      <dd>{{pyramid_translated}}</dd>
+      <dt>Translated using Jinja2</dt>
+      <dd>{% trans %}Hello World{% endtrans %}</dd>
+    </dl>
+  </fildset>
+</body>
+</html>
