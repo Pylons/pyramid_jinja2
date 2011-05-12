@@ -1,5 +1,5 @@
-0.6.3 (unreleased)
-==================
+1.0 (unreleased)
+================
 
 - Message domain can now be specified with *jinja2.i18n.domain* for i18n
 

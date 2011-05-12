@@ -32,7 +32,7 @@ except ImportError:
 
 
 setup(name='pyramid_jinja2',
-      version='0.6.3',
+      version='1.0',
       description='Jinja2 template bindings for the Pyramid web framework',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -42,7 +42,7 @@ setup(name='pyramid_jinja2',
         "License :: Repoze Public License",
         ],
       keywords='web wsgi pylons pyramid',
-      author="Chris McDonough, Agendaless Consulting",
+      author="Rocky Burt",
       author_email="pylons-discuss@googlegroups.com",
       url="https://github.com/Pylons/pyramid_jinja2",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
