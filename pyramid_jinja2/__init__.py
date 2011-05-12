@@ -16,11 +16,10 @@ from jinja2.utils import (
     )
 
 from pyramid.asset import abspath_from_asset_spec
-from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.resource import abspath_from_resource_spec
 from pyramid.settings import asbool
-from pyramid import i18n 
+from pyramid import i18n
 from pyramid.threadlocal import get_current_request
 
 
@@ -72,6 +71,9 @@ def parse_extensions(extensions):
 
 class FileInfo(object):
 
+    open_if_exists = staticmethod(open_if_exists)
+    getmtime = staticmethod(os.path.getmtime)
+
     def __init__(self, filename, encoding='utf-8'):
         self.filename = filename
         self.encoding = encoding
@@ -80,10 +82,10 @@ class FileInfo(object):
         if '_mtime' in self.__dict__:
             return
 
-        f = open_if_exists(self.filename)
+        f = self.open_if_exists(self.filename)
         if f is None:
             raise TemplateNotFound(self.filename)
-        self._mtime = os.path.getmtime(self.filename)
+        self._mtime = self.getmtime(self.filename)
         try:
             self._contents = f.read().decode(self.encoding)
         except UnicodeDecodeError, orig:

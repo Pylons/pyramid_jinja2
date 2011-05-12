@@ -131,6 +131,14 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(environ.filters['dummy'], dummy_filter)
 
 
+class TemplateRenderingErrorTests(unittest.TestCase):
+
+    def test_it(self):
+        from pyramid_jinja2 import TemplateRenderingError
+        error = TemplateRenderingError('foobar.jinja2', 'random message')
+        self.assertEqual(str(error), 'foobar.jinja2: random message')
+
+
 class Jinja2TemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid_jinja2 import Jinja2TemplateRenderer
@@ -284,6 +292,52 @@ class TestFileInfo(unittest.TestCase):
         fi = FileInfo('foobar')
         assert fi.uptodate() is False
 
+    def test_delay_init(self):
+        from StringIO import StringIO
+        from pyramid_jinja2 import FileInfo, TemplateRenderingError
+
+        class MyFileInfo(FileInfo):
+            filename = 'foo.jinja2'
+
+            def __init__(self, data):
+                self.data = data
+                FileInfo.__init__(self, self.filename)
+
+            def open_if_exists(self, fname):
+                return StringIO(self.data)
+
+            def getmtime(self, fname):
+                return 1
+
+        mi = MyFileInfo(u'nothing good here, move along')
+        mi._delay_init()
+        self.assertEqual(mi._contents, mi.data)
+
+        mi = MyFileInfo('nothing good her\xe9, move along')
+        self.assertRaises(TemplateRenderingError, mi._delay_init)
+
+
+class GetTextWrapperTests(unittest.TestCase):
+
+    def test_it(self):
+        from pyramid_jinja2 import GetTextWrapper
+
+        class MyGetTextWrapper(GetTextWrapper):
+            class localizer:
+                @staticmethod
+                def translate(s, domain):
+                    return s
+
+                @staticmethod
+                def pluralize(s1, s2, n, domain):
+                    return s2
+
+            def __init__(self):
+                GetTextWrapper.__init__(self, 'messages')
+
+        self.assertEqual(MyGetTextWrapper().gettext('foo'), 'foo')
+        self.assertEqual(MyGetTextWrapper().ngettext('foo', 'foos', 3), 'foos')
+
 
 class TestJinja2SearchPathIntegration(unittest.TestCase):
 
@@ -337,3 +391,21 @@ class TestPackageFinder(unittest.TestCase):
         import xml
         pf.inspect.items = [(Mock(f_globals={'__name__': 'xml'}),)]
         self.assertEqual(pf.caller_package(), xml)
+
+
+class MiscTests(Base, unittest.TestCase):
+
+    def test_add_jinja2_extension(self):
+        from pyramid_jinja2 import _add_jinja2_extension, _get_or_build_default_environment
+        self.config.include('pyramid_jinja2')
+
+        class MockExt(object):
+            identifier = 'foobar'
+
+            def __init__(self, x):
+                self.x = x
+
+        _add_jinja2_extension(self.config, MockExt)
+
+        u = _get_or_build_default_environment(self.config.registry)
+        self.assertTrue('foobar' in u.extensions)
