@@ -204,6 +204,32 @@ command to create a Jinja2-based Pyramid project::
 This is a good way to see a working Pyramid application that uses Jinja2, even
 if you wind up not using the result.
 
+.. code-block:: shell
+ :linenos:
+
+ # make sure Babel is installed
+ easy_install Babel 
+
+ # extract translatable strings from *.jinja2 / *.py
+ python setup.py extract_messages
+ python setup.py update_catalog
+
+ # Translate strings in <mypackage>/locale/<mylocale>/LC_MESSAGES/<myproject>.po
+ # and re-compile *.po files
+ python setup.py compile_catalog
+
+
+Paster Template I18N
+--------------------
+
+The paster template automatically sets up pot/po/mo locale files for use
+with the generated project.
+
+The usual pattern for working with i18n in pyramid_jinja2 is as follows:
+
+
+
+
 More Information
 ================
 

@@ -11,8 +11,12 @@
 	<!--[if !IE 7]>
 	<style type="text/css">
 		#wrap {display:table;height:100%}
-	</style>
+    </style>
 	<![endif]-->
+    <style>
+        .locale { text-align: center; }
+        .locale-name { font-weight: bold; }
+    </style>
 </head>
 <body>
 	<div id="wrap">
@@ -29,6 +33,10 @@
 			</div>
 		</div>
 		<div id="bottom">
+          <div class="locale">
+            <h2>{% trans %}Hello!{% endtrans %}</h2>
+            <p>Request performed with <span class="locale-name">{{ request.locale_name }}</span> locale.</p> 
+          </div>
 			<div class="bottom">
 				<div id="left" class="align-right">
 					<h3>Search Pyramid documentation</h3>

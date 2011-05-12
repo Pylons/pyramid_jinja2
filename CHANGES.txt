@@ -1,3 +1,10 @@
+0.6.3 (unreleased)
+==================
+
+- Message domain can now be specified with *jinja2.i18n.domain* for i18n
+
+- Paster template now sets up starter locale pot/po/mo files
+
 0.6.2 (2011-04-06)
 ==================
 

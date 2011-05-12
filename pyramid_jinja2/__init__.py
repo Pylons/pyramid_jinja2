@@ -201,31 +201,37 @@ def _get_or_build_default_environment(registry):
     return registry.queryUtility(IJinja2Environment)
 
 
-class GetTextHook(object):
+class GetTextWrapper(object):
+
+    def __init__(self, domain):
+        self.domain = domain
 
     @property
     def localizer(self):
         return i18n.get_localizer(get_current_request())
 
     def gettext(self, message):
-        return self.localizer.translate(message)
+        return self.localizer.translate(message,
+                                        domain=self.domain)
 
     def ngettext(self, singular, plural, n):
-        return self.localizer.pluralize(singular, plural, n)
+        return self.localizer.pluralize(singular, plural, n,
+                                        domain=self.domain)
 
 
 def _setup_environment(registry):
     settings = registry.settings
     reload_templates = asbool(settings.get('reload_templates', False))
     autoescape = asbool(settings.get('jinja2.autoescape', True))
+    domain = settings.get('jinja2.i18n.domain', 'messages')
     extensions = _get_extensions(registry)
     filters = parse_filters(settings.get('jinja2.filters', ''))
     environment = Environment(loader=directory_loader_factory(settings),
                               auto_reload=reload_templates,
                               autoescape=autoescape,
                               extensions=extensions)
-    hook = GetTextHook()
-    environment.install_gettext_callables(hook.gettext, hook.ngettext)
+    wrapper = GetTextWrapper(domain=domain)
+    environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext)
     environment.pyramid_jinja2_extensions = extensions
     package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
     if package is not None:

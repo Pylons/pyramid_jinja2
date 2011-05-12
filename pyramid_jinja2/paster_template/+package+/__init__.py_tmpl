@@ -8,10 +8,16 @@ def main(global_config, **settings):
     It is usually called by the PasteDeploy framework during 
     ``paster serve``.
     """
+    settings = dict(settings)
+    settings.setdefault('jinja2.i18n.domain', '{{project}}')
+
     config = Configurator(root_factory=get_root, settings=settings)
-    config.add_renderer('.jinja2', renderer_factory)
+    config.add_translation_dirs('locale/')
+    config.include('pyramid_jinja2')
+
     config.add_static_view('static', 'static')
     config.add_view('{{package}}.views.my_view',
                     context='{{package}}.models.MyModel', 
                     renderer="mytemplate.jinja2")
+
     return config.make_wsgi_app()
