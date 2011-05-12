@@ -15,7 +15,7 @@ def root_view(request):
     return {
         'pyramid_translated': localizer.translate(_('Hello World')),
         'locale_name': get_locale_name(request)
-        }
+       }
 
 
 def app(global_settings, **settings):
@@ -28,13 +28,21 @@ def app(global_settings, **settings):
     config.add_translation_dirs('pyramid_jinja2.demo:locale/')
     return config.make_wsgi_app()
 
-if __name__ == '__main__':
-    from wsgiref.simple_server import make_server
-    port = 8080
-    httpd = make_server('', port, app({}, **{
-                'DEBUG': True,
-                'reload_templates': True,
-                }))
-    print 'Listening on at http://127.0.0.1:%i' % port
-    # Serve until process is killed
-    httpd.serve_forever()
+
+class Mainer(object):
+
+    import wsgiref.simple_server
+    make_server = wsgiref.simple_server.make_server
+
+    def main(self):
+        port = 8080
+        httpd = self.make_server('', port, app({}, **{
+                    'DEBUG': True,
+                    'reload_templates': True,
+                    }))
+        # Serve until process is killed
+        httpd.serve_forever()
+
+main = Mainer().main
+
+if __name__ == '__main__': main()
