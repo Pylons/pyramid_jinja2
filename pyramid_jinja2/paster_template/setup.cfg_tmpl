@@ -14,6 +14,7 @@ statistics = true
 add_comments = TRANSLATORS:
 output_file = {{package}}/locale/{{project}}.pot
 width = 80
+mapping_file = message-extraction.ini
 
 [init_catalog]
 domain = {{project}}
