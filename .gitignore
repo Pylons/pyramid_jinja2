@@ -6,7 +6,11 @@ env26/
 *$py.class
 .coverage
 dist/
+<<<<<<< HEAD
 *~
 .tox
 nosetests.xml
 pyramid_jinja2/coverage.xml
+=======
+docs/.build
+>>>>>>> Update for relative position. Add .build ignore.
