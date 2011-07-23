@@ -35,8 +35,14 @@ Once activated either of these says, the following happens:
 #) Files with the ``.jinja2`` extension are considered to be
    :term:`Jinja2` templates.
 
-#) The ``add_jinja2_search_path`` method/directive is added to
-   the :term:`configurator` instance. 
+#) The :func:`pyramid_jinja2.add_jinja2_search_path` directive is added to
+   the :term:`configurator` instance.
+
+#) The :func:`pyramid_jinja2.add_jinja2_extension` directive is added to the
+   :term:`configurator` instance.
+
+#) The :func:`pyramid_jinja2.get_jinja2_environment` directive is added to the
+   :term:`configurator` instance.
 
 Usage
 =====
@@ -204,7 +210,7 @@ command to create a Jinja2-based Pyramid project::
 This is a good way to see a working Pyramid application that uses Jinja2, even
 if you wind up not using the result.
 
-.. code-block:: shell
+.. code-block:: text
  :linenos:
 
  # make sure Babel is installed

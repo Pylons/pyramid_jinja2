@@ -1,3 +1,10 @@
+Next release
+============
+
+- Add ``get_jinja2_environment`` directive.
+
+- Add all configurator directives to documentation.
+
 1.0 (2011-05-12)
 ================
 

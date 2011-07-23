@@ -7,5 +7,11 @@
 
 .. autofunction:: includeme
 
+.. autofunction:: add_jinja2_search_path
+
+.. autofunction:: add_jinja2_extension
+
+.. autofunction:: get_jinja2_environment
+
 .. autoclass:: Jinja2TemplateRenderer
 .. autoclass:: SmartAssetSpecLoader

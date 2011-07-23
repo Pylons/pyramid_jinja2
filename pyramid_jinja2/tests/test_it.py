@@ -243,6 +243,15 @@ class Test_add_jinja2_assetdirs(unittest.TestCase):
                           for x in utility.loader.searchpath],
                          ['foobar', 'grrr'])
 
+class Test_get_jinja2_environment(unittest.TestCase):
+    def test_it(self):
+        from jinja2.environment import Environment
+        from pyramid_jinja2 import includeme
+        config = testing.setUp()
+        includeme(config)
+        self.assertEqual(config.get_jinja2_environment().__class__,
+                         Environment)
+
 
 class TestSmartAssetSpecLoader(unittest.TestCase):
 
@@ -396,7 +405,8 @@ class TestPackageFinder(unittest.TestCase):
 class MiscTests(Base, unittest.TestCase):
 
     def test_add_jinja2_extension(self):
-        from pyramid_jinja2 import _add_jinja2_extension, _get_or_build_default_environment
+        from pyramid_jinja2 import (add_jinja2_extension,
+                                    _get_or_build_default_environment)
         self.config.include('pyramid_jinja2')
 
         class MockExt(object):
@@ -405,7 +415,7 @@ class MiscTests(Base, unittest.TestCase):
             def __init__(self, x):
                 self.x = x
 
-        _add_jinja2_extension(self.config, MockExt)
+        add_jinja2_extension(self.config, MockExt)
 
         u = _get_or_build_default_environment(self.config.registry)
         self.assertTrue('foobar' in u.extensions)

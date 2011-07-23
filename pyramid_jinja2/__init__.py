@@ -277,7 +277,20 @@ class Jinja2TemplateRenderer(object):
         return self.template.render(system)
 
 
-def _add_jinja2_search_path(config, searchpath):
+def add_jinja2_search_path(config, searchpath):
+    """
+    This function is added as a method of a :term:`Configurator`, and
+    should not be called directly.  Instead it should be called like so after
+    ``pyramid_jinja2`` has been passed to ``config.include``:
+
+    .. code-block:: python
+
+       config.add_jinja2_search_path('anotherpackage:templates/')
+
+    It will add the directory or :term:`asset spec` passed as ``searchpath``
+    to the current search path of the ``jinja2.environment.Environment`` used
+    by :mod:`pyramid_jinja2`.
+    """
     registry = config.registry
     env = _get_or_build_default_environment(registry)
     if isinstance(searchpath, basestring):
@@ -286,7 +299,19 @@ def _add_jinja2_search_path(config, searchpath):
         env.loader.searchpath.append(abspath_from_resource_spec(d))
 
 
-def _add_jinja2_extension(config, ext):
+def add_jinja2_extension(config, ext):
+    """
+    This function is added as a method of a :term:`Configurator`, and
+    should not be called directly.  Instead it should be called like so after
+    ``pyramid_jinja2`` has been passed to ``config.include``:
+
+    .. code-block:: python
+
+       config.add_jinja2_extension(myext)
+
+    It will add the Jinja2 extension passed as ``ext`` to the current
+    ``jinja2.environment.Environment`` used by :mod:`pyramid_jinja2`.
+    """
     registry = config.registry
 
     lst = _get_extensions(config)
@@ -309,10 +334,45 @@ def _get_extensions(config_or_registry):
         exts.append('jinja2.ext.i18n')
     return exts
 
+def get_jinja2_environment(config):
+    """
+    This function is added as a method of a :term:`Configurator`, and
+    should not be called directly.  Instead it should be called like so after
+    ``pyramid_jinja2`` has been passed to ``config.include``:
+
+    .. code-block:: python
+
+       config.get_jinja2_environment()
+
+    It will return the current ``jinja2.environment.Environment`` used by
+    :mod:`pyramid_jinja2` or ``None`` if no environment has yet been set up.
+    """
+    return config.registry.queryUtility(IJinja2Environment)
 
 def includeme(config):
-    '''Setup standard configurator registrations.'''
+    """Set up standard configurator registrations.  Use via:
+
+    .. code-block:: python
+
+       config = Configurator()
+       config.include('pyramid_jinja2')
+
+    Once this function has been invoked, the ``.jinja2`` renderer is
+    available for use in Pyramid and these new directives are available as
+    methods of the configurator:
+
+    - ``add_jinja2_search_path``: Add a search path location to the search
+      path.
+
+    - ``add_jinja2_extension``: Add a list of extensions to the Jinja2
+      environment.
+
+    - get_jinja2_environment``: Return the Jinja2 ``environment.Environment``
+      used by ``pyramid_jinja2``.
+
+    """
     config.add_renderer('.jinja2', renderer_factory)
-    config.add_directive('add_jinja2_search_path', _add_jinja2_search_path)
-    config.add_directive('add_jinja2_extension', _add_jinja2_extension)
+    config.add_directive('add_jinja2_search_path', add_jinja2_search_path)
+    config.add_directive('add_jinja2_extension', add_jinja2_extension)
+    config.add_directive('get_jinja2_environment', get_jinja2_environment)
     _get_or_build_default_environment(config.registry)
