@@ -1,5 +1,5 @@
-Next release
-============
+1.1 (2011-07-24)
+================
 
 - Add ``get_jinja2_environment`` directive.
 
