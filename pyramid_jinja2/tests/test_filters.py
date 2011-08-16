@@ -2,10 +2,8 @@
 
 import unittest
 from jinja2 import Environment
+from pyramid.testing import DummyRequest
 
-class DummyRequest(object):
-    application_url = ''
-    environ = {}
 class DummyRoot(object):
     __name__ = __parent__ = None
 
@@ -33,12 +31,12 @@ class Test_model_url_filter(unittest.TestCase):
     def test_filter(self):
         model = DummyModel()
         rendered = self._callFUT({'model':model}, '{{model|model_url}}')
-        self.assertEqual(rendered, '/dummy/')
+        self.assertEqual(rendered, 'http://example.com/dummy/')
 
     def test_filter_with_elements(self):
         model = DummyModel()
         rendered = self._callFUT({'model':model}, "{{model|model_url('edit')}}")
-        self.assertEqual(rendered, '/dummy/edit')
+        self.assertEqual(rendered, 'http://example.com/dummy/edit')
 
 class Test_route_url_filter(unittest.TestCase):
     def setUp(self):
@@ -60,8 +58,8 @@ class Test_route_url_filter(unittest.TestCase):
 
     def test_filter(self):
         rendered = self._callFUT({}, "{{'dummy_route1' | route_url }}")
-        self.assertEqual(rendered, '/dummy/')
+        self.assertEqual(rendered, 'http://example.com/dummy/')
 
     def test_filter_with_arguments(self):
         rendered = self._callFUT({}, "{{'dummy_route2' | route_url('x', name='test') }}")
-        self.assertEqual(rendered, '/dummy/test/x')
+        self.assertEqual(rendered, 'http://example.com/dummy/test/x')
