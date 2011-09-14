@@ -43,6 +43,38 @@ Once activated either of these says, the following happens:
 
 #) The :func:`pyramid_jinja2.get_jinja2_environment` directive is added to the
    :term:`configurator` instance.
+   
+To setup the jinja2 search path either one of the following steps must be taken:
+
+#) Add ``jinja2.directories`` to your ``.ini`` settings file using the pyramid
+   asset spec::
+  
+     jinja2.directories = yourapp:templates
+
+#) Or Alternatively by using the ``add_jinja2_search_path`` directive attached
+   to your application's :term:`configurator` instance also using the pyramid asset
+   spec::
+
+     config.add_jinja2_search_path("yourapp:templates")
+
+.. warning::
+
+    If you do not explicitly configure your jinja2 search path it will default to
+    the root of your application.  If configured in this way all subsequent paths
+    will need to be specified relative to the root of your application's package.
+    For example:
+
+    Without the search path configured:
+
+    .. code-block:: text
+
+        @view_config(renderer='templates/mytemplate.jinja2')
+  
+    With the search path configured:
+      
+    .. code-block:: text 
+   
+       @view_config(renderer='mytemplate.jinja2')
 
 Usage
 =====
@@ -55,8 +87,8 @@ Template Lookups
 ----------------
 
 The default lookup mechanism for templates uses the :term:`Jinja2`
-search path (specified with ``jinja2.directories``.
-
+search path. (specified with ``jinja2.directories`` or by using the 
+add_jinja2_search_path directive on the :term:`configurator` instance.)
 
 Rendering :term:`Jinja2` templates with a view like this is typically
 done as follows (where the ``templates`` directory is expected to
@@ -67,7 +99,7 @@ live in the search path):
 
  from pyramid.view import view_config
  
- @view_config(renderer='templates/mytemplate.jinja2')
+ @view_config(renderer='mytemplate.jinja2')
  def myview(request):
      return {'foo':1, 'bar':2}
 
@@ -78,7 +110,7 @@ done using the renderer api:
  :linenos:
 
  from pyramid.renderers import render_to_response
- render_to_response('templates/mytemplate.jinja2', {'foo':1, 'bar':2})
+ render_to_response('mytemplate.jinja2', {'foo':1, 'bar':2})
 
 :term:`Template Inheritance`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
