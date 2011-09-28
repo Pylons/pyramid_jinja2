@@ -1,5 +1,5 @@
-Next release
-============
+1.2 (2011-09-27)
+================
 
 - Make tests pass on Pyramid 1.2dev.
 

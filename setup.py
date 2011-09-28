@@ -32,7 +32,7 @@ except ImportError:
 
 
 setup(name='pyramid_jinja2',
-      version='1.1',
+      version='1.2',
       description='Jinja2 template bindings for the Pyramid web framework',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
