@@ -1,3 +1,4 @@
+from pyramid_jinja2.compat import text_
 from pyramid import testing
 
 
@@ -8,7 +9,7 @@ class DummyEnvironment(object):
 
     def render(self, values):
         self.values = values
-        return u'result'
+        return text_('result')
 
 
 class DummyRendererInfo(object):

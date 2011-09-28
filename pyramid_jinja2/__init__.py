@@ -3,7 +3,7 @@ import os
 import sys
 
 from zope.interface import (
-    implements,
+    implementer,
     Interface,
     )
 
@@ -14,6 +14,10 @@ from jinja2.utils import (
     import_string,
     open_if_exists
     )
+
+from pyramid_jinja2.compat import reraise
+from pyramid_jinja2.compat import string_types
+from pyramid_jinja2.compat import text_type
 
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.interfaces import ITemplateRenderer
@@ -41,7 +45,7 @@ class IJinja2Environment(Interface):
 
 
 def maybe_import_string(val):
-    if isinstance(val, basestring):
+    if isinstance(val, string_types):
         return import_string(val.strip())
     return val
 
@@ -53,7 +57,7 @@ def splitlines(s):
 def parse_filters(filters):
     # input must be a string or dict
     result = {}
-    if isinstance(filters, basestring):
+    if isinstance(filters, string_types):
         for f in splitlines(filters):
             name, impl = f.split('=', 1)
             result[name.strip()] = maybe_import_string(impl)
@@ -64,9 +68,9 @@ def parse_filters(filters):
 
 
 def parse_extensions(extensions):
-    if isinstance(extensions, basestring):
+    if isinstance(extensions, string_types):
         extensions = splitlines(extensions)
-    return extensions
+    return list(extensions) # py3
 
 
 class FileInfo(object):
@@ -94,13 +98,18 @@ class FileInfo(object):
             f.close()
 
         try:
-            self._contents = data.decode(self.encoding)
-        except UnicodeDecodeError, orig:
-            trace = sys.exc_info()[2]
-            ex = TemplateRenderingError(
-                self.filename,
-                'problem handling unicode decoding: ' + str(orig))
-            raise ex, None, trace
+            if not isinstance(data, text_type):
+                data = data.decode(self.encoding)
+            self._contents = data
+        except UnicodeDecodeError:
+            try:
+                cls, orig, trace = sys.exc_info() # py 2.5-3.2 compat
+                ex = TemplateRenderingError(
+                    self.filename,
+                    'problem handling unicode decoding: ' + str(orig))
+                reraise((ex, None, trace))
+            finally: # prevent memory leak
+                del cls, orig, trace
 
     @property
     def contents(self):
@@ -180,7 +189,8 @@ class SmartAssetSpecLoader(FileSystemLoader):
 
         try:
             return FileSystemLoader.get_source(self, environment, template)
-        except TemplateNotFound, ex:
+        except TemplateNotFound:
+            ex = sys.exc_info()[1] # py2.5-3.2 compat
             message = ex.message
             message += ('; asset=%s; searchpath=%r'
                         % (fi.filename, self.searchpath))
@@ -190,7 +200,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
 def directory_loader_factory(settings):
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
     directories = settings.get('jinja2.directories') or ''
-    if isinstance(directories, basestring):
+    if isinstance(directories, string_types):
         directories = splitlines(directories)
     directories = [abspath_from_resource_spec(d) for d in directories]
     loader = SmartAssetSpecLoader(
@@ -254,7 +264,6 @@ def renderer_factory(info):
 
 class Jinja2TemplateRenderer(object):
     '''Renderer for a jinja2 template'''
-    implements(ITemplateRenderer)
     template = None
 
     def __init__(self, info, environment):
@@ -271,11 +280,14 @@ class Jinja2TemplateRenderer(object):
     def __call__(self, value, system):
         try:
             system.update(value)
-        except (TypeError, ValueError), ex:
+        except (TypeError, ValueError):
+            ex = sys.exc_info()[1] # py2.5 - 3.2 compat
             raise ValueError('renderer was passed non-dictionary '
                              'as value: %s' % str(ex))
         return self.template.render(system)
 
+Jinja2TemplateRenderer = \
+        implementer(ITemplateRenderer)(Jinja2TemplateRenderer) # 2.5 compat, ugh
 
 def add_jinja2_search_path(config, searchpath):
     """
@@ -293,7 +305,7 @@ def add_jinja2_search_path(config, searchpath):
     """
     registry = config.registry
     env = _get_or_build_default_environment(registry)
-    if isinstance(searchpath, basestring):
+    if isinstance(searchpath, string_types):
         searchpath = [x.strip() for x in searchpath.split('\n') if x.strip()]
     for d in searchpath:
         env.loader.searchpath.append(abspath_from_resource_spec(d))

@@ -5,6 +5,11 @@ from pyramid import testing
 from pyramid_jinja2.tests.base import (
     Base, DummyRendererInfo, DummyEnvironment, Mock)
 
+from pyramid_jinja2.compat import text_type
+from pyramid_jinja2.compat import text_
+from pyramid_jinja2.compat import bytes_
+from pyramid_jinja2.compat import StringIO
+from pyramid_jinja2.compat import PY3
 
 def dummy_filter(value): return 'hoge'
 
@@ -165,8 +170,8 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
             })
         instance = self._makeOne(info, environ)
         result = instance({}, {'system': 1})
-        self.failUnless(isinstance(result, unicode))
-        self.assertEqual(result, u'result')
+        self.assertTrue(isinstance(result, text_type))
+        self.assertEqual(result, 'result')
 
     def test_call_with_system_context(self):
         environ = DummyEnvironment()
@@ -175,8 +180,8 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
             })
         instance = self._makeOne(info, environ)
         result = instance({}, {'context': 1})
-        self.failUnless(isinstance(result, unicode))
-        self.assertEqual(result, u'result')
+        self.assertTrue(isinstance(result, text_type))
+        self.assertEqual(result, 'result')
         self.assertEqual(environ.values, {'context': 1})
 
     def test_call_with_nondict_value(self):
@@ -194,7 +199,7 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
             })
         instance = self._makeOne(info, environ)
         result = instance.implementation().render({})
-        self.assertEqual(result, u'result')
+        self.assertEqual(result, 'result')
 
 
 class TestIntegration(unittest.TestCase):
@@ -212,7 +217,7 @@ class TestIntegration(unittest.TestCase):
     def test_render(self):
         from pyramid.renderers import render
         result = render('helloworld.jinja2', {'a': 1})
-        self.assertEqual(result, u'\nHello föö')
+        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
 
 
 class Test_includeme(unittest.TestCase):
@@ -302,7 +307,6 @@ class TestFileInfo(unittest.TestCase):
         assert fi.uptodate() is False
 
     def test_delay_init(self):
-        from StringIO import StringIO
         from pyramid_jinja2 import FileInfo, TemplateRenderingError
 
         class MyFileInfo(FileInfo):
@@ -318,12 +322,14 @@ class TestFileInfo(unittest.TestCase):
             def getmtime(self, fname):
                 return 1
 
-        mi = MyFileInfo(u'nothing good here, move along')
+        mi = MyFileInfo(text_('nothing good here, move along'))
         mi._delay_init()
         self.assertEqual(mi._contents, mi.data)
 
-        mi = MyFileInfo('nothing good her\xe9, move along')
-        self.assertRaises(TemplateRenderingError, mi._delay_init)
+        if not PY3:
+
+            mi = MyFileInfo(bytes_('nothing good her\xe9, move along'))
+            self.assertRaises(TemplateRenderingError, mi._delay_init)
 
 
 class GetTextWrapperTests(unittest.TestCase):
@@ -375,11 +381,11 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
 
         app1 = config1.make_wsgi_app()
         testapp = TestApp(app1)
-        self.assertEqual(testapp.get('/').body, 'foo')
+        self.assertEqual(testapp.get('/').body, bytes_('foo'))
 
         app2 = config2.make_wsgi_app()
         testapp = TestApp(app2)
-        self.assertEqual(testapp.get('/').body, 'bar')
+        self.assertEqual(testapp.get('/').body, bytes_('bar'))
 
 
 class TestPackageFinder(unittest.TestCase):

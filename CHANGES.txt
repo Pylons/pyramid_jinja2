@@ -3,6 +3,8 @@ Next release
 
 - Make tests pass on Pyramid 1.2dev.
 
+- Make compatible with Python 3.2 (requires Pyramid 1.3dev+).
+
 1.1 (2011-07-24)
 ================
 
