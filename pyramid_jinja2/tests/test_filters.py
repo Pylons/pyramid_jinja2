@@ -63,3 +63,30 @@ class Test_route_url_filter(unittest.TestCase):
     def test_filter_with_arguments(self):
         rendered = self._callFUT({}, "{{'dummy_route2' | route_url('x', name='test') }}")
         self.assertEqual(rendered, 'http://example.com/dummy/test/x')
+
+class Test_static_url_filter(unittest.TestCase):
+    def setUp(self):
+        self.environment = Environment()
+        from pyramid_jinja2.filters import static_url_filter
+        self.environment.filters['static_url'] = static_url_filter
+        from pyramid.config import Configurator
+        self.config = Configurator(autocommit=True)
+        self.config.begin(request=DummyRequest())
+        self.config.add_static_view('myfiles', 'dummy1:static')
+        self.config.add_static_view('otherfiles/{owner}', 'dummy2:files')
+       
+    def tearDown(self):
+        self.config.end()
+
+    def _callFUT(self, context, tmpl):
+        tmpl = self.environment.from_string(tmpl)
+        return tmpl.render(**context)
+
+    def test_filter(self):
+        rendered = self._callFUT({}, "{{'dummy1:static/the/quick/brown/fox.svg' | static_url }}")
+        self.assertEqual(rendered, 'http://example.com/myfiles/the/quick/brown/fox.svg')
+
+    def test_filter_with_arguments(self):
+        rendered = self._callFUT({}, "{{'dummy2:files/report.txt' | static_url(owner='foo') }}")
+        self.assertEqual(rendered, 'http://example.com/otherfiles/foo/report.txt')
+   
