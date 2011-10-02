@@ -1,4 +1,4 @@
-from pyramid.url import resource_url, route_url, static_path
+from pyramid.url import resource_url, route_url, static_url
 from pyramid.threadlocal import get_current_request
 
 __all__ = [
