@@ -12,3 +12,4 @@ dist/
 nosetests.xml
 pyramid_jinja2/coverage.xml
 docs/.build
+docs/_build/
