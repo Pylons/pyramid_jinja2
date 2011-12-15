@@ -21,7 +21,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'pyramid>=1.0',
+    'pyramid>=1.0.2', # wsgiref server entry point
     'Jinja2>=2.5.0'
 ]
 
@@ -59,6 +59,8 @@ setup(name='pyramid_jinja2',
       test_suite="pyramid_jinja2",
       entry_points="""
         [paste.paster_create_template]
-        pyramid_jinja2_starter=pyramid_jinja2.paster:Jinja2ProjectTemplate
+        pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate
+        [pyramid.scaffold]
+        pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate
       """,
       )
