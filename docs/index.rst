@@ -13,7 +13,7 @@ Installation
 
 Install using setuptools, e.g. (within a virtualenv)::
 
-  $ easy_install pyramid_jinja2
+  $ $myvenv/bin/easy_install pyramid_jinja2
 
 Setup
 =====
@@ -25,8 +25,9 @@ are completely equivalent:
 
     config.include('pyramid_jinja2')
 
-#) Ensure that some ZCML file with an analogue of the following
-   contents is executed by your Pyramid application::
+#) If you're using ``pyramid_zcml`` instead of imperative configuration,
+   wnsure that some ZCML file with an analogue of the following contents is
+   executed by your Pyramid application::
 
     <include package="pyramid_jinja2"/>
 
@@ -51,18 +52,18 @@ To setup the jinja2 search path either one of the following steps must be taken:
   
      jinja2.directories = yourapp:templates
 
-#) Or Alternatively by using the ``add_jinja2_search_path`` directive attached
-   to your application's :term:`configurator` instance also using the pyramid asset
-   spec::
+#) Or Alternatively by using the ``add_jinja2_search_path`` directive
+   attached to your application's :term:`configurator` instance also using
+   the pyramid asset spec::
 
      config.add_jinja2_search_path("yourapp:templates")
 
 .. warning::
 
-    If you do not explicitly configure your jinja2 search path it will default to
-    the root of your application.  If configured in this way all subsequent paths
-    will need to be specified relative to the root of your application's package.
-    For example:
+    If you do not explicitly configure your jinja2 search path it will
+    default to the root of your application.  If configured in this way all
+    subsequent paths will need to be specified relative to the root of your
+    application's package.  For example:
 
     Without the search path configured:
 
@@ -234,13 +235,31 @@ And use the filters in template.
 Creating a Jinja2 ``Pyramid`` Project
 =====================================
 
-After you've got ``pyramid_jinja2`` installed, you can invoke the following
-command to create a Jinja2-based Pyramid project::
+After you've got ``pyramid_jinja2`` installed, you can invoke one of the
+following commands to create a Jinja2-based Pyramid project.
 
-  $ paster create -t pyramid_jinja2_starter
+On Pyramid 1.0, 1.1, or 1.2::
+
+  $ $myvenv/bin/paster create -t pyramid_jinja2_starter myproject
+
+On Pyramid 1.3::
+
+  $ $myenv/bin/pcreate -s pyramid_jinja2_starter myproject
+
+After it's created, you can visit the ``myproject`` directory and run
+``setup.py develop``.  At that point you can start the application like any
+other Pyramid application.
 
 This is a good way to see a working Pyramid application that uses Jinja2, even
 if you wind up not using the result.
+
+Paster Template I18N
+--------------------
+
+The paster template automatically sets up pot/po/mo locale files for use
+with the generated project.  
+
+The usual pattern for working with i18n in pyramid_jinja2 is as follows:
 
 .. code-block:: text
  :linenos:
@@ -256,25 +275,12 @@ if you wind up not using the result.
  # and re-compile *.po files
  python setup.py compile_catalog
 
-
-Paster Template I18N
---------------------
-
-The paster template automatically sets up pot/po/mo locale files for use
-with the generated project.
-
-The usual pattern for working with i18n in pyramid_jinja2 is as follows:
-
-
-
-
 More Information
 ================
 
 .. toctree::
  :maxdepth: 1
 
- i18n.rst
  glossary.rst
  api.rst
 
