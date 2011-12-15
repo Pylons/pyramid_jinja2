@@ -20,16 +20,36 @@
 import sys
 import os
 
-parent = os.path.dirname(os.path.dirname(__file__))
-sys.path.append(os.path.abspath(parent))
-wd = os.getcwd()
-os.chdir(parent)
-os.system('%s setup.py test -q' % sys.executable)
-os.chdir(wd)
+# Add and use Pylons theme
+if 'sphinx-build' in ' '.join(sys.argv): # protect against dumb importers
+    from subprocess import call, Popen, PIPE
 
-for item in os.listdir(parent):
-    if item.endswith('.egg'):
-        sys.path.append(os.path.join(parent, item))
+    p = Popen('which git', shell=True, stdout=PIPE)
+    git = p.stdout.read().strip()
+    cwd = os.getcwd()
+    _themes = os.path.join(cwd, '_themes')
+
+    if not os.path.isdir(_themes):
+        call([git, 'clone', 'git://github.com/Pylons/pylons_sphinx_theme.git',
+                '_themes'])
+    else:
+        os.chdir(_themes)
+        call([git, 'checkout', 'master'])
+        call([git, 'pull'])
+        os.chdir(cwd)
+
+    sys.path.append(os.path.abspath('_themes'))
+
+    parent = os.path.dirname(os.path.dirname(__file__))
+    sys.path.append(os.path.abspath(parent))
+    wd = os.getcwd()
+    os.chdir(parent)
+    os.system('%s setup.py test -q' % sys.executable)
+    os.chdir(wd)
+
+    for item in os.listdir(parent):
+        if item.endswith('.egg'):
+            sys.path.append(os.path.join(parent, item))
 
 # General configuration
 # ---------------------
@@ -71,6 +91,8 @@ today_fmt = '%B %d, %Y'
 # List of directories, relative to source directories, that shouldn't be
 # searched for source files.
 #exclude_dirs = []
+
+exclude_patterns = ['_themes/README.rst',]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
