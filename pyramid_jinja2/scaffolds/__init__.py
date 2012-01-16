@@ -11,7 +11,7 @@ except ImportError: # pragma: no cover
         paste_script_template_renderer = None
         from pyramid.scaffolds import PyramidTemplate
 
-    class Jinja2ProjectTemplate(PyramidTemplate):
-        _template_dir = 'jinja2_starter'
-        summary = 'pyramid jinja2 starter project'
-        template_renderer = staticmethod(paste_script_template_renderer)
+class Jinja2ProjectTemplate(PyramidTemplate):
+    _template_dir = 'jinja2_starter'
+    summary = 'pyramid jinja2 starter project'
+    template_renderer = staticmethod(paste_script_template_renderer)
