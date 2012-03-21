@@ -278,12 +278,13 @@ class Jinja2TemplateRenderer(object):
         return self.environment.get_template(self.info.name)
 
     def __call__(self, value, system):
-        try:
-            system.update(value)
-        except (TypeError, ValueError):
-            ex = sys.exc_info()[1] # py2.5 - 3.2 compat
-            raise ValueError('renderer was passed non-dictionary '
-                             'as value: %s' % str(ex))
+        if value is not None:
+            try:
+                system.update(value)
+            except (TypeError, ValueError):
+                ex = sys.exc_info()[1] # py2.5 - 3.2 compat
+                raise ValueError('renderer was passed non-dictionary '
+                                 'as value: %s' % str(ex))
         return self.template.render(system)
 
 Jinja2TemplateRenderer = \
