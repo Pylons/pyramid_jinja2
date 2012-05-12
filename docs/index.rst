@@ -212,6 +212,7 @@ Jinja2 Filters
 .. currentmodule:: pyramid_jinja2.filters
 .. autofunction:: model_url_filter
 .. autofunction:: route_url_filter
+.. autofunction:: static_url_filter
 
 To use these filters, configure the settings of ``jinja2.filters``:
 
@@ -223,6 +224,7 @@ To use these filters, configure the settings of ``jinja2.filters``:
  jinja2.filters =
      model_url = pyramid_jinja2.filters:model_url_filter
      route_url = pyramid_jinja2.filters:route_url_filter
+     static_url = pyramid_jinja2.filters:static_url_filter
 
 And use the filters in template.
 
@@ -231,6 +233,8 @@ And use the filters in template.
  <a href="{{context|model_url('edit')}}">Edit</a>
 
  <a href="{{'top'|route_url}}">Top</a>
+
+ <link rel="stylesheet" href="{{'yourapp:static/css/style.css'|static_url}}" />
 
 Creating a Jinja2 ``Pyramid`` Project
 =====================================
