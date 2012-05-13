@@ -30,6 +30,8 @@ try:
 except ImportError:
     requires.append('wsgiref')
 
+testing_extras = ['WebTest', 'nose', 'coverage']
+docs_extras = ['Sphinx']
 
 setup(name='pyramid_jinja2',
       version='1.3',
@@ -56,6 +58,10 @@ setup(name='pyramid_jinja2',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
+      extras_require = {
+          'testing':testing_extras,
+          'docs':docs_extras,
+          },
       tests_require=requires + ['WebTest'],
       test_suite="pyramid_jinja2",
       entry_points="""
