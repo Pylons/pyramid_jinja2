@@ -61,21 +61,50 @@ To setup the jinja2 search path either one of the following steps must be taken:
 .. warning::
 
     If you do not explicitly configure your jinja2 search path it will
-    default to the root of your application.  If configured in this way all
-    subsequent paths will need to be specified relative to the root of your
-    application's package.  For example:
+    default to the root of your application. If the specified template
+    is not found in the root of your application and you did not specify
+    a package on the template path it will then try to load the template
+    path relative to the module's caller package. For example:
 
     Without the search path configured:
 
     .. code-block:: text
 
         @view_config(renderer='templates/mytemplate.jinja2')
-  
+    
     With the search path configured:
-      
-    .. code-block:: text 
-   
+    
+    .. code-block:: text
+    
        @view_config(renderer='mytemplate.jinja2')
+    
+    If you view module is in app.module.view and your template is
+    under app/module/templates/mytemplate.jinja2 you can access
+    that asset in a few different ways.
+    
+    Using the full path:
+    
+    .. code-block:: text
+    
+      @view_config(renderer="module/templates/mytemplate.jinja2")
+    
+    Using the package:
+    
+    .. code-block:: text
+    
+      @view_config(renderer="app.module:templates/mytemplate.jinja2")
+    
+    Using the relative path to current package:
+    
+    .. code-block:: text
+    
+      @view_config(renderer="templates/mytemplate.jinja2")
+    
+    You need to be careful when using relative paths though, if
+    there is an app/templates/mytemplate.jinja2 this will be
+    used instead as jinja2 lookup will first try the path relative
+    to the root of the app and then it will try the path relative
+    to the current package.
 
 Usage
 =====
