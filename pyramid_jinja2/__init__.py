@@ -275,7 +275,19 @@ class Jinja2TemplateRenderer(object):
 
     @property
     def template(self):
-        return self.environment.get_template(self.info.name)
+        info = self.info
+        name = info.name
+        name_with_package = name
+        if ':' not in name and hasattr(info, 'package') and info.package is not None:
+            package = self.info.package
+            name_with_package = '%s:%s' % (package.__name__, name)
+        try:
+            return self.environment.get_template(name)
+        except TemplateNotFound:
+            if name != name_with_package:
+                return self.environment.get_template(name_with_package)
+            else:
+                raise
 
     def __call__(self, value, system):
         try:
