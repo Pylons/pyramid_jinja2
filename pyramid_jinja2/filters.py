@@ -4,6 +4,7 @@ from pyramid.threadlocal import get_current_request
 __all__ = [
     'model_url_filter',
     'route_url_filter',
+    'static_url_filter',
         ]
 
 
