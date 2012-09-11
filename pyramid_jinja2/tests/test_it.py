@@ -220,6 +220,22 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(result, text_('\nHello föö', 'utf-8'))
 
 
+class TestIntegration2(unittest.TestCase):
+    def setUp(self):
+        import pyramid_jinja2
+        config = testing.setUp()
+        config.add_renderer('.jinja2',
+                            pyramid_jinja2.renderer_factory)
+    
+    def tearDown(self):
+        testing.tearDown()
+    
+    def test_render_relative_to_package(self):
+        from pyramid.renderers import render
+        result = render('templates/helloworld.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
+    
+
 class Test_includeme(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
