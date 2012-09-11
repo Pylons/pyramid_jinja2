@@ -1,6 +1,9 @@
 Next release
 ============
 
+- Drop Python 2.5 compatibility
+  [Domen Kožar]
+
 - Addition of ``static_url`` filter.
 
 - Add ``dev`` and ``docs`` setup.py aliases (ala Pyramid).

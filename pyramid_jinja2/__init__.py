@@ -262,6 +262,7 @@ def renderer_factory(info):
     return Jinja2TemplateRenderer(info, environment)
 
 
+@implementer(ITemplateRenderer)
 class Jinja2TemplateRenderer(object):
     '''Renderer for a jinja2 template'''
     template = None
@@ -285,9 +286,6 @@ class Jinja2TemplateRenderer(object):
             raise ValueError('renderer was passed non-dictionary '
                              'as value: %s' % str(ex))
         return self.template.render(system)
-
-Jinja2TemplateRenderer = \
-        implementer(ITemplateRenderer)(Jinja2TemplateRenderer) # 2.5 compat, ugh
 
 def add_jinja2_search_path(config, searchpath):
     """

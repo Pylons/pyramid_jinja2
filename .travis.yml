@@ -1,12 +1,11 @@
 language: python
 python:
-  - 2.5
   - 2.6
   - 2.7
   - 3.2
   - pypy
 install:
   - python setup.py develop
-  - easy_install pyramid_jinja2[test]
+  - easy_install pyramid_jinja2[testing]
 script:
   - nosetests
