@@ -39,6 +39,8 @@ setup(name='pyramid_jinja2',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.6",
