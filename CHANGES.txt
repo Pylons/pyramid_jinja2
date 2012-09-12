@@ -1,7 +1,8 @@
 1.4.1 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fix brown-bag release
+  [Domen Kožar]
 
 
 1.4 (2012-09-12)
