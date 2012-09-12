@@ -1,5 +1,5 @@
-Next release
-============
+1.4 (unreleased)
+================
 
 - Correctly resolve relative search paths passed to ``add_jinja2_search_path``
   and ``jinja2.directories``
