@@ -1,4 +1,4 @@
-1.4 (unreleased)
+1.4 (2012-09-12)
 ================
 
 - Correctly resolve relative search paths passed to ``add_jinja2_search_path``
