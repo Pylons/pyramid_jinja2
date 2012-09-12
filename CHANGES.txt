@@ -1,6 +1,9 @@
 Next release
 ============
 
+- #34: Don't recreate ``jinja2.Environment`` for ``add_jinja2_extension``
+  [Domen Kožar]
+
 - Drop Python 2.5 compatibility
   [Domen Kožar]
 

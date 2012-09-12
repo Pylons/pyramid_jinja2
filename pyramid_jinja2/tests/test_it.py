@@ -430,6 +430,7 @@ class MiscTests(Base, unittest.TestCase):
         from pyramid_jinja2 import (add_jinja2_extension,
                                     _get_or_build_default_environment)
         self.config.include('pyramid_jinja2')
+        env_before = _get_or_build_default_environment(self.config.registry)
 
         class MockExt(object):
             identifier = 'foobar'
@@ -439,5 +440,6 @@ class MiscTests(Base, unittest.TestCase):
 
         add_jinja2_extension(self.config, MockExt)
 
-        u = _get_or_build_default_environment(self.config.registry)
-        self.assertTrue('foobar' in u.extensions)
+        env_after = _get_or_build_default_environment(self.config.registry)
+        self.assertTrue('foobar' in env_after.extensions)
+        self.assertTrue(env_before is env_after)

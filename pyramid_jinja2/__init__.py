@@ -334,17 +334,8 @@ def add_jinja2_extension(config, ext):
     It will add the Jinja2 extension passed as ``ext`` to the current
     ``jinja2.environment.Environment`` used by :mod:`pyramid_jinja2`.
     """
-    registry = config.registry
-
-    lst = _get_extensions(config)
-    if ext not in lst:
-        lst.append(ext)
-        environment = registry.queryUtility(IJinja2Environment)
-        if environment is not None:
-            registry.unregisterUtility(environment,
-                                       provided=IJinja2Environment)
-            _setup_environment(registry)
-
+    env = _get_or_build_default_environment(config.registry)
+    env.add_extension(ext)
 
 def _get_extensions(config_or_registry):
     registry = getattr(config_or_registry, 'registry', config_or_registry)
