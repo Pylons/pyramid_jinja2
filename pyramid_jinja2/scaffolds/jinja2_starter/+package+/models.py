@@ -4,5 +4,5 @@ class MyModel(object):
 root = MyModel()
 
 
-def get_root(environ):
+def get_root(request):
     return root
