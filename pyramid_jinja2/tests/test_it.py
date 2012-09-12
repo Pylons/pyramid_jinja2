@@ -254,15 +254,18 @@ class Test_add_jinja2_assetdirs(unittest.TestCase):
         from pyramid_jinja2 import IJinja2Environment
         import os
         config = testing.setUp()
+        config.package_name = __name__
         config.registry.settings['jinja2.directories'] = 'foobar'
         includeme(config)
         utility = config.registry.getUtility(IJinja2Environment)
-        self.assertEqual([x.split(os.sep)[-1]
-                          for x in utility.loader.searchpath], ['foobar'])
+        self.assertEqual(
+            [x.split(os.sep)[-3:] for x in utility.loader.searchpath],
+            [['pyramid_jinja2', 'tests', 'foobar']])
+
         config.add_jinja2_search_path('grrr')
-        self.assertEqual([x.split(os.sep)[-1]
-                          for x in utility.loader.searchpath],
-                         ['foobar', 'grrr'])
+        self.assertEqual(
+            [x.split(os.sep)[-3:] for x in utility.loader.searchpath],
+            [['pyramid_jinja2', 'tests', 'foobar'], ['pyramid_jinja2', 'tests', 'grrr']])
 
 class Test_get_jinja2_environment(unittest.TestCase):
     def test_it(self):

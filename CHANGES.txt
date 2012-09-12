@@ -1,6 +1,10 @@
 Next release
 ============
 
+- Correctly resolve relative search paths passed to ``add_jinja2_search_path``
+  and ``jinja2.directories``
+  [Domen Kožar]
+
 - #34: Don't recreate ``jinja2.Environment`` for ``add_jinja2_extension``
   [Domen Kožar]
 

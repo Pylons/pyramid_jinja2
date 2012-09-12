@@ -28,7 +28,6 @@ from pyramid.threadlocal import get_current_request
 
 
 class TemplateRenderingError(Exception):
-
     def __init__(self, template, message):
         self.template = template
         self.message = message
@@ -67,14 +66,13 @@ def parse_filters(filters):
     return result
 
 
-def parse_extensions(extensions):
+def parse_multiline(extensions):
     if isinstance(extensions, string_types):
         extensions = splitlines(extensions)
     return list(extensions) # py3
 
 
 class FileInfo(object):
-
     open_if_exists = staticmethod(open_if_exists)
     getmtime = staticmethod(os.path.getmtime)
 
@@ -197,12 +195,12 @@ class SmartAssetSpecLoader(FileSystemLoader):
             raise TemplateNotFound(name=ex.name, message=message)
 
 
-def directory_loader_factory(settings):
+def directory_loader_factory(settings, package):
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
     directories = settings.get('jinja2.directories') or ''
     if isinstance(directories, string_types):
         directories = splitlines(directories)
-    directories = [abspath_from_resource_spec(d) for d in directories]
+    directories = [abspath_from_resource_spec(d, package) for d in directories]
     loader = SmartAssetSpecLoader(
         directories, encoding=input_encoding,
         debug=asbool(settings.get('debug_templates', False)))
@@ -238,28 +236,23 @@ class GetTextWrapper(object):
 
 def _setup_environment(registry):
     settings = registry.settings
+    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
     reload_templates = asbool(settings.get('reload_templates', False))
     autoescape = asbool(settings.get('jinja2.autoescape', True))
     domain = settings.get('jinja2.i18n.domain', 'messages')
     extensions = _get_extensions(registry)
     filters = parse_filters(settings.get('jinja2.filters', ''))
-    environment = Environment(loader=directory_loader_factory(settings),
+    environment = Environment(loader=directory_loader_factory(settings, package),
                               auto_reload=reload_templates,
                               autoescape=autoescape,
                               extensions=extensions)
     wrapper = GetTextWrapper(domain=domain)
     environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext)
     environment.pyramid_jinja2_extensions = extensions
-    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
     if package is not None:
         environment._default_package = package.__name__
     environment.filters.update(filters)
     registry.registerUtility(environment, IJinja2Environment)
-
-
-def renderer_factory(info):
-    environment = _get_or_build_default_environment(info.registry)
-    return Jinja2TemplateRenderer(info, environment)
 
 
 @implementer(ITemplateRenderer)
@@ -299,6 +292,20 @@ class Jinja2TemplateRenderer(object):
                              'as value: %s' % str(ex))
         return self.template.render(system)
 
+def renderer_factory(info):
+    environment = _get_or_build_default_environment(info.registry)
+    return Jinja2TemplateRenderer(info, environment)
+
+def _get_extensions(config_or_registry):
+    registry = getattr(config_or_registry, 'registry', config_or_registry)
+    settings = registry.settings
+    settings['jinja2.extensions'] = parse_multiline(
+        settings.get('jinja2.extensions', ''))
+    exts = settings['jinja2.extensions']
+    if 'jinja2.ext.i18n' not in exts:
+        exts.append('jinja2.ext.i18n')
+    return exts
+
 def add_jinja2_search_path(config, searchpath):
     """
     This function is added as a method of a :term:`Configurator`, and
@@ -315,10 +322,10 @@ def add_jinja2_search_path(config, searchpath):
     """
     registry = config.registry
     env = _get_or_build_default_environment(registry)
-    if isinstance(searchpath, string_types):
-        searchpath = [x.strip() for x in searchpath.split('\n') if x.strip()]
+    searchpath = parse_multiline(searchpath)
+
     for d in searchpath:
-        env.loader.searchpath.append(abspath_from_resource_spec(d))
+        env.loader.searchpath.append(abspath_from_resource_spec(d, config.package_name))
 
 
 def add_jinja2_extension(config, ext):
@@ -336,16 +343,6 @@ def add_jinja2_extension(config, ext):
     """
     env = _get_or_build_default_environment(config.registry)
     env.add_extension(ext)
-
-def _get_extensions(config_or_registry):
-    registry = getattr(config_or_registry, 'registry', config_or_registry)
-    settings = registry.settings
-    settings['jinja2.extensions'] = parse_extensions(
-        settings.get('jinja2.extensions', ''))
-    exts = settings['jinja2.extensions']
-    if 'jinja2.ext.i18n' not in exts:
-        exts.append('jinja2.ext.i18n')
-    return exts
 
 def get_jinja2_environment(config):
     """
