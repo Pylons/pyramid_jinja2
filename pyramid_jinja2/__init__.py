@@ -195,16 +195,6 @@ class SmartAssetSpecLoader(FileSystemLoader):
             raise TemplateNotFound(name=ex.name, message=message)
 
 
-def directory_loader_factory(settings, package):
-    input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
-    directories = settings.get('jinja2.directories') or ''
-    if isinstance(directories, string_types):
-        directories = splitlines(directories)
-    directories = [abspath_from_resource_spec(d, package) for d in directories]
-    loader = SmartAssetSpecLoader(
-        directories, encoding=input_encoding,
-        debug=asbool(settings.get('debug_templates', False)))
-    return loader
 
 
 def _get_or_build_default_environment(registry):
@@ -212,7 +202,36 @@ def _get_or_build_default_environment(registry):
     if environment is not None:
         return environment
 
-    _setup_environment(registry)
+    settings = registry.settings
+    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
+    reload_templates = asbool(settings.get('reload_templates', False))
+    autoescape = asbool(settings.get('jinja2.autoescape', True))
+    domain = settings.get('jinja2.i18n.domain', 'messages')
+    debug = asbool(settings.get('debug_templates', False))
+    filters = parse_filters(settings.get('jinja2.filters', ''))
+    input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
+
+    extensions = parse_multiline(settings.get('jinja2.extensions', ''))
+    if 'jinja2.ext.i18n' not in extensions:
+        extensions.append('jinja2.ext.i18n')
+
+    directories = parse_multiline(settings.get('jinja2.directories') or '')
+    directories = [abspath_from_resource_spec(d, package) for d in directories]
+    loader = SmartAssetSpecLoader(
+        directories,
+        encoding=input_encoding,
+        debug=debug)
+
+    environment = Environment(loader=loader,
+                              auto_reload=reload_templates,
+                              autoescape=autoescape,
+                              extensions=extensions)
+    wrapper = GetTextWrapper(domain=domain)
+    environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext)
+    if package is not None:
+        environment._default_package = package.__name__
+    environment.filters.update(filters)
+    registry.registerUtility(environment, IJinja2Environment)
     return registry.queryUtility(IJinja2Environment)
 
 
@@ -234,27 +253,6 @@ class GetTextWrapper(object):
                                         domain=self.domain)
 
 
-def _setup_environment(registry):
-    settings = registry.settings
-    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
-    reload_templates = asbool(settings.get('reload_templates', False))
-    autoescape = asbool(settings.get('jinja2.autoescape', True))
-    domain = settings.get('jinja2.i18n.domain', 'messages')
-    extensions = _get_extensions(registry)
-    filters = parse_filters(settings.get('jinja2.filters', ''))
-    environment = Environment(loader=directory_loader_factory(settings, package),
-                              auto_reload=reload_templates,
-                              autoescape=autoescape,
-                              extensions=extensions)
-    wrapper = GetTextWrapper(domain=domain)
-    environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext)
-    environment.pyramid_jinja2_extensions = extensions
-    if package is not None:
-        environment._default_package = package.__name__
-    environment.filters.update(filters)
-    registry.registerUtility(environment, IJinja2Environment)
-
-
 @implementer(ITemplateRenderer)
 class Jinja2TemplateRenderer(object):
     '''Renderer for a jinja2 template'''
@@ -269,16 +267,17 @@ class Jinja2TemplateRenderer(object):
 
     @property
     def template(self):
+        # get template based on searchpaths, then try relavtive one
         info = self.info
         name = info.name
-        name_with_package = name
-        if ':' not in name and hasattr(info, 'package') and info.package is not None:
+        name_with_package = None
+        if ':' not in name and getattr(info, 'package', None) is not None:
             package = self.info.package
             name_with_package = '%s:%s' % (package.__name__, name)
         try:
             return self.environment.get_template(name)
         except TemplateNotFound:
-            if name != name_with_package:
+            if name_with_package != None:
                 return self.environment.get_template(name_with_package)
             else:
                 raise
@@ -296,15 +295,6 @@ def renderer_factory(info):
     environment = _get_or_build_default_environment(info.registry)
     return Jinja2TemplateRenderer(info, environment)
 
-def _get_extensions(config_or_registry):
-    registry = getattr(config_or_registry, 'registry', config_or_registry)
-    settings = registry.settings
-    settings['jinja2.extensions'] = parse_multiline(
-        settings.get('jinja2.extensions', ''))
-    exts = settings['jinja2.extensions']
-    if 'jinja2.ext.i18n' not in exts:
-        exts.append('jinja2.ext.i18n')
-    return exts
 
 def add_jinja2_search_path(config, searchpath):
     """
