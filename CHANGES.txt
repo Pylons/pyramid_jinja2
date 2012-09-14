@@ -1,10 +1,12 @@
 1.4.2 (unreleased)
 ==================
 
+- Remove redundant decoding error handling
+  [Domen Kožar]
+
 - Configure bytecode caching by default. Introduce `jinja2.bytecode_caching`
   and `jinja2.bytecode_caching_directory` settings.
   [Domen Kožar]
-
 
 1.4.1 (2012-09-12)
 ==================

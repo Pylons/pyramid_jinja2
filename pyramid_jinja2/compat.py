@@ -11,7 +11,7 @@ if PY3: # pragma: no cover
     text_type = str
     binary_type = bytes
     long = int
-else:
+else: # pragma: no cover
     string_types = basestring,
     integer_types = (int, long)
     class_types = (type, types.ClassType)
@@ -20,13 +20,13 @@ else:
 
 # TODO check if errors is ever used
 
-def text_(s, encoding='latin-1', errors='strict'):
+def text_(s, encoding='latin-1', errors='strict'): # pragma: no cover
     if isinstance(s, binary_type):
         return s.decode(encoding, errors)
     return s # pragma: no cover
 
-def bytes_(s, encoding='latin-1', errors='strict'):
-    if isinstance(s, text_type): # pragma: no cover
+def bytes_(s, encoding='latin-1', errors='strict'): # pragma: no cover
+    if isinstance(s, text_type):
         return s.encode(encoding, errors)
     return s
 
@@ -42,7 +42,7 @@ else: # pragma: no cover
 if PY3: # pragma: no cover
     from io import StringIO
     from io import BytesIO
-else:
+else: # pragma: no cover
     from StringIO import StringIO
     BytesIO = StringIO
     

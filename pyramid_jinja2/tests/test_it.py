@@ -134,14 +134,6 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(environ.filters['dummy'], dummy_filter)
 
 
-class TemplateRenderingErrorTests(unittest.TestCase):
-
-    def test_it(self):
-        from pyramid_jinja2 import TemplateRenderingError
-        error = TemplateRenderingError('foobar.jinja2', 'random message')
-        self.assertEqual(str(error), 'foobar.jinja2: random message')
-
-
 class Jinja2TemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid_jinja2 import Jinja2TemplateRenderer
@@ -344,7 +336,7 @@ class TestFileInfo(unittest.TestCase):
         assert fi.uptodate() is False
 
     def test_delay_init(self):
-        from pyramid_jinja2 import FileInfo, TemplateRenderingError
+        from pyramid_jinja2 import FileInfo
 
         class MyFileInfo(FileInfo):
             filename = 'foo.jinja2'
@@ -362,11 +354,6 @@ class TestFileInfo(unittest.TestCase):
         mi = MyFileInfo(text_('nothing good here, move along'))
         mi._delay_init()
         self.assertEqual(mi._contents, mi.data)
-
-        if not PY3:
-
-            mi = MyFileInfo(bytes_('nothing good her\xe9, move along'))
-            self.assertRaises(TemplateRenderingError, mi._delay_init)
 
 
 class GetTextWrapperTests(unittest.TestCase):

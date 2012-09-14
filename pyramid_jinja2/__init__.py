@@ -27,18 +27,6 @@ from pyramid import i18n
 from pyramid.threadlocal import get_current_request
 
 
-class TemplateRenderingError(Exception):
-    def __init__(self, template, message):
-        self.template = template
-        self.message = message
-
-    def __str__(self):
-        s = self.template
-        if self.message:
-            s += ': ' + self.message
-        return s
-
-
 class IJinja2Environment(Interface):
     pass
 
@@ -95,19 +83,9 @@ class FileInfo(object):
         finally:
             f.close()
 
-        try:
-            if not isinstance(data, text_type):
-                data = data.decode(self.encoding)
-            self._contents = data
-        except UnicodeDecodeError:
-            try:
-                cls, orig, trace = sys.exc_info() # py 2.5-3.2 compat
-                ex = TemplateRenderingError(
-                    self.filename,
-                    'problem handling unicode decoding: ' + str(orig))
-                reraise((ex, None, trace))
-            finally: # prevent memory leak
-                del cls, orig, trace
+        if not isinstance(data, text_type):
+            data = data.decode(self.encoding)
+        self._contents = data
 
     @property
     def contents(self):
