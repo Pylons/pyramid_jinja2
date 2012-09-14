@@ -75,7 +75,8 @@ copyright = '2011, Agendaless Consulting <chrism@plope.com>'
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.3'
+import pkg_resources
+version = pkg_resources.get_distribution(project).version.replace('dev', '')
 # The full version, including alpha/beta/rc tags.
 release = version
 
