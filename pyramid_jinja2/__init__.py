@@ -12,7 +12,7 @@ from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
 from jinja2.utils import (
     import_string,
-    open_if_exists
+    open_if_exists,
     )
 
 from pyramid_jinja2.compat import reraise
@@ -206,7 +206,6 @@ def _get_or_build_default_environment(registry):
     autoescape = asbool(settings.get('jinja2.autoescape', True))
     domain = settings.get('jinja2.i18n.domain', 'messages')
     debug = asbool(settings.get('debug_templates', False))
-    filters = parse_filters(settings.get('jinja2.filters', ''))
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
 
     extensions = parse_multiline(settings.get('jinja2.extensions', ''))
@@ -224,11 +223,18 @@ def _get_or_build_default_environment(registry):
                               auto_reload=reload_templates,
                               autoescape=autoescape,
                               extensions=extensions)
+
+    # register pyramid i18n functions
     wrapper = GetTextWrapper(domain=domain)
     environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext)
+
+    # register global repository for templates
     if package is not None:
         environment._default_package = package.__name__
+
+    filters = parse_filters(settings.get('jinja2.filters', ''))
     environment.filters.update(filters)
+
     registry.registerUtility(environment, IJinja2Environment)
     return registry.queryUtility(IJinja2Environment)
 
