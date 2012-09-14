@@ -195,8 +195,6 @@ class SmartAssetSpecLoader(FileSystemLoader):
             raise TemplateNotFound(name=ex.name, message=message)
 
 
-
-
 def _get_or_build_default_environment(registry):
     environment = registry.queryUtility(IJinja2Environment)
     if environment is not None:
@@ -290,6 +288,7 @@ class Jinja2TemplateRenderer(object):
             raise ValueError('renderer was passed non-dictionary '
                              'as value: %s' % str(ex))
         return self.template.render(system)
+
 
 def renderer_factory(info):
     environment = _get_or_build_default_environment(info.registry)

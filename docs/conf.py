@@ -76,7 +76,7 @@ copyright = '2011, Agendaless Consulting <chrism@plope.com>'
 #
 # The short X.Y version.
 import pkg_resources
-version = pkg_resources.get_distribution(project).version.replace('dev', '')
+version = pkg_resources.get_distribution(project).version
 # The full version, including alpha/beta/rc tags.
 release = version
 

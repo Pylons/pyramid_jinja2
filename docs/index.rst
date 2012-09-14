@@ -44,6 +44,8 @@ Once activated either of these says, the following happens:
 
 #) The :func:`pyramid_jinja2.get_jinja2_environment` directive is added to the
    :term:`configurator` instance.
+
+#) `jinja2.Environment` is constructed and registered globally
    
 To setup the jinja2 search path either one of the following steps must be taken:
 
@@ -218,12 +220,18 @@ jinja2.input_encoding
 jinja2.autoescape
 
   ``true`` or ``false`` representing whether Jinja2 will autoescape rendered
-  blocks.
+  blocks. Defaults to ``true``.
 
 jinja2.extensions
 
   A list of extension objects or a newline-delimited set of dotted import
-  locations where each line represents an extension.
+  locations where each line represents an extension. `jinja2.ext.i18n` is
+  automatically activated.
+ 
+jinja2.i18n.domain
+
+  Pyramid domain for translations. See
+  http://pyramid.readthedocs.org/en/latest/glossary.html#term-translation-domain 
 
 jinja2.filters
 
