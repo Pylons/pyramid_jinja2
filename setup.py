@@ -30,7 +30,7 @@ try:
 except ImportError:
     requires.append('wsgiref')
 
-testing_extras = ['WebTest', 'nose', 'coverage']
+testing_extras = ['WebTest', 'nose>=1.2.0', 'coverage']
 docs_extras = ['Sphinx']
 
 setup(name='pyramid_jinja2',
