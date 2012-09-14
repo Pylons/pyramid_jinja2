@@ -7,7 +7,7 @@ from zope.interface import (
     Interface,
     )
 
-from jinja2 import Environment
+from jinja2 import Environment, FileSystemBytecodeCache
 from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
 from jinja2.utils import (
@@ -201,6 +201,7 @@ def _get_or_build_default_environment(registry):
         return environment
 
     settings = registry.settings
+    kw = {}
     package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
     reload_templates = asbool(settings.get('reload_templates', False))
     autoescape = asbool(settings.get('jinja2.autoescape', True))
@@ -219,10 +220,17 @@ def _get_or_build_default_environment(registry):
         encoding=input_encoding,
         debug=debug)
 
+    # bytecode caching
+    bytecode_caching = asbool(settings.get('jinja2.bytecode_caching', True))
+    bytecode_caching_directory = settings.get('jinja2.bytecode_caching_directory', None)
+    if bytecode_caching:
+        kw['bytecode_cache'] = FileSystemBytecodeCache(bytecode_caching_directory)
+
     environment = Environment(loader=loader,
                               auto_reload=reload_templates,
                               autoescape=autoescape,
-                              extensions=extensions)
+                              extensions=extensions,
+                              **kw)
 
     # register pyramid i18n functions
     wrapper = GetTextWrapper(domain=domain)

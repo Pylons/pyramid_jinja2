@@ -45,7 +45,7 @@ Once activated either of these says, the following happens:
 #) The :func:`pyramid_jinja2.get_jinja2_environment` directive is added to the
    :term:`configurator` instance.
 
-#) `jinja2.Environment` is constructed and registered globally
+#) `jinja2.Environment` is constructed and registered globally.
    
 To setup the jinja2 search path either one of the following steps must be taken:
 
@@ -238,6 +238,17 @@ jinja2.filters
   A dictionary mapping filter name to filter object, or a newline-delimted
   string with each line in the format ``name = dotted.name.to.filter``
   representing Jinja2 filters.
+
+jinja2.bytecode_caching
+  
+  ``true`` or ``false`` to enable filesystem bytecode caching. Defaults to ``true``.
+  See http://jinja.pocoo.org/docs/api/?highlight=bytecode#bytecode-cache
+
+jinja2.bytecode_caching_directory
+
+  Absolute path to directory to store bytecode caching files. Defaults to
+  temporary directory. See
+  http://jinja.pocoo.org/docs/api/?highlight=bytecode#jinja2.FileSystemBytecodeCache
 
 
 Jinja2 Filters

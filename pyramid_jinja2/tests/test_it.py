@@ -105,8 +105,6 @@ class Test_renderer_factory(Base, unittest.TestCase):
     def test_with_filters_object(self):
         from pyramid_jinja2 import IJinja2Environment
 
-        def dummy_filter(value): return 'hoge'
-
         self.config.registry.settings.update(
             {'jinja2.directories': self.templates_dir,
              'jinja2.filters': {'dummy': dummy_filter}})
@@ -275,6 +273,26 @@ class Test_get_jinja2_environment(unittest.TestCase):
         includeme(config)
         self.assertEqual(config.get_jinja2_environment().__class__,
                          Environment)
+
+
+class Test_bytecode_caching(unittest.TestCase):
+    def test_default(self):
+        from pyramid_jinja2 import includeme
+        import jinja2.bccache
+        config = testing.setUp()
+        includeme(config)
+        env = config.get_jinja2_environment()
+        self.assertTrue(isinstance(env.bytecode_cache,
+                                   jinja2.bccache.FileSystemBytecodeCache))
+        self.assertTrue(env.bytecode_cache.directory)
+
+    def test_directory(self):
+        from pyramid_jinja2 import includeme
+        config = testing.setUp()
+        config.registry.settings['jinja2.bytecode_caching_directory'] = '/foobar'
+        includeme(config)
+        env = config.get_jinja2_environment()
+        self.assertEqual(env.bytecode_cache.directory, text_('/foobar'))
 
 
 class TestSmartAssetSpecLoader(unittest.TestCase):
