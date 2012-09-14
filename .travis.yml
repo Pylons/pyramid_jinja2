@@ -8,4 +8,4 @@ install:
   - python setup.py develop
   - easy_install pyramid_jinja2[testing]
 script:
-  - nosetests
+  - nosetests --with-coverage
