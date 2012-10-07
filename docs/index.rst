@@ -26,7 +26,7 @@ are completely equivalent:
     config.include('pyramid_jinja2')
 
 #) If you're using ``pyramid_zcml`` instead of imperative configuration,
-   wnsure that some ZCML file with an analogue of the following contents is
+   ensure that some ZCML file with an analogue of the following contents is
    executed by your Pyramid application::
 
     <include package="pyramid_jinja2"/>
