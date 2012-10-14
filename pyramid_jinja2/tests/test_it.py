@@ -14,10 +14,10 @@ from pyramid_jinja2.compat import PY3
 def dummy_filter(value): return 'hoge'
 
 
-class Test_parse_filters(unittest.TestCase):
+class Test_parse_config(unittest.TestCase):
     def _callFUT(self, value):
-        from pyramid_jinja2 import parse_filters
-        return parse_filters(value)
+        from pyramid_jinja2 import parse_config
+        return parse_config(value)
 
     def test_parse_singile_line(self):
         import pyramid_jinja2

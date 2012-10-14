@@ -8,6 +8,9 @@
   and `jinja2.bytecode_caching_directory` settings.
   [Domen Kožar]
 
+- Allow to add custom Jinja2 tests in `jinja2.tests` setting.
+  [Sebastian Kalinowski]
+
 1.4.1 (2012-09-12)
 ==================
 

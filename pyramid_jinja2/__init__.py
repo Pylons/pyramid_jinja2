@@ -41,15 +41,19 @@ def splitlines(s):
     return filter(None, [x.strip() for x in s.splitlines()])
 
 
-def parse_filters(filters):
+def parse_config(config):
+    """
+    Parses config values from .ini file and returns a dictionary with
+    imported objects
+    """
     # input must be a string or dict
     result = {}
-    if isinstance(filters, string_types):
-        for f in splitlines(filters):
+    if isinstance(config, string_types):
+        for f in splitlines(config):
             name, impl = f.split('=', 1)
             result[name.strip()] = maybe_import_string(impl)
     else:
-        for name, impl in filters.items():
+        for name, impl in config.items():
             result[name] = maybe_import_string(impl)
     return result
 
@@ -218,8 +222,13 @@ def _get_or_build_default_environment(registry):
     if package is not None:
         environment._default_package = package.__name__
 
-    filters = parse_filters(settings.get('jinja2.filters', ''))
+    #add custom jinja2 filters
+    filters = parse_config(settings.get('jinja2.filters', ''))
     environment.filters.update(filters)
+
+    #add custom jinja2 tests
+    tests = parse_config(settings.get('jinja2.tests', ''))
+    environment.tests.update(tests)
 
     registry.registerUtility(environment, IJinja2Environment)
     return registry.queryUtility(IJinja2Environment)

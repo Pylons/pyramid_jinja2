@@ -237,7 +237,13 @@ jinja2.filters
 
   A dictionary mapping filter name to filter object, or a newline-delimted
   string with each line in the format ``name = dotted.name.to.filter``
-  representing Jinja2 filters.
+  representing :ref:`Jinja2 filters <jinja2:writing-filters>`.
+
+jinja2.tests
+
+  A dictionary mapping test name to test object, or a newline-delimted
+  string with each line in the format ``name = dotted.name.to.test``
+  representing :ref:`Jinja2 tests <jinja2:writing-tests>`.
 
 jinja2.bytecode_caching
   
