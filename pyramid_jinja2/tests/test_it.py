@@ -451,3 +451,32 @@ class MiscTests(Base, unittest.TestCase):
         env_after = _get_or_build_default_environment(self.config.registry)
         self.assertTrue('foobar' in env_after.extensions)
         self.assertTrue(env_before is env_after)
+
+
+class UndefinedTests(Base, unittest.TestCase):
+
+    def _assert_has_undefined(self, expected_undefined):
+        from pyramid_jinja2 import IJinja2Environment
+        self.config.include('pyramid_jinja2')
+        environ = self.config.registry.getUtility(IJinja2Environment)
+        self.assertEqual(environ.undefined, expected_undefined)
+
+    def test_set_regular_undefined_when_unset(self):
+        from jinja2 import Undefined
+        self._assert_has_undefined(Undefined)
+
+    def test_set_regular_undefined_by_default(self):
+        from jinja2 import Undefined
+        self.config.registry.settings['jinja2.undefined'] = ''
+        from jinja2 import Undefined
+        self._assert_has_undefined(Undefined)
+
+    def test_set_strict_undefined(self):
+        from jinja2 import StrictUndefined
+        self.config.registry.settings['jinja2.undefined'] = 'strict'
+        self._assert_has_undefined(StrictUndefined)
+
+    def test_set_debug_undefined(self):
+        from jinja2 import DebugUndefined
+        self.config.registry.settings['jinja2.undefined'] = 'debug'
+        self._assert_has_undefined(DebugUndefined)

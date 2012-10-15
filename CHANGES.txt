@@ -1,6 +1,9 @@
 1.4.2 (unreleased)
 ==================
 
+- Add `jinja2.undefined` setting to change handling of undefined types.
+  [Robert Buchholz]
+
 - Remove redundant decoding error handling
   [Domen Kožar]
 

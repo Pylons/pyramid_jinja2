@@ -7,7 +7,7 @@ from zope.interface import (
     Interface,
     )
 
-from jinja2 import Environment, FileSystemBytecodeCache
+from jinja2 import Environment, FileSystemBytecodeCache, Undefined, StrictUndefined, DebugUndefined
 from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
 from jinja2.utils import (
@@ -59,6 +59,12 @@ def parse_multiline(extensions):
         extensions = splitlines(extensions)
     return list(extensions) # py3
 
+def parse_undefined(undefined):
+    if undefined == 'strict':
+        return StrictUndefined
+    if undefined == 'debug':
+        return DebugUndefined
+    return Undefined
 
 class FileInfo(object):
     open_if_exists = staticmethod(open_if_exists)
@@ -191,6 +197,8 @@ def _get_or_build_default_environment(registry):
     if 'jinja2.ext.i18n' not in extensions:
         extensions.append('jinja2.ext.i18n')
 
+    undefined = parse_undefined(settings.get('jinja2.undefined', ''))
+
     directories = parse_multiline(settings.get('jinja2.directories') or '')
     directories = [abspath_from_resource_spec(d, package) for d in directories]
     loader = SmartAssetSpecLoader(
@@ -208,6 +216,7 @@ def _get_or_build_default_environment(registry):
                               auto_reload=reload_templates,
                               autoescape=autoescape,
                               extensions=extensions,
+                              undefined=undefined,
                               **kw)
 
     # register pyramid i18n functions
