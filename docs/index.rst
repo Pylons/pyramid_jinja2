@@ -222,6 +222,15 @@ jinja2.autoescape
   ``true`` or ``false`` representing whether Jinja2 will autoescape rendered
   blocks. Defaults to ``true``.
 
+jinja2.undefined
+
+  Changes the undefined types that are used when a variable name lookup
+  fails. If unset, defaults to ``Undefined`` (silent ignore). Setting it to
+  ``strict`` will trigger ``StrictUndefined`` behavior (raising an error,
+  this is recommended for development). Setting it to ``debug`` will trigger
+  ``DebugUndefined``, which outputs debug information in some cases.
+  See http://jinja.pocoo.org/docs/api/#undefined-types
+
 jinja2.extensions
 
   A list of extension objects or a newline-delimited set of dotted import
