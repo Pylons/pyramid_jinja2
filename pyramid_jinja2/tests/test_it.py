@@ -224,7 +224,69 @@ class TestIntegration2(unittest.TestCase):
         from pyramid.renderers import render
         result = render('templates/helloworld.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello föö', 'utf-8'))
-    
+
+
+class Test_filters_and_tests(Base, unittest.TestCase):
+
+    def _set_up_environ(self):
+        from pyramid_jinja2 import IJinja2Environment
+        self.config.include('pyramid_jinja2')
+        return self.config.registry.getUtility(IJinja2Environment)
+
+    def _assert_has_test(self, test_name, test_obj):
+        environ = self._set_up_environ()
+        self.assertTrue(test_name in environ.tests)
+        self.assertEqual(environ.tests[test_name], test_obj)
+
+    def _assert_has_filter(self, filter_name, filter_obj):
+        environ = self._set_up_environ()
+        self.assertTrue(filter_name in environ.filters)
+        self.assertEqual(environ.filters[filter_name], filter_obj)
+
+    def test_set_single_filter(self):
+        self.config.registry.settings['jinja2.filters'] = \
+                'my_filter = pyramid_jinja2.tests.test_it.my_test_func'
+        self._assert_has_filter('my_filter', my_test_func)
+
+    def test_set_single_test(self):
+        self.config.registry.settings['jinja2.tests'] = \
+                'my_test = pyramid_jinja2.tests.test_it.my_test_func'
+        self._assert_has_test('my_test', my_test_func)
+
+    def test_set_multi_filters(self):
+        self.config.registry.settings['jinja2.filters'] = \
+                'my_filter1 = pyramid_jinja2.tests.test_it.my_test_func\n' \
+                'my_filter2 = pyramid_jinja2.tests.test_it.my_test_func\n' \
+                'my_filter3 = pyramid_jinja2.tests.test_it.my_test_func'
+        self._assert_has_filter('my_filter1', my_test_func)
+        self._assert_has_filter('my_filter2', my_test_func)
+        self._assert_has_filter('my_filter3', my_test_func)
+
+    def test_set_multi_tests(self):
+        self.config.registry.settings['jinja2.tests'] = \
+                'my_test1 = pyramid_jinja2.tests.test_it.my_test_func\n' \
+                'my_test2 = pyramid_jinja2.tests.test_it.my_test_func\n' \
+                'my_test3 = pyramid_jinja2.tests.test_it.my_test_func'
+        self._assert_has_test('my_test1', my_test_func)
+        self._assert_has_test('my_test2', my_test_func)
+        self._assert_has_test('my_test3', my_test_func)
+
+    def test_filter_and_test_works_in_render(self):
+        import pyramid_jinja2
+        from pyramid.renderers import render
+        config = testing.setUp()
+        config.add_settings({
+            'jinja2.directories': 'pyramid_jinja2.tests:templates',
+            'jinja2.tests': 'my_test = pyramid_jinja2.tests.test_it.my_test_func',
+            'jinja2.filters': 'my_filter = pyramid_jinja2.tests.test_it.my_test_func'
+        })
+        config.add_renderer('.jinja2', pyramid_jinja2.renderer_factory)
+        result = render('tests_and_filters.jinja2', {})
+        #my_test_func returs "True" - it will be render as True when usign
+        # as filter and will pass in tests
+        self.assertEqual(result, text_('True is not False', 'utf-8'))
+        testing.tearDown()
+
 
 class Test_includeme(unittest.TestCase):
     def test_it(self):
@@ -480,3 +542,7 @@ class UndefinedTests(Base, unittest.TestCase):
         from jinja2 import DebugUndefined
         self.config.registry.settings['jinja2.undefined'] = 'debug'
         self._assert_has_undefined(DebugUndefined)
+
+def my_test_func(*args, **kwargs):
+    """ Used as a fake filter/test function """
+    return True
