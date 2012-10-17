@@ -251,13 +251,13 @@ jinja2.filters
 jinja2.bytecode_caching
   
   ``true`` or ``false`` to enable filesystem bytecode caching. Defaults to ``true``.
-  See http://jinja.pocoo.org/docs/api/?highlight=bytecode#bytecode-cache
+  See http://jinja.pocoo.org/docs/api/#bytecode-cache
 
 jinja2.bytecode_caching_directory
 
   Absolute path to directory to store bytecode caching files. Defaults to
   temporary directory. See
-  http://jinja.pocoo.org/docs/api/?highlight=bytecode#jinja2.FileSystemBytecodeCache
+  http://jinja.pocoo.org/docs/api/#jinja2.FileSystemBytecodeCache
 
 
 Jinja2 Filters
