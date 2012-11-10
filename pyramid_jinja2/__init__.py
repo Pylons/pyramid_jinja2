@@ -1,3 +1,4 @@
+import atexit
 import inspect
 import os
 import sys
@@ -279,6 +280,8 @@ def _get_or_build_default_environment(registry):
     if bytecode_caching:
         kw['bytecode_cache'] = \
             FileSystemBytecodeCache(bytecode_caching_directory)
+        # clear cache on exit
+        atexit.register(kw['bytecode_cache'].clear)
 
     environment = Environment(loader=loader,
                               auto_reload=reload_templates,

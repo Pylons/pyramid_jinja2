@@ -356,6 +356,7 @@ representing :ref:`Jinja2 filters <jinja2:writing-filters>`.
 
 jinja2.tests
 ------------
+
 A dictionary mapping test name to test object, or a newline-delimted
 string with each line in the format::
 
@@ -367,17 +368,23 @@ representing :ref:`Jinja2 tests <jinja2:writing-tests>`.
 
 jinja2.bytecode_caching
 -----------------------
+
 ``true`` or ``false`` to enable filesystem bytecode caching. Defaults to
 ``true``. See :ref:`Bytecode Cache <jinja2:bytecode-cache>` in Jinja2
-documentation.
+documentation. 
 
 .. _setting_jinja2_byte_cache_dir:
 
 jinja2.bytecode_caching_directory
 ---------------------------------
+
 Absolute path to directory to store bytecode caching files. Defaults to
 temporary directory. See :py:class:`jinja2.FileSystemBytecodeCache`.
 
+.. note::
+
+   Directory will be deleted by py:func:`jinja2.BytecodeCache.clear`,
+   which is called by :func:`atexit.register`.
 
 .. _jinja2_filters:
 

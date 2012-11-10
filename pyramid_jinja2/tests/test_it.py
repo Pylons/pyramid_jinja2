@@ -341,12 +341,15 @@ class Test_bytecode_caching(unittest.TestCase):
         self.assertTrue(env.bytecode_cache.directory)
 
     def test_directory(self):
+        import tempfile
         from pyramid_jinja2 import includeme
+        tmpdir = tempfile.mkdtemp()
         config = testing.setUp()
-        config.registry.settings['jinja2.bytecode_caching_directory'] = '/foobar'
+        config.registry.settings['jinja2.bytecode_caching_directory'] = tmpdir
         includeme(config)
         env = config.get_jinja2_environment()
-        self.assertEqual(env.bytecode_cache.directory, text_('/foobar'))
+        self.assertEqual(env.bytecode_cache.directory, tmpdir)
+        # TODO: test tmpdir is deleted when interpreter exits
 
 
 class TestSmartAssetSpecLoader(unittest.TestCase):
