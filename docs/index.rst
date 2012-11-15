@@ -2,11 +2,15 @@
 pyramid_jinja2
 ==============
 
+.. _overview:
+
 Overview
 ========
 
 :term:`pyramid_jinja2` is a set of bindings that make templates written for the
 :term:`Jinja2` templating system work under the :term:`Pyramid` web framework.
+
+.. _instalation:
 
 Installation
 ============
@@ -15,54 +19,61 @@ Install using setuptools, e.g. (within a virtualenv)::
 
   $ $myvenv/bin/easy_install pyramid_jinja2
 
+.. _setup:
+
 Setup
 =====
 
 There are two ways to make sure that ``pyramid_jinja2`` is active.  Both
 are completely equivalent:
 
-#) Use the ``includeme`` function via ``config.include``::
+#) Use the :py:func:`~pyramid_jinja2.includeme` function via :py:meth:`~pyramid.config.Configurator.include`::
 
+    config = Configurator()
     config.include('pyramid_jinja2')
 
-#) If you're using ``pyramid_zcml`` instead of imperative configuration,
-   wnsure that some ZCML file with an analogue of the following contents is
-   executed by your Pyramid application::
 
-    <include package="pyramid_jinja2"/>
+#) If you're using `pyramid_zcml
+   <http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/>`_
+   instead of imperative configuration, ensure that some ZCML file with an
+   analogue of the following contents is executed by your Pyramid
+   application:
+
+   .. code-block:: xml
+
+        <include package="pyramid_jinja2"/>
 
 Once activated either of these says, the following happens:
 
-#) Files with the ``.jinja2`` extension are considered to be
+#) Files with the :file:`.jinja2` extension are considered to be
    :term:`Jinja2` templates.
 
 #) The :func:`pyramid_jinja2.add_jinja2_search_path` directive is added to
-   the :term:`configurator` instance.
+   the :term:`Configurator` instance.
 
 #) The :func:`pyramid_jinja2.add_jinja2_extension` directive is added to the
-   :term:`configurator` instance.
+   :term:`Configurator` instance.
 
 #) The :func:`pyramid_jinja2.get_jinja2_environment` directive is added to the
-   :term:`configurator` instance.
+   :term:`Configurator` instance.
 
-#) `jinja2.Environment` is constructed and registered globally.
+#) :py:class:`jinja2.Environment` is constructed and registered globally.
 
-To setup the jinja2 search path either one of the following steps must be taken:
+To setup the Jinja2 search path either one of the following steps must be taken:
 
-#) Add ``jinja2.directories`` to your ``.ini`` settings file using the pyramid
-   asset spec::
+#) Add :ref:`setting_jinja2_directories` to your :file:`.ini` settings file using the pyramid asset spec::
 
      jinja2.directories = yourapp:templates
 
-#) Or Alternatively by using the ``add_jinja2_search_path`` directive
-   attached to your application's :term:`configurator` instance also using
-   the pyramid asset spec::
+#) Or Alternatively by using the :func:`~pyramid_jinja2.add_jinja2_search_path`
+   directive attached to your application's :term:`Configurator` instance also
+   using the pyramid asset spec::
 
      config.add_jinja2_search_path("yourapp:templates")
 
 .. warning::
 
-    If you do not explicitly configure your jinja2 search path it will
+    If you do not explicitly configure your Jinja2 search path it will
     default to the root of your application. If the specified template
     is not found in the root of your application and you did not specify
     a package on the template path it will then try to load the template
@@ -70,60 +81,65 @@ To setup the jinja2 search path either one of the following steps must be taken:
 
     Without the search path configured:
 
-    .. code-block:: text
+    .. code-block:: python
 
         @view_config(renderer='templates/mytemplate.jinja2')
 
     With the search path configured:
 
-    .. code-block:: text
+    .. code-block:: python
 
        @view_config(renderer='mytemplate.jinja2')
 
     If you view module is in app.module.view and your template is
-    under app/module/templates/mytemplate.jinja2 you can access
+    under :file:`app/module/templates/mytemplate.jinja2` you can access
     that asset in a few different ways.
 
     Using the full path:
 
-    .. code-block:: text
+    .. code-block:: python
 
       @view_config(renderer="module/templates/mytemplate.jinja2")
 
     Using the package:
 
-    .. code-block:: text
+    .. code-block:: python
 
       @view_config(renderer="app.module:templates/mytemplate.jinja2")
 
     Using the relative path to current package:
 
-    .. code-block:: text
+    .. code-block:: python
 
       @view_config(renderer="templates/mytemplate.jinja2")
 
     You need to be careful when using relative paths though, if
-    there is an app/templates/mytemplate.jinja2 this will be
-    used instead as jinja2 lookup will first try the path relative
+    there is an :file:`app/templates/mytemplate.jinja2` this will be
+    used instead as Jinja2 lookup will first try the path relative
     to the root of the app and then it will try the path relative
     to the current package.
+
+.. _usage:
 
 Usage
 =====
 
-Once :term:`pyramid_jinja2` been activated ``.jinja2`` templates
+Once :term:`pyramid_jinja2` been activated :file:`.jinja2` templates
 can be loaded either by looking up names that would be found on
 the :term:`Jinja2` search path or by looking up asset specifications.
+
+.. _template_lookups:
 
 Template Lookups
 ----------------
 
 The default lookup mechanism for templates uses the :term:`Jinja2`
-search path. (specified with ``jinja2.directories`` or by using the
-add_jinja2_search_path directive on the :term:`configurator` instance.)
+search path (specified with :ref:`setting_jinja2_directories` or by using
+the :func:`~pyramid_jinja2.add_jinja2_search_path` directive on the
+:term:`Configurator` instance).
 
 Rendering :term:`Jinja2` templates with a view like this is typically
-done as follows (where the ``templates`` directory is expected to
+done as follows (where the :file:`templates` directory is expected to
 live in the search path):
 
 .. code-block:: python
@@ -177,63 +193,42 @@ template lookups.  An example:
  </p>
  {% endblock %}
 
-For further information on :term:`template inheritance` in Jinja2
-templates please see http://jinja.pocoo.org/docs/templates/#template-inheritance.
+For further information on :term:`Template Inheritance` in Jinja2
+templates please see :ref:`Template Inheritance <jinja2:template-inheritance>`
+in Jinja2 documentation.
+
+.. _assets_spec_lookups:
 
 Asset Specification Lookups
 ---------------------------
 
 Looking up templates via asset specification is a feature specific
-to :term:`Pyramid`.  For further info please see `Understanding
-Asset Specifications
-<http://docs.pylonsproject.org/projects/pyramid/1.0/narr/assets.html#understanding-asset-specifications>`_.
+to :term:`Pyramid`.  For further info please see :ref:`Understanding
+Asset Specifications <pyramid:asset_specifications>`.
 Overriding templates in this style uses the standard
-`pyramid asset overriding technique
-<http://docs.pylonsproject.org/projects/pyramid/1.0/narr/assets.html#overriding-assets>`_.
+:ref:`pyramid asset overriding technique <pyramid:overriding_assets_section>`.
+
+.. _settings:
 
 Settings
 ========
 
-Jinja2 derives additional settings to configure its template renderer. Many
+:term:`Jinja2` derives additional settings to configure its template renderer. Many
 of these settings are optional and only need to be set if they should be
-different from the default.  The below values can be present in the ``.ini``
-file used to configure the Pyramid application (in the ``app`` section
-representing your Pyramid app) or they can be passed directly within the
-``settings`` argument passed to a Pyramid Configurator.
+different from the default.  The below values can be present in the
+:file:`.ini` file used to configure the Pyramid application (in the ``app``
+section representing your Pyramid app) or they can be passed directly within
+the ``settings`` argument passed to a Pyramid Configurator.
 
-reload_templates
+Generic Settings
+----------------
 
-  ``true`` or ``false`` representing whether Jinja2 templates should be
-  reloaded when they change on disk.  Useful for development to be ``true``.
-  This is the same as Jinja2's ``auto_reload`` flag.
+  These setttings correspond to the ones documented in Jinja2.
+  Set them accordingly. See http://jinja.pocoo.org/docs/api/#high-level-api
 
-jinja2.directories
+.. warning::
 
-  A list of directory names or a newline-delimited string with each line
-  representing a directory name.  These locations are where Jinja2 will
-  search for templates.  Each can optionally be an absolute resource
-  specification (e.g. ``package:subdirectory/``).
-
-jinja2.input_encoding
-
-  The input encoding of templates.  Defaults to ``utf-8``.
-
-jinja2.extensions
-
-  A list of extension objects or a newline-delimited set of dotted import
-  locations where each line represents an extension. `jinja2.ext.i18n` is
-  automatically activated.
-
-jinja2.i18n.domain
-
-  Pyramid domain for translations. See
-  http://pyramid.readthedocs.org/en/latest/glossary.html#term-translation-domain
-
-jinja2.filters
-
-  A dictionary mapping filter name to filter object, or a newline-delimted
-  string with each line in the format ``name = dotted.name.to.filter``
-  representing Jinja2 filters.
+    For the boolean settings please use ``true`` or ``false``
 
 jinja2.block_start_string
 
@@ -244,6 +239,8 @@ jinja2.variable_start_string
 jinja2.variable_end_string
 
 jinja2.comment_start_string
+
+jinja2.comment_end_string
 
 jinja2.line_statement_prefix
 
@@ -259,30 +256,107 @@ jinja2.autoescape
 
 jinja2.cache_size
 
-  The above setttings correspond to the ones documented in Jinja2.
-  Set them accordingly. See http://jinja.pocoo.org/docs/api/#high-level-api
 
-.. warning::
+.. _setting_reload_templates:
 
-    For the boolean settings please use ``true`` or ``false``
+reload_templates
+----------------
+
+``true`` or ``false`` representing whether Jinja2 templates should be
+reloaded when they change on disk.  Useful for development to be ``true``.
+
+.. _setting_jinja2_autoreload:
 
 jinja2.auto_reload
+------------------
 
-  See ``reload_templates`` settings.
+See ``reload_templates`` settings.
 
+
+.. _setting_jinja2_directories:
+
+jinja2.directories
+------------------
+
+A list of directory names or a newline-delimited string with each line
+representing a directory name.  These locations are where Jinja2 will
+search for templates.  Each can optionally be an absolute resource
+specification (e.g. ``package:subdirectory/``).
+
+.. _setting_jinja2_input_encoding:
+
+jinja2.input_encoding
+---------------------
+
+The input encoding of templates.  Defaults to ``utf-8``.
+
+.. _setting_jinja2_undefined:
+
+jinja2.undefined
+----------------
+
+Changes the undefined types that are used when a variable name lookup fails.
+If unset, defaults to :py:class:`~jinja2.Undefined` (silent ignore). Setting
+it to ``strict`` will trigger :py:class:`~jinja2.StrictUndefined` behavior
+(raising an error, this is recommended for development). Setting it to
+``debug`` will trigger :py:class:`~jinja2.DebugUndefined`, which outputs
+debug information in some cases.  See `Undefined Types <http://jinja.pocoo.org/docs/api/#undefined-types>`_
+
+.. _setting_jinja2_extensions:
+
+jinja2.extensions
+-----------------
+A list of extension objects or a newline-delimited set of dotted import
+locations where each line represents an extension. :ref:`jinja2.ext.i18n
+<jinja2:i18n-extension>` is automatically activated.
+
+.. _setting_jinja2_i18n_domain:
+
+jinja2.i18n.domain
+------------------
+Pyramid domain for translations. See :term:`Translation Domain` in Pyramid
+documentation.
+
+.. _setting_jinja2_filers:
+
+jinja2.filters
+--------------
+
+A dictionary mapping filter name to filter object, or a newline-delimted
+string with each line in the format::
+
+    name = dotted.name.to.filter
+
+representing :ref:`Jinja2 filters <jinja2:writing-filters>`.
+
+.. _setting_jinja2_tests:
+
+jinja2.tests
+------------
+A dictionary mapping test name to test object, or a newline-delimted
+string with each line in the format::
+
+    name = dotted.name.to.test
+
+representing :ref:`Jinja2 tests <jinja2:writing-tests>`.
+
+.. _setting_jinja2_byte_cache:
 
 jinja2.bytecode_caching
+-----------------------
+``true`` or ``false`` to enable filesystem bytecode caching. Defaults to
+``true``. See :ref:`Bytecode Cache <jinja2:bytecode-cache>` in Jinja2
+documentation.
 
-  ``true`` or ``false`` to enable filesystem bytecode caching. Defaults to
-  ``true``.
-  See http://jinja.pocoo.org/docs/api/?highlight=bytecode#bytecode-cache
+.. _setting_jinja2_byte_cache_dir:
 
 jinja2.bytecode_caching_directory
+---------------------------------
+Absolute path to directory to store bytecode caching files. Defaults to
+temporary directory. See :py:class:`jinja2.FileSystemBytecodeCache`.
 
-  Absolute path to directory to store bytecode caching files. Defaults to
-  temporary directory. See
-  http://jinja.pocoo.org/docs/api/?highlight=bytecode#jinja2.FileSystemBytecodeCache
 
+.. _jinja2_filters:
 
 Jinja2 Filters
 ==============

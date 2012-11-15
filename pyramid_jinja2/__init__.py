@@ -7,6 +7,9 @@ from zope.interface import Interface
 
 from jinja2 import Environment
 from jinja2 import FileSystemBytecodeCache
+from jinja2 import Undefined
+from jinja2 import StrictUndefined
+from jinja2 import DebugUndefined
 
 from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
@@ -38,15 +41,19 @@ def splitlines(s):
     return filter(None, [x.strip() for x in s.splitlines()])
 
 
-def parse_filters(filters):
+def parse_config(config):
+    """
+    Parses config values from .ini file and returns a dictionary with
+    imported objects
+    """
     # input must be a string or dict
     result = {}
-    if isinstance(filters, string_types):
-        for f in splitlines(filters):
+    if isinstance(config, string_types):
+        for f in splitlines(config):
             name, impl = f.split('=', 1)
             result[name.strip()] = maybe_import_string(impl)
     else:
-        for name, impl in filters.items():
+        for name, impl in config.items():
             result[name] = maybe_import_string(impl)
     return result
 
@@ -55,6 +62,14 @@ def parse_multiline(extensions):
     if isinstance(extensions, string_types):
         extensions = splitlines(extensions)
     return list(extensions)  # py3
+
+
+def parse_undefined(undefined):
+    if undefined == 'strict':
+        return StrictUndefined
+    if undefined == 'debug':
+        return DebugUndefined
+    return Undefined
 
 
 class FileInfo(object):
@@ -186,8 +201,9 @@ def _get_or_build_default_environment(registry):
     # set string settings
     for short_key_name in ('block_start_string', 'block_end_string',
                            'variable_start_string', 'variable_end_string',
-                           'comment_start_string', 'line_statement_prefix',
-                           'line_comment_prefix', 'newline_sequence'):
+                           'comment_start_string', 'comment_end_string',
+                           'line_statement_prefix', 'line_comment_prefix',
+                           'newline_sequence'):
         key_name = 'jinja2.%s' % (short_key_name,)
         if key_name in settings:
             kw[short_key_name] = settings.get(key_name)
@@ -208,6 +224,8 @@ def _get_or_build_default_environment(registry):
     if 'jinja2.ext.i18n' not in extensions:
         extensions.append('jinja2.ext.i18n')
 
+    undefined = parse_undefined(settings.get('jinja2.undefined', ''))
+
     directories = parse_multiline(settings.get('jinja2.directories') or '')
     directories = [abspath_from_resource_spec(d, package) for d in directories]
     loader = SmartAssetSpecLoader(
@@ -226,6 +244,7 @@ def _get_or_build_default_environment(registry):
     environment = Environment(loader=loader,
                               auto_reload=reload_templates,
                               extensions=extensions,
+                              undefined=undefined,
                               **kw)
 
     # register pyramid i18n functions
@@ -236,8 +255,13 @@ def _get_or_build_default_environment(registry):
     if package is not None:
         environment._default_package = package.__name__
 
-    filters = parse_filters(settings.get('jinja2.filters', ''))
+    #add custom jinja2 filters
+    filters = parse_config(settings.get('jinja2.filters', ''))
     environment.filters.update(filters)
+
+    #add custom jinja2 tests
+    tests = parse_config(settings.get('jinja2.tests', ''))
+    environment.tests.update(tests)
 
     registry.registerUtility(environment, IJinja2Environment)
     return registry.queryUtility(IJinja2Environment)
@@ -285,7 +309,7 @@ class Jinja2TemplateRenderer(object):
         try:
             return self.environment.get_template(name)
         except TemplateNotFound:
-            if name_with_package != None:
+            if name_with_package is not None:
                 return self.environment.get_template(name_with_package)
             else:
                 raise
@@ -325,7 +349,7 @@ def add_jinja2_search_path(config, searchpath):
 
     for folder in searchpath:
         env.loader.searchpath.append(abspath_from_resource_spec(folder,
-                                        config.package_name))
+                                     config.package_name))
 
 
 def add_jinja2_extension(config, ext):

@@ -1,5 +1,28 @@
-1.4.2 (unreleased)
+1.4.3 (unreleased)
 ==================
+
+- Add support for more Jinja2 options. Note support for jinja2.autoescape is
+  limitted to boolean only.
+  * jinja2.block_start_string
+  * jinja2.block_end_string
+  * jinja2.variable_start_string
+  * jinja2.variable_end_string
+  * jinja2.comment_start_string
+  * jinja2.comment_end_string
+  * jinja2.line_statement_prefix
+  * jinja2.line_comment_prefix
+  * jinja2.trim_blocks
+  * jinja2.newline_sequence
+  * jinja2.optimized
+  * jinja2.cache_size
+  * jinja2.autoescape
+  [Michael Ryabushkin]
+
+1.4.2 (2012-10-17)
+==================
+
+- Add `jinja2.undefined` setting to change handling of undefined types.
+  [Robert Buchholz]
 
 - Remove redundant decoding error handling
   [Domen Kožar]
@@ -7,6 +30,9 @@
 - Configure bytecode caching by default. Introduce `jinja2.bytecode_caching`
   and `jinja2.bytecode_caching_directory` settings.
   [Domen Kožar]
+
+- Allow to add custom Jinja2 tests in `jinja2.tests` setting.
+  [Sebastian Kalinowski]
 
 1.4.1 (2012-09-12)
 ==================

@@ -195,6 +195,12 @@ html_last_updated_fmt = '%b %d, %Y'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'atemplatedoc'
 
+# for cross referencing documentations
+intersphinx_mapping = {
+    'jinja2': ('http://jinja.pocoo.org/docs/', None),
+    'pyramid': ('http://docs.pylonsproject.org/projects/pyramid/en/latest/', None),
+}
+
 
 # Options for LaTeX output
 # ------------------------
