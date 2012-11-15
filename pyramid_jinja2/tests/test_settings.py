@@ -14,8 +14,6 @@ class DummyRendererInfo(object):
     """
     def __init__(self, kw):
         self.__dict__.update(kw)
-        if 'registry' in self.__dict__:
-            self.settings = self.registry.settings
 
 
 class Test_settings(TestCase):
@@ -24,21 +22,23 @@ class Test_settings(TestCase):
     """
 
     def setUp(self):
-        self.request = testing.DummyRequest()
-        self.config = testing.setUp(request=self.request)
-        self.request.registry = self.config.registry
+        # get test config
+        self.config = testing.setUp()
 
     def tearDown(self):
+        # tear the config down and delete it
         testing.tearDown()
         del self.config
 
     def _callFUT(self, info):
+        # initialize renderer with dummy info containing our configs
         from pyramid_jinja2 import renderer_factory
-        return renderer_factory(info)
+        renderer_factory(info)
 
     def test_settings(self):
         from pyramid_jinja2 import IJinja2Environment
-        from pyramid_jinja2.tests.base import DummyRendererInfo
+
+        # configure test settings
         self.config.registry.settings.update(
             {'jinja2.block_start_string': '<<<',
              'jinja2.block_end_string': '>>>',
@@ -55,14 +55,17 @@ class Test_settings(TestCase):
              'jinja2.cache_size': 300
             })
 
+        # provide minimum amount of information to the renderer
         info = DummyRendererInfo(
             {'name': 'helloworld.jinja2',
              'package': None,
-             'registry': self.config.registry
+             'registry': self.config.registry,
+             'settings': self.config.registry.settings
              })
 
         # call renderer so the Jinja2 environment is created
         self._callFUT(info)
+        # get Jinja2 environment
         environ = self.config.registry.getUtility(IJinja2Environment)
 
         self.assertEqual(environ.block_start_string, '<<<')
