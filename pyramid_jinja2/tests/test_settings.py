@@ -1,45 +1,21 @@
 # -*- coding: utf-8 -*-
 
-"""
-Tests for jinja2 settings.
-"""
-
 from unittest import TestCase
-from pyramid import testing
 
 
 class DummyRendererInfo(object):
-    """
-    RendererInfo fixture.
-    """
-    def __init__(self, kw):
-        self.__dict__.update(kw)
+
+    def __init__(self, registry):
+        self.name = 'helloworld.jinja2'
+        self.package = None
+        self.registry = registry
+        self.settings = registry.settings
 
 
-class Test_settings(TestCase):
-    """
-    Test case for settings.
-    """
+class DummyRegistry(object):
 
-    def setUp(self):
-        # get test config
-        self.config = testing.setUp()
-
-    def tearDown(self):
-        # tear the config down and delete it
-        testing.tearDown()
-        del self.config
-
-    def _callFUT(self, info):
-        # initialize renderer with dummy info containing our configs
-        from pyramid_jinja2 import renderer_factory
-        renderer_factory(info)
-
-    def test_settings(self):
-        from pyramid_jinja2 import IJinja2Environment
-
-        # configure test settings
-        self.config.registry.settings.update(
+    def __init__(self, settings=None):
+        self.settings = \
             {'jinja2.block_start_string': '<<<',
              'jinja2.block_end_string': '>>>',
              'jinja2.variable_start_string': '<|<',
@@ -53,21 +29,37 @@ class Test_settings(TestCase):
              'jinja2.optimized': False,
              'jinja2.autoescape': True,
              'jinja2.cache_size': 300
-            })
+            }
 
+        self.impl = None
+
+    def queryUtility(self, iface):
+        return self.impl
+
+    def registerUtility(self, impl, iface):
+        self.impl = impl
+
+
+class Test_settings(TestCase):
+
+    def _callFUT(self, info):
+        # initialize renderer with dummy info containing our configs
+        from pyramid_jinja2 import renderer_factory
+        return renderer_factory(info)
+
+    def test_settings(self):
+        from pyramid_jinja2 import IJinja2Environment
+
+        registry = DummyRegistry()
         # provide minimum amount of information to the renderer
-        info = DummyRendererInfo(
-            {'name': 'helloworld.jinja2',
-             'package': None,
-             'registry': self.config.registry,
-             'settings': self.config.registry.settings
-             })
+        info = DummyRendererInfo(registry)
 
         # call renderer so the Jinja2 environment is created
         self._callFUT(info)
         # get Jinja2 environment
-        environ = self.config.registry.getUtility(IJinja2Environment)
+        environ = registry.queryUtility(IJinja2Environment)
 
+        # test
         self.assertEqual(environ.block_start_string, '<<<')
         self.assertEqual(environ.block_end_string, '>>>')
         self.assertEqual(environ.variable_start_string, '<|<')
