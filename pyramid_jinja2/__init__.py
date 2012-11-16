@@ -220,12 +220,14 @@ def _get_or_build_default_environment(registry):
         if key_name in settings:
             kw[short_key_name] = int(settings.get(key_name))
 
+    # extensions
     extensions = parse_multiline(settings.get('jinja2.extensions', ''))
     if 'jinja2.ext.i18n' not in extensions:
         extensions.append('jinja2.ext.i18n')
 
     undefined = parse_undefined(settings.get('jinja2.undefined', ''))
 
+    # jinja directories
     directories = parse_multiline(settings.get('jinja2.directories') or '')
     directories = [abspath_from_resource_spec(d, package) for d in directories]
     loader = SmartAssetSpecLoader(
