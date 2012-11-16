@@ -2,20 +2,20 @@ import inspect
 import os
 import sys
 
-from zope.interface import (
-    implementer,
-    Interface,
-    )
+from zope.interface import implementer
+from zope.interface import Interface
 
-from jinja2 import Environment, FileSystemBytecodeCache, Undefined, StrictUndefined, DebugUndefined
+from jinja2 import Environment
+from jinja2 import FileSystemBytecodeCache
+from jinja2 import Undefined
+from jinja2 import StrictUndefined
+from jinja2 import DebugUndefined
+
 from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
-from jinja2.utils import (
-    import_string,
-    open_if_exists,
-    )
+from jinja2.utils import import_string
+from jinja2.utils import open_if_exists
 
-from pyramid_jinja2.compat import reraise
 from pyramid_jinja2.compat import string_types
 from pyramid_jinja2.compat import text_type
 
@@ -61,7 +61,8 @@ def parse_config(config):
 def parse_multiline(extensions):
     if isinstance(extensions, string_types):
         extensions = splitlines(extensions)
-    return list(extensions) # py3
+    return list(extensions)  # py3
+
 
 def parse_undefined(undefined):
     if undefined == 'strict':
@@ -69,6 +70,7 @@ def parse_undefined(undefined):
     if undefined == 'debug':
         return DebugUndefined
     return Undefined
+
 
 class FileInfo(object):
     open_if_exists = staticmethod(open_if_exists)
@@ -176,7 +178,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
         try:
             return FileSystemLoader.get_source(self, environment, template)
         except TemplateNotFound:
-            ex = sys.exc_info()[1] # py2.5-3.2 compat
+            ex = sys.exc_info()[1]  # py2.5-3.2 compat
             message = ex.message
             message += ('; asset=%s; searchpath=%r'
                         % (fi.filename, self.searchpath))
@@ -192,17 +194,40 @@ def _get_or_build_default_environment(registry):
     kw = {}
     package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
     reload_templates = asbool(settings.get('reload_templates', False))
-    autoescape = asbool(settings.get('jinja2.autoescape', True))
     domain = settings.get('jinja2.i18n.domain', 'messages')
     debug = asbool(settings.get('debug_templates', False))
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
 
+    # set string settings
+    for short_key_name in ('block_start_string', 'block_end_string',
+                           'variable_start_string', 'variable_end_string',
+                           'comment_start_string', 'comment_end_string',
+                           'line_statement_prefix', 'line_comment_prefix',
+                           'newline_sequence'):
+        key_name = 'jinja2.%s' % (short_key_name,)
+        if key_name in settings:
+            kw[short_key_name] = settings.get(key_name)
+
+    # boolean settings
+    for short_key_name in ('autoescape', 'trim_blocks', 'optimized'):
+        key_name = 'jinja2.%s' % (short_key_name,)
+        if key_name in settings:
+            kw[short_key_name] = asbool(settings.get(key_name))
+
+    # integer settings
+    for short_key_name in ('cache_size',):
+        key_name = 'jinja2.%s' % (short_key_name,)
+        if key_name in settings:
+            kw[short_key_name] = int(settings.get(key_name))
+
+    # extensions
     extensions = parse_multiline(settings.get('jinja2.extensions', ''))
     if 'jinja2.ext.i18n' not in extensions:
         extensions.append('jinja2.ext.i18n')
 
     undefined = parse_undefined(settings.get('jinja2.undefined', ''))
 
+    # jinja directories
     directories = parse_multiline(settings.get('jinja2.directories') or '')
     directories = [abspath_from_resource_spec(d, package) for d in directories]
     loader = SmartAssetSpecLoader(
@@ -212,13 +237,14 @@ def _get_or_build_default_environment(registry):
 
     # bytecode caching
     bytecode_caching = asbool(settings.get('jinja2.bytecode_caching', True))
-    bytecode_caching_directory = settings.get('jinja2.bytecode_caching_directory', None)
+    bytecode_caching_directory = \
+        settings.get('jinja2.bytecode_caching_directory', None)
     if bytecode_caching:
-        kw['bytecode_cache'] = FileSystemBytecodeCache(bytecode_caching_directory)
+        kw['bytecode_cache'] = \
+            FileSystemBytecodeCache(bytecode_caching_directory)
 
     environment = Environment(loader=loader,
                               auto_reload=reload_templates,
-                              autoescape=autoescape,
                               extensions=extensions,
                               undefined=undefined,
                               **kw)
@@ -285,7 +311,7 @@ class Jinja2TemplateRenderer(object):
         try:
             return self.environment.get_template(name)
         except TemplateNotFound:
-            if name_with_package != None:
+            if name_with_package is not None:
                 return self.environment.get_template(name_with_package)
             else:
                 raise
@@ -294,7 +320,7 @@ class Jinja2TemplateRenderer(object):
         try:
             system.update(value)
         except (TypeError, ValueError):
-            ex = sys.exc_info()[1] # py2.5 - 3.2 compat
+            ex = sys.exc_info()[1]  # py2.5 - 3.2 compat
             raise ValueError('renderer was passed non-dictionary '
                              'as value: %s' % str(ex))
         return self.template.render(system)
@@ -323,8 +349,9 @@ def add_jinja2_search_path(config, searchpath):
     env = _get_or_build_default_environment(registry)
     searchpath = parse_multiline(searchpath)
 
-    for d in searchpath:
-        env.loader.searchpath.append(abspath_from_resource_spec(d, config.package_name))
+    for folder in searchpath:
+        env.loader.searchpath.append(abspath_from_resource_spec(folder,
+                                     config.package_name))
 
 
 def add_jinja2_extension(config, ext):
@@ -343,6 +370,7 @@ def add_jinja2_extension(config, ext):
     env = _get_or_build_default_environment(config.registry)
     env.add_extension(ext)
 
+
 def get_jinja2_environment(config):
     """
     This function is added as a method of a :term:`Configurator`, and
@@ -357,6 +385,7 @@ def get_jinja2_environment(config):
     :mod:`pyramid_jinja2` or ``None`` if no environment has yet been set up.
     """
     return config.registry.queryUtility(IJinja2Environment)
+
 
 def includeme(config):
     """Set up standard configurator registrations.  Use via:
