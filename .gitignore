@@ -1,5 +1,6 @@
 build
 env26/
+env27
 env32/
 *.egg
 *.egg-info
