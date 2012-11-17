@@ -31,6 +31,12 @@ class IJinja2Environment(Interface):
     pass
 
 
+# defaults we want to override
+_JINJA2_ENVIRONMENT_DEFAULTS = {
+    'autoescape': True
+}
+
+
 def maybe_import_string(val):
     if isinstance(val, string_types):
         return import_string(val.strip())
@@ -185,18 +191,25 @@ class SmartAssetSpecLoader(FileSystemLoader):
             raise TemplateNotFound(name=ex.name, message=message)
 
 
-def _get_or_build_default_environment(registry):
-    environment = registry.queryUtility(IJinja2Environment)
-    if environment is not None:
-        return environment
+def _parse_config_for_settings(settings):
+    """
+    Generate a dictionary with Jinja2 settings parsed from the config,
+    settings.
 
-    settings = registry.settings
-    kw = {}
-    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
-    reload_templates = asbool(settings.get('reload_templates', False))
-    domain = settings.get('jinja2.i18n.domain', 'messages')
-    debug = asbool(settings.get('debug_templates', False))
-    input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
+    :param settings: configurator registry settings.
+    :type settings: dict
+
+    :return: dictionary to passed into Jinja2 Environment object
+    :rtype: dict
+    """
+
+    environ_args = {}
+    defaults = _JINJA2_ENVIRONMENT_DEFAULTS
+
+    # set up the keys with the defaults
+    # this ensures that the defaults are still setup if they are not
+    # specified in the config
+    environ_args = defaults.copy()
 
     # set string settings
     for short_key_name in ('block_start_string', 'block_end_string',
@@ -206,28 +219,52 @@ def _get_or_build_default_environment(registry):
                            'newline_sequence'):
         key_name = 'jinja2.%s' % (short_key_name,)
         if key_name in settings:
-            kw[short_key_name] = settings.get(key_name)
+            environ_args[short_key_name] = \
+                settings.get(key_name, defaults.get(key_name))
 
     # boolean settings
     for short_key_name in ('autoescape', 'trim_blocks', 'optimized'):
         key_name = 'jinja2.%s' % (short_key_name,)
         if key_name in settings:
-            kw[short_key_name] = asbool(settings.get(key_name))
+            environ_args[short_key_name] = \
+                asbool(settings.get(key_name, defaults.get(key_name)))
 
     # integer settings
     for short_key_name in ('cache_size',):
         key_name = 'jinja2.%s' % (short_key_name,)
         if key_name in settings:
-            kw[short_key_name] = int(settings.get(key_name))
+            environ_args[short_key_name] = \
+                int(settings.get(key_name, defaults.get(key_name)))
 
-    # extensions
+    return environ_args
+
+
+def _get_or_build_default_environment(registry):
+    environment = registry.queryUtility(IJinja2Environment)
+    if environment is not None:
+        return environment
+
+    settings = registry.settings
+    kw = {}
+
+    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
+    debug = asbool(settings.get('debug_templates', False))
+
+    # get basic environment jinja2 settings
+    kw.update(_parse_config_for_settings(settings))
+    reload_templates = asbool(settings.get('reload_templates', False))
+    undefined = parse_undefined(settings.get('jinja2.undefined', ''))
+
+    # get supplementary junja2 settings
+    input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
+    domain = settings.get('jinja2.i18n.domain', 'messages')
+
+    # get jinja2 extensions
     extensions = parse_multiline(settings.get('jinja2.extensions', ''))
     if 'jinja2.ext.i18n' not in extensions:
         extensions.append('jinja2.ext.i18n')
 
-    undefined = parse_undefined(settings.get('jinja2.undefined', ''))
-
-    # jinja directories
+    # get jinja2 directories
     directories = parse_multiline(settings.get('jinja2.directories') or '')
     directories = [abspath_from_resource_spec(d, package) for d in directories]
     loader = SmartAssetSpecLoader(
@@ -235,7 +272,7 @@ def _get_or_build_default_environment(registry):
         encoding=input_encoding,
         debug=debug)
 
-    # bytecode caching
+    # get jinja2 bytecode caching settings and set up bytecaching
     bytecode_caching = asbool(settings.get('jinja2.bytecode_caching', True))
     bytecode_caching_directory = \
         settings.get('jinja2.bytecode_caching_directory', None)
