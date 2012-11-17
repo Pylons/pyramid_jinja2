@@ -223,10 +223,12 @@ the ``settings`` argument passed to a Pyramid Configurator.
 Generic Settings
 ----------------
 
-  These setttings correspond to the ones documented in Jinja2.
-  Set them accordingly. See http://jinja.pocoo.org/docs/api/#high-level-api
+These setttings correspond to the ones documented in Jinja2.
+Set them accordingly.
 
-.. warning::
+For reference please see: http://jinja.pocoo.org/docs/api/#high-level-api
+
+.. note ::
 
     For the boolean settings please use ``true`` or ``false``
 
@@ -252,9 +254,21 @@ jinja2.newline_sequence
 
 jinja2.optimized
 
-jinja2.autoescape
-
 jinja2.cache_size
+
+jinja2.autoescape
+-----------------
+
+Jinja2 autoescape setting.
+
+Possible values: ``true`` or ``false``.
+
+.. warning ::
+
+    By default Jinja2 sets autoescaping to False.
+
+    Pyramid_jinja2 sets it to true as it is considered a good security
+    practice.
 
 
 .. _setting_reload_templates:
@@ -262,15 +276,24 @@ jinja2.cache_size
 reload_templates
 ----------------
 
+This is a Pyramid setting (not a pyramid_jinja2 one)
+
+For usage see :ref:`Pyramid: Automatically Reloading Templates
+<pyramid:reload_templates_section>`.
+
 ``true`` or ``false`` representing whether Jinja2 templates should be
-reloaded when they change on disk.  Useful for development to be ``true``.
+reloaded when they change on disk.  Useful for development to be ``true``. This setting sets to Jinja2 ``auto_reload`` setting.
+
+The rationale for using is a differently named setting is: this setting existed
+when Pyramid only supported Chameleon and Mako templates and acts uniformly
+accross the template renderers.
 
 .. _setting_jinja2_autoreload:
 
 jinja2.auto_reload
 ------------------
 
-See ``reload_templates`` settings.
+See Pyramid ``reload_templates`` setting.
 
 
 .. _setting_jinja2_directories:
