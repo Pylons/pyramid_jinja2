@@ -40,6 +40,24 @@ class Test_settings(TestCase):
         from pyramid_jinja2 import renderer_factory
         return renderer_factory(info)
 
+    def test_settings_defaults(self):
+        from pyramid_jinja2 import IJinja2Environment
+        from pyramid_jinja2 import _JINJA2_ENVIRONMENT_DEFAULTS
+
+        # do not setup the registry with any settings so we get the defaults
+        registry = DummyRegistry()
+        # provide minimum amount of information to the renderer
+        info = DummyRendererInfo(registry)
+        # call renderer so the Jinja2 environment is created
+        self._callFUT(info)
+        # get Jinja2 environment
+        environ = registry.queryUtility(IJinja2Environment)
+        # iterate over the defaults and test them
+        # (fyi, this will not work for cache_size)
+        for key_name in _JINJA2_ENVIRONMENT_DEFAULTS:
+            self.assertEqual(getattr(environ, key_name),
+                             _JINJA2_ENVIRONMENT_DEFAULTS[key_name])
+
     def test_most_settings(self):
         from pyramid_jinja2 import IJinja2Environment
 
@@ -58,9 +76,9 @@ class Test_settings(TestCase):
              'jinja2.autoescape': False,
              'jinja2.cache_size': 300
             })
+
         # provide minimum amount of information to the renderer
         info = DummyRendererInfo(registry)
-
         # call renderer so the Jinja2 environment is created
         self._callFUT(info)
         # get Jinja2 environment
@@ -79,4 +97,5 @@ class Test_settings(TestCase):
         self.assertEqual(environ.newline_sequence, '\r')
         self.assertEqual(environ.optimized, False)
         self.assertEqual(environ.autoescape, False)
+        # this is where cache_size gets set in Jinja2
         self.assertEqual(environ.cache.capacity, 300)
