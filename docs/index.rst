@@ -33,10 +33,10 @@ are completely equivalent:
     config.include('pyramid_jinja2')
 
 
-#) If you're using `pyramid_zcml 
-   <http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/>`_ 
+#) If you're using `pyramid_zcml
+   <http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/>`_
    instead of imperative configuration, ensure that some ZCML file with an
-   analogue of the following contents is executed by your Pyramid 
+   analogue of the following contents is executed by your Pyramid
    application:
 
    .. code-block:: xml
@@ -58,7 +58,7 @@ Once activated either of these says, the following happens:
    :term:`Configurator` instance.
 
 #) :py:class:`jinja2.Environment` is constructed and registered globally.
-   
+
 To setup the Jinja2 search path either one of the following steps must be taken:
 
 #) Add :ref:`setting_jinja2_directories` to your :file:`.ini` settings file using the pyramid asset spec::
@@ -84,35 +84,35 @@ To setup the Jinja2 search path either one of the following steps must be taken:
     .. code-block:: python
 
         @view_config(renderer='templates/mytemplate.jinja2')
-    
+
     With the search path configured:
-    
+
     .. code-block:: python
-    
+
        @view_config(renderer='mytemplate.jinja2')
-    
+
     If you view module is in app.module.view and your template is
     under :file:`app/module/templates/mytemplate.jinja2` you can access
     that asset in a few different ways.
-    
+
     Using the full path:
-    
-    .. code-block:: python 
-    
+
+    .. code-block:: python
+
       @view_config(renderer="module/templates/mytemplate.jinja2")
-    
+
     Using the package:
-    
+
     .. code-block:: python
-    
+
       @view_config(renderer="app.module:templates/mytemplate.jinja2")
-    
+
     Using the relative path to current package:
-    
+
     .. code-block:: python
-    
+
       @view_config(renderer="templates/mytemplate.jinja2")
-    
+
     You need to be careful when using relative paths though, if
     there is an :file:`app/templates/mytemplate.jinja2` this will be
     used instead as Jinja2 lookup will first try the path relative
@@ -135,7 +135,7 @@ Template Lookups
 
 The default lookup mechanism for templates uses the :term:`Jinja2`
 search path (specified with :ref:`setting_jinja2_directories` or by using
-the :func:`~pyramid_jinja2.add_jinja2_search_path` directive on the 
+the :func:`~pyramid_jinja2.add_jinja2_search_path` directive on the
 :term:`Configurator` instance).
 
 Rendering :term:`Jinja2` templates with a view like this is typically
@@ -146,7 +146,7 @@ live in the search path):
  :linenos:
 
  from pyramid.view import view_config
- 
+
  @view_config(renderer='mytemplate.jinja2')
  def myview(request):
      return {'foo':1, 'bar':2}
@@ -215,18 +215,86 @@ Settings
 
 :term:`Jinja2` derives additional settings to configure its template renderer. Many
 of these settings are optional and only need to be set if they should be
-different from the default.  The below values can be present in the 
-:file:`.ini` file used to configure the Pyramid application (in the ``app`` 
+different from the default.  The below values can be present in the
+:file:`.ini` file used to configure the Pyramid application (in the ``app``
 section representing your Pyramid app) or they can be passed directly within
 the ``settings`` argument passed to a Pyramid Configurator.
+
+Generic Settings
+----------------
+
+These setttings correspond to the ones documented in Jinja2.
+Set them accordingly.
+
+For reference please see: http://jinja.pocoo.org/docs/api/#high-level-api
+
+.. note ::
+
+    For the boolean settings please use ``true`` or ``false``
+
+jinja2.block_start_string
+
+jinja2.block_end_string
+
+jinja2.variable_start_string
+
+jinja2.variable_end_string
+
+jinja2.comment_start_string
+
+jinja2.comment_end_string
+
+jinja2.line_statement_prefix
+
+jinja2.line_comment_prefix
+
+jinja2.trim_blocks
+
+jinja2.newline_sequence
+
+jinja2.optimized
+
+jinja2.cache_size
+
+jinja2.autoescape
+-----------------
+
+Jinja2 autoescape setting.
+
+Possible values: ``true`` or ``false``.
+
+.. warning ::
+
+    By default Jinja2 sets autoescaping to False.
+
+    Pyramid_jinja2 sets it to true as it is considered a good security
+    practice.
+
 
 .. _setting_reload_templates:
 
 reload_templates
 ----------------
-  
+
+This is a Pyramid setting (not a pyramid_jinja2 one)
+
+For usage see :ref:`Pyramid: Automatically Reloading Templates
+<pyramid:reload_templates_section>`.
+
 ``true`` or ``false`` representing whether Jinja2 templates should be
-reloaded when they change on disk.  Useful for development to be ``true``.
+reloaded when they change on disk.  Useful for development to be ``true``. This setting sets to Jinja2 ``auto_reload`` setting.
+
+The rationale for using is a differently named setting is: this setting existed
+when Pyramid only supported Chameleon and Mako templates and acts uniformly
+accross the template renderers.
+
+.. _setting_jinja2_autoreload:
+
+jinja2.auto_reload
+------------------
+
+See Pyramid ``reload_templates`` setting.
+
 
 .. _setting_jinja2_directories:
 
@@ -245,14 +313,6 @@ jinja2.input_encoding
 
 The input encoding of templates.  Defaults to ``utf-8``.
 
-.. _setting_jinja2_autoescape:
-
-jinja2.autoescape
------------------
-
-``true`` or ``false`` representing whether Jinja2 will autoescape rendered
-blocks. Defaults to ``true``.
-
 .. _setting_jinja2_undefined:
 
 jinja2.undefined
@@ -263,7 +323,7 @@ If unset, defaults to :py:class:`~jinja2.Undefined` (silent ignore). Setting
 it to ``strict`` will trigger :py:class:`~jinja2.StrictUndefined` behavior
 (raising an error, this is recommended for development). Setting it to
 ``debug`` will trigger :py:class:`~jinja2.DebugUndefined`, which outputs
-debug information in some cases.  See `Undefined Types <http://jinja.pocoo.org/docs/api/#undefined-types>`_ 
+debug information in some cases.  See `Undefined Types <http://jinja.pocoo.org/docs/api/#undefined-types>`_
 
 .. _setting_jinja2_extensions:
 
@@ -272,7 +332,7 @@ jinja2.extensions
 A list of extension objects or a newline-delimited set of dotted import
 locations where each line represents an extension. :ref:`jinja2.ext.i18n
 <jinja2:i18n-extension>` is automatically activated.
- 
+
 .. _setting_jinja2_i18n_domain:
 
 jinja2.i18n.domain
@@ -379,7 +439,7 @@ Paster Template I18N
 --------------------
 
 The paster template automatically sets up pot/po/mo locale files for use
-with the generated project.  
+with the generated project.
 
 The usual pattern for working with i18n in pyramid_jinja2 is as follows:
 
@@ -387,7 +447,7 @@ The usual pattern for working with i18n in pyramid_jinja2 is as follows:
  :linenos:
 
  # make sure Babel is installed
- easy_install Babel 
+ easy_install Babel
 
  # extract translatable strings from *.jinja2 / *.py
  python setup.py extract_messages
