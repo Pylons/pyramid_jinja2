@@ -267,7 +267,7 @@ Possible values: ``true`` or ``false``.
 
     By default Jinja2 sets autoescaping to False.
 
-    Pyramid_jinja2 sets it to true as it is considered a good security
+    pyramid_jinja2 sets it to true as it is considered a good security
     practice.
 
 
