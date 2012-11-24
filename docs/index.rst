@@ -273,8 +273,8 @@ Possible values: ``true`` or ``false``.
 
 .. _setting_reload_templates:
 
-reload_templates
-----------------
+pyramid.reload_templates
+------------------------
 
 This is a Pyramid setting (not a pyramid_jinja2 one)
 
@@ -282,19 +282,26 @@ For usage see :ref:`Pyramid: Automatically Reloading Templates
 <pyramid:reload_templates_section>`.
 
 ``true`` or ``false`` representing whether Jinja2 templates should be
-reloaded when they change on disk.  Useful for development to be ``true``. This setting sets to Jinja2 ``auto_reload`` setting.
+reloaded when they change on disk.  Useful for development to be ``true``.
+This setting sets to Jinja2 ``auto_reload`` setting.
 
 The rationale for using is a differently named setting is: this setting existed
 when Pyramid only supported Chameleon and Mako templates and acts uniformly
-accross the template renderers.
+across the template renderers.
+
+reload_templates
+------------------------
+
+.. warning::
+
+   Deprecated as of version 1.5, use :ref:`setting_reload_templates` instead
 
 .. _setting_jinja2_autoreload:
 
 jinja2.auto_reload
 ------------------
 
-See Pyramid ``reload_templates`` setting.
-
+Use Pyramid :ref:`setting_reload_templates` setting.
 
 .. _setting_jinja2_directories:
 

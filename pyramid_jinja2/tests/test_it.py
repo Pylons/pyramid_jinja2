@@ -334,11 +334,13 @@ class Test_bytecode_caching(unittest.TestCase):
         from pyramid_jinja2 import includeme
         import jinja2.bccache
         config = testing.setUp()
+        config.registry.settings = {}
         includeme(config)
         env = config.get_jinja2_environment()
         self.assertTrue(isinstance(env.bytecode_cache,
                                    jinja2.bccache.FileSystemBytecodeCache))
         self.assertTrue(env.bytecode_cache.directory)
+        self.assertFalse(env.auto_reload)
 
     def test_directory(self):
         import tempfile
@@ -350,6 +352,24 @@ class Test_bytecode_caching(unittest.TestCase):
         env = config.get_jinja2_environment()
         self.assertEqual(env.bytecode_cache.directory, tmpdir)
         # TODO: test tmpdir is deleted when interpreter exits
+
+    def test_reload_templates(self):
+        from pyramid_jinja2 import includeme
+        config = testing.setUp()
+        config.registry.settings = {}
+        config.registry.settings['reload_templates'] = 'true'
+        includeme(config)
+        env = config.get_jinja2_environment()
+        self.assertTrue(env.auto_reload)
+
+    def test_pyramid_reload_templates(self):
+        from pyramid_jinja2 import includeme
+        config = testing.setUp()
+        config.registry.settings = {}
+        config.registry.settings['pyramid.reload_templates'] = 'true'
+        includeme(config)
+        env = config.get_jinja2_environment()
+        self.assertTrue(env.auto_reload)
 
 
 class TestSmartAssetSpecLoader(unittest.TestCase):

@@ -1,11 +1,15 @@
 1.5 (unreleased)
 ================
 
+- Add `pyramid.reload_templates` to set `jinja2.auto_reload` instead of
+  using `reload_templates`. Deprecate the latter.
+  [Domen Kožar]
+
 - Clear bytecode cache on atexit
   [Domen Kožar]
 
 - Add support for more Jinja2 options. Note support for jinja2.autoescape is
-  limitted to boolean only.
+  limited to boolean only.
 
   * jinja2.block_start_string
   * jinja2.block_end_string
