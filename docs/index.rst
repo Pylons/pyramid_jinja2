@@ -378,7 +378,7 @@ jinja2.bytecode_caching
 
 ``true`` or ``false`` to enable filesystem bytecode caching. Defaults to
 ``true``. See :ref:`Bytecode Cache <jinja2:bytecode-cache>` in Jinja2
-documentation. 
+documentation.
 
 .. _setting_jinja2_byte_cache_dir:
 
@@ -390,8 +390,22 @@ temporary directory. See :py:class:`jinja2.FileSystemBytecodeCache`.
 
 .. note::
 
-   Directory will be deleted by py:func:`jinja2.BytecodeCache.clear`,
-   which is called by :func:`atexit.register`.
+   :term:`pyramid_jinja2` will attempt to delete the cached files by
+   calling :py:func:`jinja2.BytecodeCache.clear` from function
+   registered by :py:func:`atexit.register`.
+
+   .. warning ::
+
+      As noted by the `atexit documentation
+      <http://docs.python.org/2/library/atexit.html>`__
+      the functions registered by the module will only be called
+      **upon normal termination**. In case of abnormal program
+      termination the files may remain, littering your file system
+      (and eating up inodes).
+
+      You are **strongly advised** to consider an additional clean up
+      strategy (such as cron) to check and remove such files.
+
 
 .. _jinja2_filters:
 
