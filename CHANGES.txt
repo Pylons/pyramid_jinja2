@@ -1,8 +1,21 @@
 1.4.3 (unreleased)
 ==================
 
-- Nothing changed yet.
-
+- Add support for more Jinja2 options. Note support for jinja2.autoescape is
+  limitted to boolean only.
+  * jinja2.block_start_string
+  * jinja2.block_end_string
+  * jinja2.variable_start_string
+  * jinja2.variable_end_string
+  * jinja2.comment_start_string
+  * jinja2.comment_end_string
+  * jinja2.line_statement_prefix
+  * jinja2.line_comment_prefix
+  * jinja2.trim_blocks
+  * jinja2.newline_sequence
+  * jinja2.optimized
+  * jinja2.cache_size
+  * jinja2.autoescape
 
 1.4.2 (2012-10-17)
 ==================
@@ -44,7 +57,7 @@
 
 - Add ``dev`` and ``docs`` setup.py aliases (ala Pyramid).
 
-- Changed template loading relative to package calling the renderer so 
+- Changed template loading relative to package calling the renderer so
   it works like the Chameleon template loader.
 
 1.3 (2011-12-14)
