@@ -1,5 +1,5 @@
-1.4.3 (unreleased)
-==================
+1.5 (unreleased)
+================
 
 - Clear bytecode cache on atexit
   [Domen Kožar]
