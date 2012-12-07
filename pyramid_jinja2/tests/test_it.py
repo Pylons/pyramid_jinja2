@@ -538,7 +538,7 @@ class TestNewstyle(unittest.TestCase):
 
         app = config.make_wsgi_app()
         testapp = TestApp(app)
-        self.assertEqual(testapp.get('/').body, text_('my hovercraft is full of eels!', 'utf-8'))
+        self.assertEqual(testapp.get('/').body.decode('utf-8'), text_('my hovercraft is full of eels!'))
 
 
 class MiscTests(Base, unittest.TestCase):
