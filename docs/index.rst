@@ -415,7 +415,7 @@ jinja2.newstyle
 ``true`` or ``false`` to enable the use of newstyle gettext calls. Defaults to
 ``false``.
 
-See `Newstyle Gettext <http://jinja.pocoo.org/docs/extensions/#newstyle-gettext>`
+See `Newstyle Gettext http://jinja.pocoo.org/docs/extensions/#newstyle-gettext`
 
 .. _jinja2_filters:
 
