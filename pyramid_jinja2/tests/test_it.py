@@ -517,6 +517,30 @@ class TestPackageFinder(unittest.TestCase):
         self.assertEqual(pf.caller_package(), xml)
 
 
+class TestNewstyle(unittest.TestCase):
+    def test_it(self):
+        from pyramid.config import Configurator
+        from pyramid_jinja2 import includeme
+        from webtest import TestApp
+        import os
+
+        here = os.path.abspath(os.path.dirname(__file__))
+        templates_dir = os.path.join(here, 'templates')
+
+        def myview(request):
+            return {'what': 'eels'}
+
+        config = Configurator(settings={
+                'jinja2.directories': templates_dir,
+                'jinja2.newstyle': True})
+        includeme(config)
+        config.add_view(view=myview, renderer='newstyle.jinja2')
+
+        app = config.make_wsgi_app()
+        testapp = TestApp(app)
+        self.assertEqual(testapp.get('/').body, text_('my hovercraft is full of eels!', 'utf-8'))
+
+
 class MiscTests(Base, unittest.TestCase):
 
     def test_add_jinja2_extension(self):

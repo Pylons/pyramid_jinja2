@@ -295,7 +295,7 @@ def _get_or_build_default_environment(registry):
         # clear cache on exit
         atexit.register(kw['bytecode_cache'].clear)
 
-    # use newstyle gettext calls (http://jinja.pocoo.org/docs/extensions/#newstyle-gettext)
+    # should newstyle gettext calls be enabled?
     newstyle = asbool(settings.get('jinja2.newstyle', False))
 
     environment = Environment(loader=loader,
