@@ -295,6 +295,9 @@ def _get_or_build_default_environment(registry):
         # clear cache on exit
         atexit.register(kw['bytecode_cache'].clear)
 
+    # should newstyle gettext calls be enabled?
+    newstyle = asbool(settings.get('jinja2.newstyle', False))
+
     environment = Environment(loader=loader,
                               auto_reload=reload_templates,
                               extensions=extensions,
@@ -303,7 +306,7 @@ def _get_or_build_default_environment(registry):
 
     # register pyramid i18n functions
     wrapper = GetTextWrapper(domain=domain)
-    environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext)
+    environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext, newstyle=newstyle)
 
     # register global repository for templates
     if package is not None:

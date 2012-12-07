@@ -1,7 +1,7 @@
 1.6 (unreleased)
 ================
 
-- Nothing changed yet.
+- Add `jinja2.newstyle` setting to enable newstyle gettext calls
 
 
 1.5 (2012-11-24)
