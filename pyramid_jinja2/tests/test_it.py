@@ -243,6 +243,11 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         self.assertTrue(filter_name in environ.filters)
         self.assertEqual(environ.filters[filter_name], filter_obj)
 
+    def _assert_has_global(self, global_name, global_obj):
+        environ = self._set_up_environ()
+        self.assertTrue(global_name in environ.globals)
+        self.assertEqual(environ.globals[global_name], global_obj)
+
     def test_set_single_filter(self):
         self.config.registry.settings['jinja2.filters'] = \
                 'my_filter = pyramid_jinja2.tests.test_it.my_test_func'
@@ -252,6 +257,11 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         self.config.registry.settings['jinja2.tests'] = \
                 'my_test = pyramid_jinja2.tests.test_it.my_test_func'
         self._assert_has_test('my_test', my_test_func)
+
+    def test_set_single_global(self):
+        self.config.registry.settings['jinja2.globals'] = \
+                'my_test = pyramid_jinja2.tests.test_it.my_test_func'
+        self._assert_has_global('my_test', my_test_func)
 
     def test_set_multi_filters(self):
         self.config.registry.settings['jinja2.filters'] = \
@@ -271,20 +281,30 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         self._assert_has_test('my_test2', my_test_func)
         self._assert_has_test('my_test3', my_test_func)
 
-    def test_filter_and_test_works_in_render(self):
+    def test_set_multi_globals(self):
+        self.config.registry.settings['jinja2.globals'] = \
+                'my_global1 = pyramid_jinja2.tests.test_it.my_test_func\n' \
+                'my_global2 = pyramid_jinja2.tests.test_it.my_test_func\n' \
+                'my_global3 = pyramid_jinja2.tests.test_it.my_test_func'
+        self._assert_has_global('my_global1', my_test_func)
+        self._assert_has_global('my_global2', my_test_func)
+        self._assert_has_global('my_global3', my_test_func)
+
+    def test_filter_and_test_and_global_works_in_render(self):
         import pyramid_jinja2
         from pyramid.renderers import render
         config = testing.setUp()
         config.add_settings({
             'jinja2.directories': 'pyramid_jinja2.tests:templates',
             'jinja2.tests': 'my_test = pyramid_jinja2.tests.test_it.my_test_func',
-            'jinja2.filters': 'my_filter = pyramid_jinja2.tests.test_it.my_test_func'
+            'jinja2.filters': 'my_filter = pyramid_jinja2.tests.test_it.my_test_func',
+            'jinja2.globals': 'my_global = pyramid_jinja2.tests.test_it.my_test_func'
         })
         config.add_renderer('.jinja2', pyramid_jinja2.renderer_factory)
         result = render('tests_and_filters.jinja2', {})
         #my_test_func returs "True" - it will be render as True when usign
         # as filter and will pass in tests
-        self.assertEqual(result, text_('True is not False', 'utf-8'))
+        self.assertEqual(result, text_('True is not False True', 'utf-8'))
         testing.tearDown()
 
 

@@ -359,6 +359,18 @@ string with each line in the format::
 
 representing :ref:`Jinja2 filters <jinja2:writing-filters>`.
 
+.. _setting_jinja2_globals:
+
+jinja2.globals
+---------------
+
+A dictionary mapping global name to global template object,
+or a newline-delimited string with each line in the format::
+
+    name = dotted.name.to.globals
+
+representing :ref:`Jinja2 globals <jinja2:the-global-namespace>`
+
 .. _setting_jinja2_tests:
 
 jinja2.tests
