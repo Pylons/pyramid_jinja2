@@ -320,6 +320,10 @@ def _get_or_build_default_environment(registry):
     tests = parse_config(settings.get('jinja2.tests', ''))
     environment.tests.update(tests)
 
+    # add custom jinja2 functions
+    jinja_globals = parse_config(settings.get('jinja2.globals', ''))
+    environment.globals.update(jinja_globals)
+
     registry.registerUtility(environment, IJinja2Environment)
     return registry.queryUtility(IJinja2Environment)
 
