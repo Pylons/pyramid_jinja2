@@ -6,6 +6,7 @@
   [Eugene Fominykh]
 
 - Add `jinja2.newstyle` setting to enable newstyle gettext calls
+  [Thomas Schüßler]
 
 1.5 (2012-11-24)
 ================
