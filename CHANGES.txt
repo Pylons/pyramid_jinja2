@@ -1,8 +1,11 @@
 1.6 (unreleased)
 ================
 
-- Add `jinja2.newstyle` setting to enable newstyle gettext calls
+- Add `jinja2.globals` setting to add global objects into 
+  the template context
+  [Eugene Fominykh]
 
+- Add `jinja2.newstyle` setting to enable newstyle gettext calls
 
 1.5 (2012-11-24)
 ================
