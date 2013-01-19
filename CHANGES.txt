@@ -1,6 +1,10 @@
 1.6 (unreleased)
 ================
 
+- Set `jinja2.i18n.domain` default to the package name
+  of the pyramid application.
+  [Domen Kožar]
+
 - Add `jinja2.globals` setting to add global objects into 
   the template context
   [Eugene Fominykh]

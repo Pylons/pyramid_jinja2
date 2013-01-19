@@ -210,6 +210,17 @@ Overriding templates in this style uses the standard
 
 .. _settings:
 
+Internalization (i18n)
+----------------------
+
+When :term:`pyramid_jinja2` is included as pyramid application,
+:ref:`jinja2.ext.i18n <jinja2:i18n-extension>` is automatically activated.
+
+Be sure to configure `jinja2.i18n.domain` according to `setup.cfg` domain
+settings. By default, `jinja2.i18n.domain` is set to the package name of
+the pyramid application.
+
+
 Settings
 ========
 
@@ -345,7 +356,7 @@ locations where each line represents an extension. :ref:`jinja2.ext.i18n
 jinja2.i18n.domain
 ------------------
 Pyramid domain for translations. See :term:`Translation Domain` in Pyramid
-documentation.
+documentation. Defaults to the package name of the pyramid application.
 
 .. _setting_jinja2_filers:
 

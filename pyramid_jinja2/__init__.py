@@ -270,7 +270,7 @@ def _get_or_build_default_environment(registry):
 
     # get supplementary junja2 settings
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
-    domain = settings.get('jinja2.i18n.domain', 'messages')
+    domain = settings.get('jinja2.i18n.domain', package and package.__name__ or 'messages')
 
     # get jinja2 extensions
     extensions = parse_multiline(settings.get('jinja2.extensions', ''))
