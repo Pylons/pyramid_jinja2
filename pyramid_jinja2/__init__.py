@@ -258,13 +258,6 @@ def _get_or_build_default_environment(registry):
     if reload_templates is None:
         # since version 1.5, both settings are supported
         reload_templates = settings.get('pyramid.reload_templates', False)
-    else:
-        warnings.warn(
-            'reload_templates setting is deprecated, use '
-            'pyramid.reload_templates instead.',
-            DeprecationWarning,
-            2,
-        )
     reload_templates = asbool(reload_templates)
     undefined = parse_undefined(settings.get('jinja2.undefined', ''))
 
