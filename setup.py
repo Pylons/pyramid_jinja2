@@ -13,12 +13,17 @@
 ##############################################################################
 
 import os
+import sys
 
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.rst')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+if sys.version_info.major > 2:
+    README = open(os.path.join(here, 'README.rst'), encoding="utf-8").read()
+    CHANGES = open(os.path.join(here, 'CHANGES.txt'), encoding="utf-8").read()
+else:
+    README = open(os.path.join(here, 'README.rst')).read()
+    CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'pyramid>=1.0.2', # wsgiref server entry point
