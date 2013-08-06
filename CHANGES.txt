@@ -1,7 +1,12 @@
 1.7 (unreleased)
 ================
 
-- Nothing changed yet.
+- #56: python3.3: Non-ASCII characters in changelog breaks pip installation
+  [Domen Kožar]
+
+- #57: Remove useless warning: `DeprecationWarning: reload_templates setting
+  is deprecated, use pyramid.reload_templates instead.`
+  [Marc Abramowitz]
 
 
 1.6 (2013-01-23)
