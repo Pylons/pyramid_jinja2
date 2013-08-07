@@ -1,4 +1,4 @@
-1.7 (unreleased)
+1.7 (2013-08-07)
 ================
 
 - #56: python3.3: Non-ASCII characters in changelog breaks pip installation
