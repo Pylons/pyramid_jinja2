@@ -40,7 +40,7 @@ testing_extras = ['WebTest', 'nose>=1.2.0', 'coverage']
 docs_extras = ['Sphinx']
 
 setup(name='pyramid_jinja2',
-      version='1.7',
+      version='1.8.dev0',
       description='Jinja2 template bindings for the Pyramid web framework',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
