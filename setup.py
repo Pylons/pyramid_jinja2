@@ -27,7 +27,8 @@ else:
 
 requires = [
     'pyramid>=1.0.2', # wsgiref server entry point
-    'Jinja2>=2.5.0'
+    'Jinja2>=2.5.0,<2.7dev', #2.7 drops Python 3.2 compat.
+    'markupsafe<0.16', #0.15 drops Python 3.2 compat
 ]
 
 try:
