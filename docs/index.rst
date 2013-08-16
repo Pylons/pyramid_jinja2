@@ -43,6 +43,14 @@ are completely equivalent:
 
         <include package="pyramid_jinja2"/>
 
+
+#) Include \*.jinja2 to MANAFEST.ini
+
+   .. code-block:: python
+
+       recursive-include *.jinja2
+      
+      
 Once activated either of these says, the following happens:
 
 #) Files with the :file:`.jinja2` extension are considered to be
