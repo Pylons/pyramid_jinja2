@@ -119,6 +119,13 @@ To setup the Jinja2 search path either one of the following steps must be taken:
     to the root of the app and then it will try the path relative
     to the current package.
 
+Finally, to make sure your :file:`.jinja2` template files are included in your
+package's source distribution (e.g. when using ``python setup.py sdist``), add
+``*.jinja2`` to your :file:`MANIFEST.in`::
+
+  recursive-include yourapp *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.jinja2 *.js *.html *.xml
+
+
 .. _usage:
 
 Usage
