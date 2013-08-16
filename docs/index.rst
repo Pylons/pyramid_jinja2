@@ -21,8 +21,14 @@ Install using setuptools, e.g. (within a virtualenv)::
 
 .. _setup:
 
+
 Setup
 =====
+
+.. note::
+
+  If you start a project from scratch, consider using the :ref:`project template <jinja2_starter_template>`
+  which comes with a working setup and sensible defaults.
 
 There are two ways to make sure that ``pyramid_jinja2`` is active.  Both
 are completely equivalent:
@@ -32,6 +38,10 @@ are completely equivalent:
     config = Configurator()
     config.include('pyramid_jinja2')
 
+#) Add ``pyramid_jinja2`` to the list of your ``pyramid.includes`` in your :file:`.ini` settings file::
+
+    pyramid.includes =
+        pyramid_jinja2
 
 #) If you're using `pyramid_zcml
    <http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/>`_
@@ -474,6 +484,9 @@ And use the filters in template.
  <a href="{{'top'|route_url}}">Top</a>
 
  <link rel="stylesheet" href="{{'yourapp:static/css/style.css'|static_url}}" />
+
+
+.. _jinja2_starter_template:
 
 Creating a Jinja2 ``Pyramid`` Project
 =====================================
