@@ -30,8 +30,8 @@ Setup
   If you start a project from scratch, consider using the :ref:`project template <jinja2_starter_template>`
   which comes with a working setup and sensible defaults.
 
-There are two ways to make sure that ``pyramid_jinja2`` is active.  Both
-are completely equivalent:
+There are multiple ways to make sure that ``pyramid_jinja2`` is active.
+All are completely equivalent:
 
 #) Use the :py:func:`~pyramid_jinja2.includeme` function via :py:meth:`~pyramid.config.Configurator.include`::
 
