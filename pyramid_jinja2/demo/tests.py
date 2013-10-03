@@ -1,6 +1,8 @@
 import unittest
 import pyramid.testing
 
+from pyramid_jinja2.tests.base import Mock
+
 
 class DemoTests(unittest.TestCase):
     def test_root_view(self):
