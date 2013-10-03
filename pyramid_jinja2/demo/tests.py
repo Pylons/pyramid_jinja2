@@ -1,11 +1,11 @@
 import unittest
-from pyramid_jinja2.tests.base import Mock
+import pyramid.testing
 
 
 class DemoTests(unittest.TestCase):
     def test_root_view(self):
         from pyramid_jinja2.demo import root_view
-        m = Mock()
+        m = pyramid.testing.DummyRequest()
         root_view(m)
         self.assertEqual(m.locale_name, 'fr')
 
