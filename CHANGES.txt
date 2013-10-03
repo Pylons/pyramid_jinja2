@@ -1,7 +1,8 @@
 1.8 (unreleased)
 ================
 
-- Nothing changed yet.
+- #70: Do not pin for py3.2 compatibility unless running under py3.2
+  [dairiki]
 
 
 1.7 (2013-08-07)
