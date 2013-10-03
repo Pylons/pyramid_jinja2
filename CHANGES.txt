@@ -1,4 +1,4 @@
-1.8 (unreleased)
+1.8 (2013-10-03)
 ================
 
 - #70: Do not pin for py3.2 compatibility unless running under py3.2
