@@ -143,16 +143,6 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
-    def test_instance_implements_ITemplate(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import ITemplateRenderer
-        verifyObject(ITemplateRenderer, self._makeOne(None, None))
-
-    def test_class_implements_ITemplate(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import ITemplateRenderer
-        verifyClass(ITemplateRenderer, self._getTargetClass())
-
     def test_call(self):
         environ = DummyEnvironment()
         info = DummyRendererInfo({
