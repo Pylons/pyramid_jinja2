@@ -22,7 +22,6 @@ from pyramid_jinja2.compat import string_types
 from pyramid_jinja2.compat import text_type
 
 from pyramid.asset import abspath_from_asset_spec
-from pyramid.interfaces import ITemplateRenderer
 from pyramid.resource import abspath_from_resource_spec
 from pyramid.settings import asbool
 from pyramid import i18n
@@ -339,7 +338,6 @@ class GetTextWrapper(object):
                                         domain=self.domain)
 
 
-@implementer(ITemplateRenderer)
 class Jinja2TemplateRenderer(object):
     '''Renderer for a jinja2 template'''
     template = None

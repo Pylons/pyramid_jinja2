@@ -1,7 +1,8 @@
 1.9 (unreleased)
 ================
 
-- Nothing changed yet.
+- Remove unnecessary dependency on ``pyramid.interfaces.ITemplateRenderer``
+  which was deprecated in Pyramid 1.5.
 
 
 1.8 (2013-10-03)
