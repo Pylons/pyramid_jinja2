@@ -5,7 +5,6 @@ from jinja2 import contextfilter
 
 __all__ = [
     'model_url_filter',
-    'model_path_filter',
     'route_url_filter',
     'route_path_filter',
     'static_url_filter',
