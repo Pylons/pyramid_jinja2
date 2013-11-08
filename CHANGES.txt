@@ -1,6 +1,9 @@
 1.9 (unreleased)
 ================
 
+- fix indentation level for Jinja2ProjectTemplate in scaffolds/__init__.py
+  [Bruno Binet]
+
 - Remove unnecessary dependency on ``pyramid.interfaces.ITemplateRenderer``
   which was deprecated in Pyramid 1.5.
   [mmerickel]
