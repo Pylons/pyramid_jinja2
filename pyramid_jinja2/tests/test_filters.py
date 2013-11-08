@@ -151,7 +151,7 @@ class Test_filters_not_caching(unittest.TestCase):
         config.registry.settings = {}
         includeme(config)
         self.environment = config.get_jinja2_environment()
-	from pyramid_jinja2.filters import route_url_filter
+        from pyramid_jinja2.filters import route_url_filter
         self.environment.filters['route_url'] = route_url_filter
         from pyramid.config import Configurator
         self.config = Configurator(autocommit=True)
@@ -172,7 +172,7 @@ class Test_filters_not_caching(unittest.TestCase):
         self.assertEqual(rendered, 'http://example.com/dummy/')
        
         self.config.begin(request=DummyRequest(application_url='http://sub.example.com', host='sub.example.com:80'))
-	rendered = self._callFUT({}, "{{'dummy_route1' | route_url }}")
+        rendered = self._callFUT({}, "{{'dummy_route1' | route_url }}")
         self.assertEqual(rendered, 'http://sub.example.com/dummy/')
 
     def test_filter_with_arguments(self):
