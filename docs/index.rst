@@ -462,13 +462,16 @@ See `Newstyle Gettext http://jinja.pocoo.org/docs/extensions/#newstyle-gettext`
 Jinja2 Filters
 ==============
 
-``pyramid_jinja2`` provides two filters.
+``pyramid_jinja2`` provides following filters.
 
 
 .. currentmodule:: pyramid_jinja2.filters
 .. autofunction:: model_url_filter
 .. autofunction:: route_url_filter
 .. autofunction:: static_url_filter
+.. autofunction:: model_path_filter
+.. autofunction:: route_path_filter
+.. autofunction:: static_path_filter
 
 To use these filters, configure the settings of ``jinja2.filters``:
 
