@@ -1,4 +1,4 @@
-1.9 (unreleased)
+1.9 (2013-11-08)
 ================
 
 - fix indentation level for Jinja2ProjectTemplate in scaffolds/__init__.py
