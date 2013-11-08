@@ -3,6 +3,13 @@
 
 - Remove unnecessary dependency on ``pyramid.interfaces.ITemplateRenderer``
   which was deprecated in Pyramid 1.5.
+  [mmerickel]
+
+- #68: Added `model_path_filter`, `route_path_filter` and `static_path_filter` filters
+  [Remco]
+
+- #74: Fixed issue with route being converted as_const by jinja2 engine when using btyecode cache
+  [Remco]
 
 
 1.8 (2013-10-03)
