@@ -469,7 +469,6 @@ Jinja2 Filters
 .. autofunction:: model_url_filter
 .. autofunction:: route_url_filter
 .. autofunction:: static_url_filter
-.. autofunction:: model_path_filter
 .. autofunction:: route_path_filter
 .. autofunction:: static_path_filter
 
