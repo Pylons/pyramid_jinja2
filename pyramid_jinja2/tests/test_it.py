@@ -206,10 +206,10 @@ class TestIntegration2(unittest.TestCase):
         config = testing.setUp()
         config.add_renderer('.jinja2',
                             pyramid_jinja2.renderer_factory)
-    
+
     def tearDown(self):
         testing.tearDown()
-    
+
     def test_render_relative_to_package(self):
         from pyramid.renderers import render
         result = render('templates/helloworld.jinja2', {'a': 1})
@@ -342,9 +342,18 @@ class Test_get_jinja2_environment(unittest.TestCase):
 class Test_bytecode_caching(unittest.TestCase):
     def test_default(self):
         from pyramid_jinja2 import includeme
-        import jinja2.bccache
         config = testing.setUp()
         config.registry.settings = {}
+        includeme(config)
+        env = config.get_jinja2_environment()
+        self.assertTrue(env.bytecode_cache is None)
+        self.assertFalse(env.auto_reload)
+
+    def test_default_bccache(self):
+        from pyramid_jinja2 import includeme
+        import jinja2.bccache
+        config = testing.setUp()
+        config.registry.settings = {'jinja2.bytecode_caching': 'true'}
         includeme(config)
         env = config.get_jinja2_environment()
         self.assertTrue(isinstance(env.bytecode_cache,
@@ -357,11 +366,23 @@ class Test_bytecode_caching(unittest.TestCase):
         from pyramid_jinja2 import includeme
         tmpdir = tempfile.mkdtemp()
         config = testing.setUp()
+        config.registry.settings['jinja2.bytecode_caching'] = '1'
         config.registry.settings['jinja2.bytecode_caching_directory'] = tmpdir
         includeme(config)
         env = config.get_jinja2_environment()
         self.assertEqual(env.bytecode_cache.directory, tmpdir)
         # TODO: test tmpdir is deleted when interpreter exits
+
+    def test_bccache_instance(self):
+        from pyramid_jinja2 import includeme
+        import jinja2.bccache
+        mycache = jinja2.bccache.MemcachedBytecodeCache(DummyMemcachedClient())
+        config = testing.setUp()
+        config.registry.settings = {'jinja2.bytecode_caching': mycache}
+        includeme(config)
+        env = config.get_jinja2_environment()
+        self.assertTrue(env.bytecode_cache is mycache)
+        self.assertFalse(env.auto_reload)
 
     def test_reload_templates(self):
         from pyramid_jinja2 import includeme
@@ -603,3 +624,9 @@ class UndefinedTests(Base, unittest.TestCase):
 def my_test_func(*args, **kwargs):
     """ Used as a fake filter/test function """
     return True
+
+class DummyMemcachedClient(dict):
+    """ A memcached client acceptable to jinja2.MemcachedBytecodeCache.
+    """
+    def set(self, key, value, timeout):
+        self[key] = value               # pragma: no cover

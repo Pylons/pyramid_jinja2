@@ -1,7 +1,15 @@
 1.10 (unreleased)
 =================
 
-- Nothing changed yet.
+- #77: Change semantics of ``jinja2.bytecode_caching`` setting.  The new
+  default is false (no bytecode caching) — ``bytecode_caching`` must
+  explicitly be set to true to enable a filesystem bytecode cache.
+  In addition, an atexit callback to clean the cache is no longer
+  registered (as this seemed to defeat most of the purpose of having
+  a bytecode cache.)  Finally, a more complex bytecode cache may be
+  configured by setting ``jinja2.bytecode_caching`` directly to a
+  ``jinja2.BytecodeCache`` instance.  (This can not be done in a
+  paste .ini file, it must be done programatically.)
 
 
 1.9 (2013-11-08)

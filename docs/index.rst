@@ -416,36 +416,39 @@ representing :ref:`Jinja2 tests <jinja2:writing-tests>`.
 jinja2.bytecode_caching
 -----------------------
 
-``true`` or ``false`` to enable filesystem bytecode caching. Defaults to
-``true``. See :ref:`Bytecode Cache <jinja2:bytecode-cache>` in Jinja2
-documentation.
+If set to ``true``, a filesystem bytecode cache will be configured
+(in a directory determined by :ref:`setting_jinja2_byte_cache_dir`.)
+To configure other types of bytecode caching, ``jinja2.bytecode_caching``
+may also be set directly to an instance of :class:`jinja2.BytecodeCache`
+(This can not be done in a paste ``.ini`` file, however, it must be done
+programatically.)
+By default, no bytecode cache is configured.
+
+.. versionchanged:: 1.10
+   Previously, ``jinja2.bytecode_caching`` defaulted to ``true``.
+
+Note that configuring a filesystem bytecode cache will (not surprisiningly)
+generate files in the cache directory.  As templates are changed, some
+of these will become stale, pointless wastes of disk space.
+You are advised to consider a clean up
+strategy (such as a cron job) to check for and remove such files.
+
+See the :ref:`Jinja2 Documentation <jinja2:bytecode-cache>`
+for more information on bytecode caching.
+
+.. versionchanged:: 1.10
+   Previously, an atexit callback which called
+   :py:meth:`jinja2.BytecodeCache.clear` was registered in an effort
+   to delete the cache files.  This is no longer done.
 
 .. _setting_jinja2_byte_cache_dir:
 
 jinja2.bytecode_caching_directory
 ---------------------------------
 
-Absolute path to directory to store bytecode caching files. Defaults to
-temporary directory. See :py:class:`jinja2.FileSystemBytecodeCache`.
-
-.. note::
-
-   :term:`pyramid_jinja2` will attempt to delete the cached files by
-   calling :py:func:`jinja2.BytecodeCache.clear` from function
-   registered by :py:func:`atexit.register`.
-
-   .. warning ::
-
-      As noted by the `atexit documentation
-      <http://docs.python.org/2/library/atexit.html>`__
-      the functions registered by the module will only be called
-      **upon normal termination**. In case of abnormal program
-      termination the files may remain, littering your file system
-      (and eating up inodes).
-
-      You are **strongly advised** to consider an additional clean up
-      strategy (such as cron) to check and remove such files.
-
+Absolute path to directory to store bytecode cache files. Defaults to
+the system temporary directory.
+This is only used if ``jinja2.bytecode_caching`` is set to ``true``.
 
 .. _setting_jinja2_newstyle:
 
