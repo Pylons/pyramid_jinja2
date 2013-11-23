@@ -397,7 +397,7 @@ or a newline-delimited string with each line in the format::
 
     name = dotted.name.to.globals
 
-representing :ref:`Jinja2 globals <jinja2:the-global-namespace>`
+representing :ref:`Jinja2 globals <jinja2:global-namespace>`
 
 .. _setting_jinja2_tests:
 
