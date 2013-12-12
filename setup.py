@@ -30,12 +30,12 @@ requires = [
 ]
 
 if (3,) < sys.version_info < (3, 3):
-    requires.append([
+    requires.extend([
         'Jinja2>=2.5.0,<2.7dev', #2.7 drops Python 3.2 compat.
         'markupsafe<0.16', #0.16 drops Python 3.2 compat
         ])
 else:
-    requires.append([
+    requires.extend([
         'Jinja2>=2.5.0',
         'markupsafe',
         ])
