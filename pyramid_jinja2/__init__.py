@@ -260,7 +260,7 @@ def _get_or_build_default_environment(registry):
     reload_templates = asbool(reload_templates)
     undefined = parse_undefined(settings.get('jinja2.undefined', ''))
 
-    # get supplementary junja2 settings
+    # get supplementary jinja2 settings
     input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
     domain = settings.get('jinja2.i18n.domain', package and package.__name__ or 'messages')
 
