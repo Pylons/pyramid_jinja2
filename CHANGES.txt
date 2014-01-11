@@ -1,4 +1,4 @@
-1.10 (unreleased)
+1.10 (2014-01-11)
 =================
 
 - #77: Change semantics of ``jinja2.bytecode_caching`` setting.  The new
