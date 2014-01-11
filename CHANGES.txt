@@ -10,6 +10,10 @@
   configured by setting ``jinja2.bytecode_caching`` directly to a
   ``jinja2.BytecodeCache`` instance.  (This can not be done in a
   paste .ini file, it must be done programatically.)
+  [dairiki]
+
+- prevent error when using `python setup.py bdist_wheel`
+  [msabramo]
 
 
 1.9 (2013-11-08)
