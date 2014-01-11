@@ -8,6 +8,7 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 from jinja2 import Environment
+from jinja2 import BytecodeCache
 from jinja2 import FileSystemBytecodeCache
 from jinja2 import Undefined
 from jinja2 import StrictUndefined
@@ -278,14 +279,14 @@ def _get_or_build_default_environment(registry):
         debug=debug)
 
     # get jinja2 bytecode caching settings and set up bytecaching
-    bytecode_caching = asbool(settings.get('jinja2.bytecode_caching', True))
-    bytecode_caching_directory = \
-        settings.get('jinja2.bytecode_caching_directory', None)
-    if bytecode_caching:
+    bytecode_caching = settings.get('jinja2.bytecode_caching', False)
+    if isinstance(bytecode_caching, BytecodeCache):
+        kw['bytecode_cache'] = bytecode_caching
+    elif asbool(bytecode_caching):
+        bytecode_caching_directory = \
+            settings.get('jinja2.bytecode_caching_directory', None)
         kw['bytecode_cache'] = \
             FileSystemBytecodeCache(bytecode_caching_directory)
-        # clear cache on exit
-        atexit.register(kw['bytecode_cache'].clear)
 
     # should newstyle gettext calls be enabled?
     newstyle = asbool(settings.get('jinja2.newstyle', False))
