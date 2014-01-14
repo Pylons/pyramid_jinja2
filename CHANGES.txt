@@ -1,7 +1,9 @@
 1.11 (unreleased)
 =================
 
-- Nothing changed yet.
+- #75: Fix the missing piece of relative template loading by allowing a
+  template to inherit from a template relative to itself, instead of
+  forcing the parent to be on the search path. [mmerickel]
 
 
 1.10 (2014-01-11)
