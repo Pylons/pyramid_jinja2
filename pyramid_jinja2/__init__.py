@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 
 from jinja2 import Environment as _Jinja2Environment
 
@@ -8,7 +9,9 @@ from jinja2.loaders import FileSystemLoader
 from jinja2.utils import open_if_exists
 
 from pyramid.asset import abspath_from_asset_spec
+from pyramid.path import DottedNameResolver
 
+from zope.deprecation import deprecated
 from zope.interface import Interface
 
 from .compat import text_type
@@ -134,9 +137,47 @@ class Jinja2TemplateRenderer(object):
         return self.template.render(system)
 
 
+_factory_lock = threading.Lock()
+
+
+def renderer_factory(info):
+    _factory_lock.acquire()
+    try:
+        registry = info.registry
+        env = registry.queryUtility(IJinja2Environment)
+        if env is None:
+            resolver = DottedNameResolver(package=info.package)
+            loader_opts = parse_loader_options_from_settings(
+                registry.settings,
+                'jinja2.',
+                resolver.maybe_resolve,
+                info.package,
+            )
+            env_opts = parse_env_options_from_settings(
+                registry.settings,
+                'jinja2.',
+                resolver.maybe_resolve,
+                info.package,
+            )
+            env = create_environment_from_options(env_opts, loader_opts)
+            registry.registerUtility(env, IJinja2Environment)
+    finally:
+        _factory_lock.release()
+
+    factory = Jinja2RendererFactory()
+    factory.environment = env
+    return factory(info)
+
+
+deprecated(
+    'renderer_factory',
+    'The pyramid_jinja2.renderer_factory was deprecated in version 1.11 and '
+    'will be removed in the future. You should upgrade to the newer '
+    'config.add_jinja2_renderer() API.')
+
+
 class Jinja2RendererFactory(object):
-    def __init__(self, environment):
-        self.environment = environment
+    environment = None
 
     def __call__(self, info):
         # get template based on searchpaths, then try relavtive one
@@ -175,7 +216,7 @@ def add_jinja2_search_path(config, searchpath, renderer_extension='.jinja2'):
         searchpaths = parse_multiline(searchpath)
         for folder in searchpaths:
             env.loader.searchpath.append(abspath_from_asset_spec(folder,
-                                         config.package_name))
+                                         config.package))
     config.action(None, register, order=EXTRAS_CONFIG_PHASE)
 
 
@@ -264,6 +305,7 @@ def add_jinja2_renderer(config, extension, settings_prefix='jinja2.'):
             config.package,
         )
         env = create_environment_from_options(env_opts, loader_opts)
+        renderer_factory.environment = env
 
         registry.registerUtility(env, IJinja2Environment, name=extension)
 

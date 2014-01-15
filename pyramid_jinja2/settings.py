@@ -77,8 +77,8 @@ def parse_loader_options_from_settings(settings,
 
     return dict(
         debug=debug,
-        input_encoding=input_encoding,
-        directories=directories,
+        encoding=input_encoding,
+        searchpath=directories,
     )
 
 
@@ -97,8 +97,10 @@ def parse_env_options_from_settings(settings,
 
     opts = {}
 
-    reload_templates = asbool(settings.get('pyramid.reload_templates', False))
-    opts['reload_templates'] = reload_templates
+    reload_templates = sget('reload_templates')
+    if reload_templates is None:
+        reload_templates = settings.get('pyramid.reload_templates')
+    opts['auto_reload'] = asbool(reload_templates)
 
     # set string settings
     for key_name in ('block_start_string', 'block_end_string',
@@ -111,13 +113,13 @@ def parse_env_options_from_settings(settings,
             opts[key_name] = value
 
     # boolean settings
-    for short_key_name in ('autoescape', 'trim_blocks', 'optimized'):
+    for key_name in ('autoescape', 'trim_blocks', 'optimized'):
         value = sget(key_name, defaults.get(key_name))
         if value is not None:
             opts[key_name] = asbool(value)
 
     # integer settings
-    for short_key_name in ('cache_size',):
+    for key_name in ('cache_size',):
         value = sget(key_name, defaults.get(key_name))
         if value is not None:
             opts[key_name] = int(value)
@@ -151,12 +153,12 @@ def parse_env_options_from_settings(settings,
         opts['package_name'] = package.__name__
 
     #add custom jinja2 filters
-    opts['filters'] = parse_named_assetspecs(sget('filters', ''))
+    opts['filters'] = parse_named_assetspecs(sget('filters', ''), maybe_dotted)
 
     #add custom jinja2 tests
-    opts['tests'] = parse_named_assetspecs(sget('tests', ''))
+    opts['tests'] = parse_named_assetspecs(sget('tests', ''), maybe_dotted)
 
     # add custom jinja2 functions
-    opts['globals'] = parse_named_assetspecs(sget('globals', ''))
+    opts['globals'] = parse_named_assetspecs(sget('globals', ''), maybe_dotted)
 
     return opts

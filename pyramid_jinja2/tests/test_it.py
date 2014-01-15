@@ -2,51 +2,32 @@
 
 import unittest
 from pyramid import testing
-from pyramid_jinja2.tests.base import (
-    Base, DummyRendererInfo, DummyEnvironment, Mock)
 
-from pyramid_jinja2.compat import text_type
-from pyramid_jinja2.compat import text_
-from pyramid_jinja2.compat import bytes_
-from pyramid_jinja2.compat import StringIO
-from pyramid_jinja2.compat import PY3
+from pyramid_jinja2.compat import (
+    text_type,
+    text_,
+    bytes_,
+    StringIO,
+)
+from .base import Base
+
 
 def dummy_filter(value): return 'hoge'
 
 
-class Test_parse_config(unittest.TestCase):
-    def _callFUT(self, value):
-        from pyramid_jinja2 import parse_config
-        return parse_config(value)
-
-    def test_parse_singile_line(self):
-        import pyramid_jinja2
-        self.assertEqual(self._callFUT('dummy=pyramid_jinja2'),
-                         {'dummy': pyramid_jinja2})
-
-    def test_parse_multi_line(self):
-        import pyramid_jinja2
-        self.assertEqual(self._callFUT("""
-            dummy = pyramid_jinja2
-            dummy2 = pyramid_jinja2"""),
-        {'dummy': pyramid_jinja2, 'dummy2': pyramid_jinja2})
-
-    def test_parse_dict_stringvals(self):
-        import pyramid_jinja2
-        self.assertEqual(self._callFUT(
-            {'dummy': 'pyramid_jinja2',
-             'dummy2': 'pyramid_jinja2'}),
-        {'dummy': pyramid_jinja2, 'dummy2': pyramid_jinja2})
-
-    def test_parse_dict_objvals(self):
-        import pyramid_jinja2
-        self.assertEqual(self._callFUT(
-            {'dummy': pyramid_jinja2,
-             'dummy2': pyramid_jinja2}),
-        {'dummy': pyramid_jinja2, 'dummy2': pyramid_jinja2})
-
-
 class Test_renderer_factory(Base, unittest.TestCase):
+
+    def setUp(self):
+        Base.setUp(self)
+        import warnings
+        self.warnings = warnings.catch_warnings()
+        self.warnings.__enter__()
+        warnings.simplefilter('ignore', DeprecationWarning)
+
+    def tearDown(self):
+        self.warnings.__exit__(None, None, None)
+        Base.tearDown(self)
+
     def _callFUT(self, info):
         from pyramid_jinja2 import renderer_factory
         return renderer_factory(info)
@@ -58,8 +39,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             'package': None,
             'registry': self.config.registry,
             })
-        renderer = self._callFUT(info)
-        self.assertRaises(TemplateNotFound, lambda: renderer({}, {}))
+        self.assertRaises(TemplateNotFound, lambda: self._callFUT(info))
 
     def test_no_environment(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -73,8 +53,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
         renderer = self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.loader.searchpath, [self.templates_dir])
-        self.assertEqual(renderer.info, info)
-        self.assertEqual(renderer.environment, environ)
+        self.assertTrue(renderer.template is not None)
 
     def test_composite_directories_path(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -91,7 +70,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
 
     def test_with_environ(self):
         from pyramid_jinja2 import IJinja2Environment
-        environ = dict()
+        environ = DummyEnviron()
         self.config.registry.registerUtility(environ, IJinja2Environment)
         info = DummyRendererInfo({
             'name': 'helloworld.jinja2',
@@ -99,8 +78,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             'registry': self.config.registry,
             })
         renderer = self._callFUT(info)
-        self.assertEqual(renderer.environment, environ)
-        self.assertEqual(renderer.info, info)
+        self.assertEqual(renderer.template, 'helloworld.jinja2')
 
     def test_with_filters_object(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -134,7 +112,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(environ.filters['dummy'], dummy_filter)
 
 
-class Jinja2TemplateRendererTests(Base, unittest.TestCase):
+class TestJinja2TemplateRenderer(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid_jinja2 import Jinja2TemplateRenderer
         return Jinja2TemplateRenderer
@@ -144,52 +122,31 @@ class Jinja2TemplateRendererTests(Base, unittest.TestCase):
         return klass(*arg, **kw)
 
     def test_call(self):
-        environ = DummyEnvironment()
-        info = DummyRendererInfo({
-            'name': 'name',
-            })
-        instance = self._makeOne(info, environ)
+        template = DummyTemplate()
+        instance = self._makeOne(template)
         result = instance({}, {'system': 1})
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, 'result')
 
     def test_call_with_system_context(self):
-        environ = DummyEnvironment()
-        info = DummyRendererInfo({
-            'name': 'name',
-            })
-        instance = self._makeOne(info, environ)
+        template = DummyTemplate()
+        instance = self._makeOne(template)
         result = instance({}, {'context': 1})
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, 'result')
-        self.assertEqual(environ.values, {'context': 1})
 
     def test_call_with_nondict_value(self):
-        environ = DummyEnvironment()
-        info = DummyRendererInfo({
-            'name': 'name',
-            })
-        instance = self._makeOne(info, environ)
+        template = DummyTemplate()
+        instance = self._makeOne(template)
         self.assertRaises(ValueError, instance, None, {'context': 1})
-
-    def test_implementation(self):
-        environ = DummyEnvironment()
-        info = DummyRendererInfo({
-            'name': 'name',
-            })
-        instance = self._makeOne(info, environ)
-        result = instance.implementation().render({})
-        self.assertEqual(result, 'result')
 
 
 class TestIntegration(unittest.TestCase):
     def setUp(self):
-        import pyramid_jinja2
         config = testing.setUp()
         config.add_settings({'jinja2.directories':
                              'pyramid_jinja2.tests:templates'})
-        config.add_renderer('.jinja2',
-                            pyramid_jinja2.renderer_factory)
+        config.include('pyramid_jinja2')
 
     def tearDown(self):
         testing.tearDown()
@@ -202,10 +159,8 @@ class TestIntegration(unittest.TestCase):
 
 class TestIntegration2(unittest.TestCase):
     def setUp(self):
-        import pyramid_jinja2
         config = testing.setUp()
-        config.add_renderer('.jinja2',
-                            pyramid_jinja2.renderer_factory)
+        config.include('pyramid_jinja2')
 
     def tearDown(self):
         testing.tearDown()
@@ -219,9 +174,8 @@ class TestIntegration2(unittest.TestCase):
 class Test_filters_and_tests(Base, unittest.TestCase):
 
     def _set_up_environ(self):
-        from pyramid_jinja2 import IJinja2Environment
         self.config.include('pyramid_jinja2')
-        return self.config.registry.getUtility(IJinja2Environment)
+        return self.config.get_jinja2_environment()
 
     def _assert_has_test(self, test_name, test_obj):
         environ = self._set_up_environ()
@@ -281,16 +235,16 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         self._assert_has_global('my_global3', my_test_func)
 
     def test_filter_and_test_and_global_works_in_render(self):
-        import pyramid_jinja2
         from pyramid.renderers import render
         config = testing.setUp()
+        config.include('pyramid_jinja2')
         config.add_settings({
             'jinja2.directories': 'pyramid_jinja2.tests:templates',
             'jinja2.tests': 'my_test = pyramid_jinja2.tests.test_it.my_test_func',
             'jinja2.filters': 'my_filter = pyramid_jinja2.tests.test_it.my_test_func',
             'jinja2.globals': 'my_global = pyramid_jinja2.tests.test_it.my_test_func'
         })
-        config.add_renderer('.jinja2', pyramid_jinja2.renderer_factory)
+        config.add_jinja2_renderer('.jinja2')
         result = render('tests_and_filters.jinja2', {})
         #my_test_func returs "True" - it will be render as True when usign
         # as filter and will pass in tests
@@ -302,31 +256,31 @@ class Test_includeme(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         from pyramid_jinja2 import includeme
-        from pyramid_jinja2 import renderer_factory
+        from pyramid_jinja2 import Jinja2RendererFactory
         config = testing.setUp()
         config.registry.settings['jinja2.directories'] = '/foobar'
         includeme(config)
         utility = config.registry.getUtility(IRendererFactory, name='.jinja2')
-        self.assertEqual(utility, renderer_factory)
+        self.assertTrue(isinstance(utility, Jinja2RendererFactory))
 
 
 class Test_add_jinja2_assetdirs(unittest.TestCase):
     def test_it(self):
+        import pyramid_jinja2.tests
         from pyramid_jinja2 import includeme
-        from pyramid_jinja2 import IJinja2Environment
         import os
         config = testing.setUp()
-        config.package_name = __name__
+        config.package = pyramid_jinja2.tests
         config.registry.settings['jinja2.directories'] = 'foobar'
         includeme(config)
-        utility = config.registry.getUtility(IJinja2Environment)
+        env = config.get_jinja2_environment()
         self.assertEqual(
-            [x.split(os.sep)[-3:] for x in utility.loader.searchpath],
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath],
             [['pyramid_jinja2', 'tests', 'foobar']])
 
         config.add_jinja2_search_path('grrr')
         self.assertEqual(
-            [x.split(os.sep)[-3:] for x in utility.loader.searchpath],
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath],
             [['pyramid_jinja2', 'tests', 'foobar'], ['pyramid_jinja2', 'tests', 'grrr']])
 
 class Test_get_jinja2_environment(unittest.TestCase):
@@ -382,15 +336,6 @@ class Test_bytecode_caching(unittest.TestCase):
         env = config.get_jinja2_environment()
         self.assertTrue(env.bytecode_cache is mycache)
         self.assertFalse(env.auto_reload)
-
-    def test_reload_templates(self):
-        from pyramid_jinja2 import includeme
-        config = testing.setUp()
-        config.registry.settings = {}
-        config.registry.settings['reload_templates'] = 'true'
-        includeme(config)
-        env = config.get_jinja2_environment()
-        self.assertTrue(env.auto_reload)
 
     def test_pyramid_reload_templates(self):
         from pyramid_jinja2 import includeme
@@ -471,28 +416,6 @@ class TestFileInfo(unittest.TestCase):
         self.assertEqual(mi._contents, mi.data)
 
 
-class GetTextWrapperTests(unittest.TestCase):
-
-    def test_it(self):
-        from pyramid_jinja2 import GetTextWrapper
-
-        class MyGetTextWrapper(GetTextWrapper):
-            class localizer:
-                @staticmethod
-                def translate(s, domain):
-                    return s
-
-                @staticmethod
-                def pluralize(s1, s2, n, domain):
-                    return s2
-
-            def __init__(self):
-                GetTextWrapper.__init__(self, 'messages')
-
-        self.assertEqual(MyGetTextWrapper().gettext('foo'), 'foo')
-        self.assertEqual(MyGetTextWrapper().ngettext('foo', 'foos', 3), 'foos')
-
-
 class TestJinja2SearchPathIntegration(unittest.TestCase):
 
     def test_it(self):
@@ -551,26 +474,6 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
 
 
-class TestPackageFinder(unittest.TestCase):
-
-    def test_caller_package(self):
-        from pyramid_jinja2 import _PackageFinder
-        pf = _PackageFinder()
-
-        class MockInspect(object):
-            def __init__(self, items=()):
-                self.items = items
-
-            def stack(self):
-                return self.items
-        pf.inspect = MockInspect()
-        self.assertEqual(pf.caller_package(), None)
-
-        import xml
-        pf.inspect.items = [(Mock(f_globals={'__name__': 'xml'}),)]
-        self.assertEqual(pf.caller_package(), xml)
-
-
 class TestNewstyle(unittest.TestCase):
     def test_it(self):
         from pyramid.config import Configurator
@@ -595,13 +498,11 @@ class TestNewstyle(unittest.TestCase):
         self.assertEqual(testapp.get('/').body.decode('utf-8'), text_('my hovercraft is full of eels!'))
 
 
-class MiscTests(Base, unittest.TestCase):
+class Test_add_jinja2_extension(Base, unittest.TestCase):
 
-    def test_add_jinja2_extension(self):
-        from pyramid_jinja2 import (add_jinja2_extension,
-                                    _get_or_build_default_environment)
+    def test_it(self):
         self.config.include('pyramid_jinja2')
-        env_before = _get_or_build_default_environment(self.config.registry)
+        env_before = self.config.get_jinja2_environment()
 
         class MockExt(object):
             identifier = 'foobar'
@@ -609,40 +510,31 @@ class MiscTests(Base, unittest.TestCase):
             def __init__(self, x):
                 self.x = x
 
-        add_jinja2_extension(self.config, MockExt)
+        self.config.add_jinja2_extension(MockExt)
 
-        env_after = _get_or_build_default_environment(self.config.registry)
+        env_after = self.config.get_jinja2_environment()
         self.assertTrue('foobar' in env_after.extensions)
         self.assertTrue(env_before is env_after)
 
-
-class UndefinedTests(Base, unittest.TestCase):
-
-    def _assert_has_undefined(self, expected_undefined):
-        from pyramid_jinja2 import IJinja2Environment
+    def test_alternate_renderer_extension(self):
         self.config.include('pyramid_jinja2')
-        environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.undefined, expected_undefined)
+        self.config.add_jinja2_renderer('.html')
+        env_before = self.config.get_jinja2_environment('.html')
 
-    def test_set_regular_undefined_when_unset(self):
-        from jinja2 import Undefined
-        self._assert_has_undefined(Undefined)
+        class MockExt(object):
+            identifier = 'foobar'
 
-    def test_set_regular_undefined_by_default(self):
-        from jinja2 import Undefined
-        self.config.registry.settings['jinja2.undefined'] = ''
-        from jinja2 import Undefined
-        self._assert_has_undefined(Undefined)
+            def __init__(self, x):
+                self.x = x
 
-    def test_set_strict_undefined(self):
-        from jinja2 import StrictUndefined
-        self.config.registry.settings['jinja2.undefined'] = 'strict'
-        self._assert_has_undefined(StrictUndefined)
+        self.config.add_jinja2_extension(MockExt, '.html')
 
-    def test_set_debug_undefined(self):
-        from jinja2 import DebugUndefined
-        self.config.registry.settings['jinja2.undefined'] = 'debug'
-        self._assert_has_undefined(DebugUndefined)
+        env_after = self.config.get_jinja2_environment('.html')
+        default_env = self.config.get_jinja2_environment()
+
+        self.assertTrue('foobar' in env_after.extensions)
+        self.assertTrue('foobar' not in default_env.extensions)
+        self.assertTrue(env_before is env_after)
 
 def my_test_func(*args, **kwargs):
     """ Used as a fake filter/test function """
@@ -653,3 +545,21 @@ class DummyMemcachedClient(dict):
     """
     def set(self, key, value, timeout):
         self[key] = value               # pragma: no cover
+
+class DummyEnviron(dict):
+    def get_template(self, path):
+        return path
+
+class DummyTemplate(object):
+    def render(self, system):
+        return u'result'
+
+class DummyRendererInfo(object):
+    def __init__(self, kw):
+        self.__dict__.update(kw)
+        if 'registry' in self.__dict__:
+            self.settings = self.registry.settings
+
+class Mock(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)

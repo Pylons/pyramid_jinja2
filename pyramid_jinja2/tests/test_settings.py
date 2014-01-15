@@ -1,101 +1,139 @@
-# -*- coding: utf-8 -*-
-
-# TODO: add a test for defaults once we decouple get and build of
-#       _get_or_build_default_environment function
-
-from unittest import TestCase
+import os.path
+import unittest
 
 
-class DummyRendererInfo(object):
+class Test_parse_named_assetspecs(unittest.TestCase):
 
-    def __init__(self, registry):
-        self.name = 'helloworld.jinja2'
-        self.package = None
-        self.registry = registry
-        self.settings = registry.settings
+    def _callFUT(self, *args, **kwargs):
+        from pyramid_jinja2.settings import parse_named_assetspecs
+        return parse_named_assetspecs(*args, **kwargs)
+
+    def test_it_with_strings(self):
+        from pyramid.path import DottedNameResolver
+        import pyramid_jinja2
+        import pyramid_jinja2.tests
+        resolver = DottedNameResolver()
+        result = self._callFUT(
+            '''
+            foo = pyramid_jinja2
+            bar= pyramid_jinja2.tests
+            ''',
+            resolver.maybe_resolve,
+        )
+        self.assertEqual(result['foo'], pyramid_jinja2)
+        self.assertEqual(result['bar'], pyramid_jinja2.tests)
+
+    def test_it_with_dict(self):
+        from pyramid.path import DottedNameResolver
+        import pyramid_jinja2
+        import pyramid_jinja2.tests
+        resolver = DottedNameResolver()
+        result = self._callFUT(
+            {
+                'foo': 'pyramid_jinja2',
+                'bar': pyramid_jinja2.tests,
+            },
+            resolver.maybe_resolve,
+        )
+        self.assertEqual(result['foo'], pyramid_jinja2)
+        self.assertEqual(result['bar'], pyramid_jinja2.tests)
 
 
-class DummyRegistry(object):
+class Test_parse_loader_options_from_settings(unittest.TestCase):
 
-    def __init__(self, settings=None):
+    def _callFUT(self, *args, **kwargs):
+        from pyramid_jinja2.settings import parse_loader_options_from_settings
+        return parse_loader_options_from_settings(*args, **kwargs)
 
-        # do the mutable default
-        self.settings = settings
-        if self.settings is None:
-            self.settings = {}
+    def test_defaults(self):
+        options = self._callFUT({}, 'p.', None, None)
+        self.assertEqual(options['debug'], False)
+        self.assertEqual(options['encoding'], 'utf-8')
+        self.assertEqual(options['searchpath'], [])
 
-        self.impl = None
+    def test_options(self):
+        options = self._callFUT(
+            {
+                'debug_templates': 'false',
+                'p.debug_templates': 'true',
+                'p.input_encoding': 'ascii',
+                'p.directories': 'templates',
+            },
+            'p.', None, __package__,
+        )
+        self.assertEqual(options['debug'], True)
+        self.assertEqual(options['encoding'], 'ascii')
+        self.assertTrue(
+            options['searchpath'][0].endswith(
+                os.path.join('pyramid_jinja2', 'tests', 'templates')))
 
-    def queryUtility(self, iface):
-        return self.impl
+    def test_debug_fallback(self):
+        options = self._callFUT(
+            {
+                'debug_templates': 'true',
+            },
+            'p.', None, None,
+        )
+        self.assertEqual(options['debug'], True)
 
-    def registerUtility(self, impl, iface):
-        self.impl = impl
 
+class Test_parse_env_options_from_settings(unittest.TestCase):
 
-class Test_settings(TestCase):
-
-    def _callFUT(self, info):
-        # initialize renderer with dummy info containing our configs
-        from pyramid_jinja2 import renderer_factory
-        return renderer_factory(info)
-
-    def test_settings_defaults(self):
-        from pyramid_jinja2 import IJinja2Environment
-        from pyramid_jinja2 import _JINJA2_ENVIRONMENT_DEFAULTS
-
-        # do not setup the registry with any settings so we get the defaults
-        registry = DummyRegistry()
-        # provide minimum amount of information to the renderer
-        info = DummyRendererInfo(registry)
-        # call renderer so the Jinja2 environment is created
-        self._callFUT(info)
-        # get Jinja2 environment
-        environ = registry.queryUtility(IJinja2Environment)
-        # iterate over the defaults and test them
-        # (fyi, this will not work for cache_size)
-        for key_name in _JINJA2_ENVIRONMENT_DEFAULTS:
-            self.assertEqual(getattr(environ, key_name),
-                             _JINJA2_ENVIRONMENT_DEFAULTS[key_name])
+    def _callFUT(self, settings, prefix=''):
+        from pyramid.path import DottedNameResolver
+        import pyramid_jinja2
+        from pyramid_jinja2.settings import parse_env_options_from_settings
+        resolver = DottedNameResolver()
+        return parse_env_options_from_settings(
+            settings, prefix, resolver.maybe_resolve, pyramid_jinja2,
+        )
 
     def test_most_settings(self):
-        from pyramid_jinja2 import IJinja2Environment
-
-        registry = DummyRegistry(
-            {'jinja2.block_start_string': '<<<',
-             'jinja2.block_end_string': '>>>',
-             'jinja2.variable_start_string': '<|<',
-             'jinja2.variable_end_string': '>|>',
-             'jinja2.comment_start_string': '<+<',
-             'jinja2.comment_end_string': '>+>',
-             'jinja2.line_statement_prefix': '>.>',
-             'jinja2.line_comment_prefix': '^.^',
-             'jinja2.trim_blocks': True,
-             'jinja2.newline_sequence': '\r',
-             'jinja2.optimized': False,
-             'jinja2.autoescape': False,
-             'jinja2.cache_size': 300
-            })
-
-        # provide minimum amount of information to the renderer
-        info = DummyRendererInfo(registry)
-        # call renderer so the Jinja2 environment is created
-        self._callFUT(info)
-        # get Jinja2 environment
-        environ = registry.queryUtility(IJinja2Environment)
-
+        settings = {
+            'j2.block_start_string': '<<<',
+            'j2.block_end_string': '>>>',
+            'j2.variable_start_string': '<|<',
+            'j2.variable_end_string': '>|>',
+            'j2.comment_start_string': '<+<',
+            'j2.comment_end_string': '>+>',
+            'j2.line_statement_prefix': '>.>',
+            'j2.line_comment_prefix': '^.^',
+            'j2.trim_blocks': 'true',
+            'j2.newline_sequence': '\r',
+            'j2.optimized': 'true',
+            'j2.autoescape': 'false',
+            'j2.cache_size': '300',
+        }
+        opts = self._callFUT(settings, 'j2.')
         # test
-        self.assertEqual(environ.block_start_string, '<<<')
-        self.assertEqual(environ.block_end_string, '>>>')
-        self.assertEqual(environ.variable_start_string, '<|<')
-        self.assertEqual(environ.variable_end_string, '>|>')
-        self.assertEqual(environ.comment_start_string, '<+<')
-        self.assertEqual(environ.comment_end_string, '>+>')
-        self.assertEqual(environ.line_statement_prefix, '>.>')
-        self.assertEqual(environ.line_comment_prefix, '^.^')
-        self.assertEqual(environ.trim_blocks, True)
-        self.assertEqual(environ.newline_sequence, '\r')
-        self.assertEqual(environ.optimized, False)
-        self.assertEqual(environ.autoescape, False)
-        # this is where cache_size gets set in Jinja2
-        self.assertEqual(environ.cache.capacity, 300)
+        self.assertEqual(opts['block_start_string'], '<<<')
+        self.assertEqual(opts['block_end_string'], '>>>')
+        self.assertEqual(opts['variable_start_string'], '<|<')
+        self.assertEqual(opts['variable_end_string'], '>|>')
+        self.assertEqual(opts['comment_start_string'], '<+<')
+        self.assertEqual(opts['comment_end_string'], '>+>')
+        self.assertEqual(opts['line_statement_prefix'], '>.>')
+        self.assertEqual(opts['line_comment_prefix'], '^.^')
+        self.assertEqual(opts['trim_blocks'], True)
+        self.assertEqual(opts['newline_sequence'], '\r')
+        self.assertEqual(opts['optimized'], True)
+        self.assertEqual(opts['autoescape'], False)
+        self.assertEqual(opts['cache_size'], 300)
+
+    def test_strict_undefined(self):
+        from jinja2 import StrictUndefined
+        settings = {'j2.undefined': 'strict'}
+        opts = self._callFUT(settings, 'j2.')
+        self.assertEqual(opts['undefined'], StrictUndefined)
+
+    def test_debug_undefined(self):
+        from jinja2 import DebugUndefined
+        settings = {'j2.undefined': 'debug'}
+        opts = self._callFUT(settings, 'j2.')
+        self.assertEqual(opts['undefined'], DebugUndefined)
+
+    def test_default_undefined(self):
+        from jinja2 import Undefined
+        settings = {'j2.undefined': ''}
+        opts = self._callFUT(settings, 'j2.')
+        self.assertEqual(opts['undefined'], Undefined)
