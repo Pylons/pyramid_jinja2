@@ -209,7 +209,8 @@ def add_jinja2_search_path(config, searchpath, renderer_extension='.jinja2'):
 
     It will add the directory or :term:`asset spec` passed as ``searchpath``
     to the current search path of the ``jinja2.environment.Environment`` used
-    by :mod:`pyramid_jinja2`.
+    by :mod:`pyramid_jinja2`. Be aware that each ``renderer_extension`` has
+    its own search path for templates.
     """
     def register():
         env = get_jinja2_environment(config, renderer_extension)

@@ -58,6 +58,9 @@ Once activated either of these says, the following happens:
 #) Files with the :file:`.jinja2` extension are considered to be
    :term:`Jinja2` templates.
 
+#) The :func:`pyramid_jinja2.add_jinja2_renderer` directive is added to the
+   :term:`Configurator` instance.
+
 #) The :func:`pyramid_jinja2.add_jinja2_search_path` directive is added to
    the :term:`Configurator` instance.
 
