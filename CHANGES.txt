@@ -5,6 +5,11 @@
   template to inherit from a template relative to itself, instead of
   forcing the parent to be on the search path. [mmerickel]
 
+- #73: Deprecated ``pyramid_jinja2.renderer_factory`` and replaced it with
+  a new ``config.add_jinja2_renderer`` API that can create and override
+  multiple Jinja2 renderers, each loaded using different ini settings.
+  [mmerickel]
+
 
 1.10 (2014-01-11)
 =================
