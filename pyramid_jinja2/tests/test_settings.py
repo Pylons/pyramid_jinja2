@@ -52,6 +52,7 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
         self.assertEqual(options['searchpath'], [])
 
     def test_options(self):
+        import pyramid_jinja2.tests
         options = self._callFUT(
             {
                 'debug_templates': 'false',
@@ -59,7 +60,7 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
                 'p.input_encoding': 'ascii',
                 'p.directories': 'templates',
             },
-            'p.', None, __package__,
+            'p.', None, pyramid_jinja2.tests,
         )
         self.assertEqual(options['debug'], True)
         self.assertEqual(options['encoding'], 'ascii')
