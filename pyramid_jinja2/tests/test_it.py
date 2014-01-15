@@ -552,7 +552,7 @@ class DummyEnviron(dict):
 
 class DummyTemplate(object):
     def render(self, system):
-        return u'result'
+        return b'result'.decode('utf-8')
 
 class DummyRendererInfo(object):
     def __init__(self, kw):
