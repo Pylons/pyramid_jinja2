@@ -7,7 +7,7 @@ from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
 from jinja2.utils import open_if_exists
 
-from pyramid.assets import abspath_from_asset_spec
+from pyramid.asset import abspath_from_asset_spec
 
 from zope.interface import Interface
 
@@ -218,21 +218,15 @@ def get_jinja2_environment(config, renderer_extension='.jinja2'):
 def create_environment_from_options(env_opts, loader_opts):
     loader = SmartAssetSpecLoader(**loader_opts)
 
-    auto_reload = env_opts.pop('reload_templates')
-    extensions = env_opts.pop('extensions')
-    undefined = env_opts.pop('undefined')
-    newstyle = env_opts.pop('newstyle')
-    gettext = env_opts.pop('gettext')
+    newstyle = env_opts.pop('newstyle', False)
+    gettext = env_opts.pop('gettext', None)
     package_name = env_opts.pop('package_name', None)
-    filters = env_opts.pop('filters')
-    tests = env_opts.pop('tests')
-    globals = env_opts.pop('globals')
+    filters = env_opts.pop('filters', {})
+    tests = env_opts.pop('tests', {})
+    globals = env_opts.pop('globals', {})
 
     env = Environment(
         loader=loader,
-        auto_reload=auto_reload,
-        extensions=extensions,
-        undefined=undefined,
         **env_opts
     )
 
@@ -298,7 +292,7 @@ def includeme(config):
     - ``add_jinja2_extension``: Add a list of extensions to the Jinja2
       environment.
 
-    - get_jinja2_environment``: Return the Jinja2 ``environment.Environment``
+    - ``get_jinja2_environment``: Return the Jinja2 ``environment.Environment``
       used by ``pyramid_jinja2``.
 
     """
