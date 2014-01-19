@@ -1,4 +1,3 @@
-import atexit
 import inspect
 import os
 import sys
@@ -7,7 +6,7 @@ import warnings
 from zope.interface import implementer
 from zope.interface import Interface
 
-from jinja2 import Environment
+from jinja2 import Environment as _Jinja2Environment
 from jinja2 import BytecodeCache
 from jinja2 import FileSystemBytecodeCache
 from jinja2 import Undefined
@@ -37,6 +36,11 @@ class IJinja2Environment(Interface):
 _JINJA2_ENVIRONMENT_DEFAULTS = {
     'autoescape': True
 }
+
+
+class Environment(_Jinja2Environment):
+    def join_path(self, template, parent):
+        return os.path.join(os.path.dirname(parent), template)
 
 
 def maybe_import_string(val):

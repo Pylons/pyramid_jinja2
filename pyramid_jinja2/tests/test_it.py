@@ -331,8 +331,7 @@ class Test_add_jinja2_assetdirs(unittest.TestCase):
 
 class Test_get_jinja2_environment(unittest.TestCase):
     def test_it(self):
-        from jinja2.environment import Environment
-        from pyramid_jinja2 import includeme
+        from pyramid_jinja2 import includeme, Environment
         config = testing.setUp()
         includeme(config)
         self.assertEqual(config.get_jinja2_environment().__class__,
@@ -526,6 +525,30 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         app2 = config2.make_wsgi_app()
         testapp = TestApp(app2)
         self.assertEqual(testapp.get('/').body, bytes_('bar'))
+
+    def test_it_relative(self):
+        from pyramid.config import Configurator
+        from pyramid_jinja2 import includeme
+        from webtest import TestApp
+        import os
+
+        here = os.path.abspath(os.path.dirname(__file__))
+        templates_dir = os.path.join(here, 'templates')
+
+        def myview(request):
+            return {}
+
+        config = Configurator(settings={'jinja2.directories': templates_dir})
+        includeme(config)
+        config.add_view(view=myview, name='baz1',
+                        renderer='baz1/mytemplate.jinja2')
+        config.add_view(view=myview, name='baz2',
+                        renderer='baz2/mytemplate.jinja2')
+
+        app1 = config.make_wsgi_app()
+        testapp = TestApp(app1)
+        self.assertEqual(testapp.get('/baz1').body, bytes_('baz1\nbaz1 body'))
+        self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
 
 
 class TestPackageFinder(unittest.TestCase):
