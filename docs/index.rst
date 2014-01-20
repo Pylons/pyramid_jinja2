@@ -17,7 +17,7 @@ Installation
 
 Install using setuptools, e.g. (within a virtualenv)::
 
-  $ $myvenv/bin/easy_install pyramid_jinja2
+  $ $VENV/bin/easy_install pyramid_jinja2
 
 .. _setup:
 
@@ -27,18 +27,21 @@ Setup
 
 .. note::
 
-  If you start a project from scratch, consider using the :ref:`project template <jinja2_starter_template>`
-  which comes with a working setup and sensible defaults.
+  If you start a project from scratch, consider using the
+  :ref:`project template <jinja2_starter_template>` which comes with a
+  working setup and sensible defaults.
 
 There are multiple ways to make sure that ``pyramid_jinja2`` is active.
 All are completely equivalent:
 
-#) Use the :py:func:`~pyramid_jinja2.includeme` function via :py:meth:`~pyramid.config.Configurator.include`::
+#) Use the :py:func:`~pyramid_jinja2.includeme` function via
+   :py:meth:`~pyramid.config.Configurator.include`::
 
     config = Configurator()
     config.include('pyramid_jinja2')
 
-#) Add ``pyramid_jinja2`` to the list of your ``pyramid.includes`` in your :file:`.ini` settings file::
+#) Add ``pyramid_jinja2`` to the list of your ``pyramid.includes`` in your
+   :file:`.ini` settings file::
 
     pyramid.includes =
         pyramid_jinja2
@@ -74,13 +77,14 @@ Once activated either of these says, the following happens:
 
 To setup the Jinja2 search path either one of the following steps must be taken:
 
-#) Add :ref:`setting_jinja2_directories` to your :file:`.ini` settings file using the pyramid asset spec::
+#) Add :ref:`setting_jinja2_directories` to your :file:`.ini` settings file
+   using a Pyramid :term:`asset spec`::
 
      jinja2.directories = yourapp:templates
 
 #) Or Alternatively by using the :func:`~pyramid_jinja2.add_jinja2_search_path`
    directive attached to your application's :term:`Configurator` instance also
-   using the pyramid asset spec::
+   using a Pyramid :term:`asset spec`::
 
      config.add_jinja2_search_path("yourapp:templates")
 
@@ -96,7 +100,7 @@ To setup the Jinja2 search path either one of the following steps must be taken:
 
     .. code-block:: python
 
-        @view_config(renderer='templates/mytemplate.jinja2')
+       @view_config(renderer='templates/mytemplate.jinja2')
 
     With the search path configured:
 
@@ -104,7 +108,7 @@ To setup the Jinja2 search path either one of the following steps must be taken:
 
        @view_config(renderer='mytemplate.jinja2')
 
-    If you view module is in app.module.view and your template is
+    If your view module is in ``app.module.view`` and your template is
     under :file:`app/module/templates/mytemplate.jinja2` you can access
     that asset in a few different ways.
 
@@ -112,19 +116,19 @@ To setup the Jinja2 search path either one of the following steps must be taken:
 
     .. code-block:: python
 
-      @view_config(renderer="module/templates/mytemplate.jinja2")
+       @view_config(renderer="module/templates/mytemplate.jinja2")
 
     Using the package:
 
     .. code-block:: python
 
-      @view_config(renderer="app.module:templates/mytemplate.jinja2")
+       @view_config(renderer="app.module:templates/mytemplate.jinja2")
 
     Using the relative path to current package:
 
     .. code-block:: python
 
-      @view_config(renderer="templates/mytemplate.jinja2")
+       @view_config(renderer="templates/mytemplate.jinja2")
 
     You need to be careful when using relative paths though, if
     there is an :file:`app/templates/mytemplate.jinja2` this will be
@@ -163,22 +167,22 @@ done as follows (where the :file:`templates` directory is expected to
 live in the search path):
 
 .. code-block:: python
- :linenos:
+   :linenos:
 
- from pyramid.view import view_config
+   from pyramid.view import view_config
 
- @view_config(renderer='mytemplate.jinja2')
- def myview(request):
-     return {'foo':1, 'bar':2}
+   @view_config(renderer='mytemplate.jinja2')
+   def myview(request):
+       return {'foo':1, 'bar':2}
 
 Rendering templates outside of a view (and without a request) can be
 done using the renderer api:
 
 .. code-block:: python
- :linenos:
+   :linenos:
 
- from pyramid.renderers import render_to_response
- render_to_response('mytemplate.jinja2', {'foo':1, 'bar':2})
+   from pyramid.renderers import render_to_response
+   render_to_response('mytemplate.jinja2', {'foo':1, 'bar':2})
 
 :term:`Template Inheritance`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,31 +191,31 @@ done using the renderer api:
 template lookups.  An example:
 
 .. code-block:: html+django
- :linenos:
+   :linenos:
 
- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
- <!-- templates/layout.jinja2 -->
+   <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+   <!-- templates/layout.jinja2 -->
 
- <html lang="en">
- <html xmlns="http://www.w3.org/1999/xhtml">
- <head>
-   <link rel="stylesheet" href="style.css" />
- </head>
- <body>
-   <div id="content">{% block content %}{% endblock %}</div>
- </body>
+   <html lang="en">
+   <html xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+     <link rel="stylesheet" href="style.css" />
+   </head>
+   <body>
+     <div id="content">{% block content %}{% endblock %}</div>
+   </body>
 
 .. code-block:: html+django
- :linenos:
+   :linenos:
 
- <!-- templates/root.jinja2 -->
- {% extends "templates/layout.jinja2" %}
- {% block content %}
- <h1>Yes</h1>
- <p>
-   Some random paragraph.
- </p>
- {% endblock %}
+   <!-- templates/root.jinja2 -->
+   {% extends "templates/layout.jinja2" %}
+   {% block content %}
+   <h1>Yes</h1>
+   <p>
+     Some random paragraph.
+   </p>
+   {% endblock %}
 
 For further information on :term:`Template Inheritance` in Jinja2
 templates please see :ref:`Template Inheritance <jinja2:template-inheritance>`
@@ -244,8 +248,8 @@ the pyramid application.
 Settings
 ========
 
-:term:`Jinja2` derives additional settings to configure its template renderer. Many
-of these settings are optional and only need to be set if they should be
+:term:`Jinja2` derives additional settings to configure its template renderer.
+Many of these settings are optional and only need to be set if they should be
 different from the default.  The below values can be present in the
 :file:`.ini` file used to configure the Pyramid application (in the ``app``
 section representing your Pyramid app) or they can be passed directly within
@@ -254,14 +258,14 @@ the ``settings`` argument passed to a Pyramid Configurator.
 Generic Settings
 ----------------
 
-These setttings correspond to the ones documented in Jinja2.
+These settings correspond to the ones documented in Jinja2.
 Set them accordingly.
 
 For reference please see: http://jinja.pocoo.org/docs/api/#high-level-api
 
-.. note ::
+.. note::
 
-    For the boolean settings please use ``true`` or ``false``
+   For the boolean settings please use ``true`` or ``false``
 
 jinja2.block_start_string
 
@@ -294,12 +298,12 @@ Jinja2 autoescape setting.
 
 Possible values: ``true`` or ``false``.
 
-.. warning ::
+.. warning::
 
-    By default Jinja2 sets autoescaping to False.
+   By default Jinja2 sets autoescaping to False.
 
-    pyramid_jinja2 sets it to true as it is considered a good security
-    practice.
+   pyramid_jinja2 sets it to true as it is considered a good security
+   practice.
 
 
 .. _setting_reload_templates:
@@ -307,21 +311,15 @@ Possible values: ``true`` or ``false``.
 pyramid.reload_templates
 ------------------------
 
-This is a Pyramid setting (not a pyramid_jinja2 one)
-
 For usage see :ref:`Pyramid: Automatically Reloading Templates
 <pyramid:reload_templates_section>`.
 
 ``true`` or ``false`` representing whether Jinja2 templates should be
 reloaded when they change on disk.  Useful for development to be ``true``.
-This setting sets to Jinja2 ``auto_reload`` setting.
-
-The rationale for using is a differently named setting is: this setting existed
-when Pyramid only supported Chameleon and Mako templates and acts uniformly
-across the template renderers.
+This setting sets the Jinja2 ``auto_reload`` setting.
 
 reload_templates
-------------------------
+----------------
 
 .. warning::
 
@@ -428,6 +426,7 @@ programatically.)
 By default, no bytecode cache is configured.
 
 .. versionchanged:: 1.10
+
    Previously, ``jinja2.bytecode_caching`` defaulted to ``true``.
 
 Note that configuring a filesystem bytecode cache will (not surprisiningly)
@@ -440,6 +439,7 @@ See the :ref:`Jinja2 Documentation <jinja2:bytecode-cache>`
 for more information on bytecode caching.
 
 .. versionchanged:: 1.10
+
    Previously, an atexit callback which called
    :py:meth:`jinja2.BytecodeCache.clear` was registered in an effort
    to delete the cache files.  This is no longer done.
@@ -456,7 +456,7 @@ This is only used if ``jinja2.bytecode_caching`` is set to ``true``.
 .. _setting_jinja2_newstyle:
 
 jinja2.newstyle
------------------------
+---------------
 
 ``true`` or ``false`` to enable the use of newstyle gettext calls. Defaults to
 ``false``.
@@ -470,7 +470,6 @@ Jinja2 Filters
 
 ``pyramid_jinja2`` provides following filters.
 
-
 .. currentmodule:: pyramid_jinja2.filters
 .. autofunction:: model_url_filter
 .. autofunction:: route_url_filter
@@ -481,24 +480,24 @@ Jinja2 Filters
 To use these filters, configure the settings of ``jinja2.filters``:
 
 .. code-block:: ini
- :linenos:
+   :linenos:
 
- [app:yourapp]
- # ... other stuff ...
- jinja2.filters =
-     model_url = pyramid_jinja2.filters:model_url_filter
-     route_url = pyramid_jinja2.filters:route_url_filter
-     static_url = pyramid_jinja2.filters:static_url_filter
+   [app:yourapp]
+   # ... other stuff ...
+   jinja2.filters =
+       model_url = pyramid_jinja2.filters:model_url_filter
+       route_url = pyramid_jinja2.filters:route_url_filter
+       static_url = pyramid_jinja2.filters:static_url_filter
 
 And use the filters in template.
 
 .. code-block:: html
 
- <a href="{{context|model_url('edit')}}">Edit</a>
+   <a href="{{context|model_url('edit')}}">Edit</a>
 
- <a href="{{'top'|route_url}}">Top</a>
+   <a href="{{'top'|route_url}}">Top</a>
 
- <link rel="stylesheet" href="{{'yourapp:static/css/style.css'|static_url}}" />
+   <link rel="stylesheet" href="{{'yourapp:static/css/style.css'|static_url}}" />
 
 
 .. _jinja2_starter_template:
@@ -511,11 +510,11 @@ following commands to create a Jinja2-based Pyramid project.
 
 On Pyramid 1.0, 1.1, or 1.2::
 
-  $ $myvenv/bin/paster create -t pyramid_jinja2_starter myproject
+  $ $VENV/bin/paster create -t pyramid_jinja2_starter myproject
 
-On Pyramid 1.3::
+On Pyramid 1.3+::
 
-  $ $myenv/bin/pcreate -s pyramid_jinja2_starter myproject
+  $ $VENV/bin/pcreate -s pyramid_jinja2_starter myproject
 
 After it's created, you can visit the ``myproject`` directory and run
 ``setup.py develop``.  At that point you can start the application like any
@@ -533,27 +532,27 @@ with the generated project.
 The usual pattern for working with i18n in pyramid_jinja2 is as follows:
 
 .. code-block:: text
- :linenos:
+   :linenos:
 
- # make sure Babel is installed
- easy_install Babel
+   # make sure Babel is installed
+   easy_install Babel
 
- # extract translatable strings from *.jinja2 / *.py
- python setup.py extract_messages
- python setup.py update_catalog
+   # extract translatable strings from *.jinja2 / *.py
+   python setup.py extract_messages
+   python setup.py update_catalog
 
- # Translate strings in <mypackage>/locale/<mylocale>/LC_MESSAGES/<myproject>.po
- # and re-compile *.po files
- python setup.py compile_catalog
+   # Translate strings in <mypackage>/locale/<mylocale>/LC_MESSAGES/<myproject>.po
+   # and re-compile *.po files
+   python setup.py compile_catalog
 
 More Information
 ================
 
 .. toctree::
- :maxdepth: 1
+   :maxdepth: 1
 
- glossary.rst
- api.rst
+   glossary.rst
+   api.rst
 
 Reporting Bugs / Development Versions
 =====================================
