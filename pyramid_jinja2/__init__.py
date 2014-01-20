@@ -208,7 +208,7 @@ def add_jinja2_search_path(config, searchpath, name='.jinja2'):
        config.add_jinja2_search_path('anotherpackage:templates/')
 
     It will add the directory or :term:`asset spec` passed as ``searchpath``
-    to the current search path of the ``jinja2.environment.Environment`` used
+    to the current search path of the :class:`jinja2.Environment` used
     by the renderer identified by ``name``.
 
     """
@@ -232,7 +232,7 @@ def add_jinja2_extension(config, ext, name='.jinja2'):
        config.add_jinja2_extension(myext)
 
     It will add the Jinja2 extension passed as ``ext`` to the current
-    ``jinja2.environment.Environment`` used by the renderer named ``name``.
+    :class:`jinja2.Environment` used by the renderer named ``name``.
 
     """
     def register():
@@ -251,7 +251,7 @@ def get_jinja2_environment(config, name='.jinja2'):
 
        config.get_jinja2_environment()
 
-    It will return the configured ``jinja2.environment.Environment`` for the
+    It will return the configured ``jinja2.Environment`` for the
     renderer named ``name``. Configuration is delayed until a call to
     ``config.commit()`` or ``config.make_wsgi_app()``. As such, if this
     method is called prior to committing the changes, it may return ``None``.
@@ -344,17 +344,17 @@ def includeme(config):
     available for use in Pyramid and these new directives are available as
     methods of the configurator:
 
-    - ``add_jinja2_renderer``: Add another Jinja2 renderer, with a different
-      extension and/or settings.
+    - ``add_jinja2_renderer``: Add a new Jinja2 renderer, with a different
+      file extension and/or settings.
 
     - ``add_jinja2_search_path``: Add a new location to the search path
-      for a renderer.
+      for the specified renderer.
 
     - ``add_jinja2_extension``: Add a list of extensions to the Jinja2
-      environment used by a renderer.
+      environment used by the specified renderer.
 
-    - ``get_jinja2_environment``: Return the ``jinja2.environment.Environment``
-      used by a renderer.
+    - ``get_jinja2_environment``: Return the :class:`jinja2.Environment`
+      used by the specified renderer.
 
     """
     config.add_directive('add_jinja2_renderer', add_jinja2_renderer)
