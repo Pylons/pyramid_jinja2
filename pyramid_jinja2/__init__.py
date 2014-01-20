@@ -197,7 +197,7 @@ class Jinja2RendererFactory(object):
         return Jinja2TemplateRenderer(template)
 
 
-def add_jinja2_search_path(config, searchpath, renderer_extension='.jinja2'):
+def add_jinja2_search_path(config, searchpath, name='.jinja2'):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -209,11 +209,11 @@ def add_jinja2_search_path(config, searchpath, renderer_extension='.jinja2'):
 
     It will add the directory or :term:`asset spec` passed as ``searchpath``
     to the current search path of the ``jinja2.environment.Environment`` used
-    by :mod:`pyramid_jinja2`. Be aware that each ``renderer_extension`` has
-    its own search path for templates.
+    by the renderer identified by ``name``.
+
     """
     def register():
-        env = get_jinja2_environment(config, renderer_extension)
+        env = get_jinja2_environment(config, name)
         searchpaths = parse_multiline(searchpath)
         for folder in searchpaths:
             env.loader.searchpath.append(abspath_from_asset_spec(folder,
@@ -221,7 +221,7 @@ def add_jinja2_search_path(config, searchpath, renderer_extension='.jinja2'):
     config.action(None, register, order=EXTRAS_CONFIG_PHASE)
 
 
-def add_jinja2_extension(config, ext, renderer_extension='.jinja2'):
+def add_jinja2_extension(config, ext, name='.jinja2'):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -232,15 +232,16 @@ def add_jinja2_extension(config, ext, renderer_extension='.jinja2'):
        config.add_jinja2_extension(myext)
 
     It will add the Jinja2 extension passed as ``ext`` to the current
-    ``jinja2.environment.Environment`` used by :mod:`pyramid_jinja2`.
+    ``jinja2.environment.Environment`` used by the renderer named ``name``.
+
     """
     def register():
-        env = get_jinja2_environment(config, renderer_extension)
+        env = get_jinja2_environment(config, name)
         env.add_extension(ext)
     config.action(None, register, order=EXTRAS_CONFIG_PHASE)
 
 
-def get_jinja2_environment(config, renderer_extension='.jinja2'):
+def get_jinja2_environment(config, name='.jinja2'):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -250,11 +251,14 @@ def get_jinja2_environment(config, renderer_extension='.jinja2'):
 
        config.get_jinja2_environment()
 
-    It will return the current ``jinja2.environment.Environment`` used by
-    :mod:`pyramid_jinja2` or ``None`` if no environment has yet been set up.
+    It will return the configured ``jinja2.environment.Environment`` for the
+    renderer named ``name``. Configuration is delayed until a call to
+    ``config.commit()`` or ``config.make_wsgi_app()``. As such, if this
+    method is called prior to committing the changes, it may return ``None``.
+
     """
     registry = config.registry
-    return registry.queryUtility(IJinja2Environment, name=renderer_extension)
+    return registry.queryUtility(IJinja2Environment, name=name)
 
 
 def create_environment_from_options(env_opts, loader_opts):
@@ -285,9 +289,23 @@ def create_environment_from_options(env_opts, loader_opts):
     return env
 
 
-def add_jinja2_renderer(config, extension, settings_prefix='jinja2.'):
+def add_jinja2_renderer(config, name, settings_prefix='jinja2.'):
+    """
+    This function is added as a method of a :term:`Configurator`, and
+    should not be called directly.  Instead it should be called like so after
+    ``pyramid_jinja2`` has been passed to ``config.include``:
+
+    .. code-block:: python
+
+       config.add_jinja2_renderer('.html', settings_prefix='jinja2.')
+
+    It will register a new renderer, loaded from settings at the specified
+    ``settings_prefix`` prefix. This renderer will be active for files using
+    the specified extension ``name``.
+
+    """
     renderer_factory = Jinja2RendererFactory()
-    config.add_renderer(extension, renderer_factory)
+    config.add_renderer(name, renderer_factory)
 
     def register():
         registry = config.registry
@@ -308,10 +326,10 @@ def add_jinja2_renderer(config, extension, settings_prefix='jinja2.'):
         env = create_environment_from_options(env_opts, loader_opts)
         renderer_factory.environment = env
 
-        registry.registerUtility(env, IJinja2Environment, name=extension)
+        registry.registerUtility(env, IJinja2Environment, name=name)
 
     config.action(
-        ('jinja2-renderer', extension), register, order=ENV_CONFIG_PHASE)
+        ('jinja2-renderer', name), register, order=ENV_CONFIG_PHASE)
 
 
 def includeme(config):
@@ -329,14 +347,14 @@ def includeme(config):
     - ``add_jinja2_renderer``: Add another Jinja2 renderer, with a different
       extension and/or settings.
 
-    - ``add_jinja2_search_path``: Add a search path location to the search
-      path.
+    - ``add_jinja2_search_path``: Add a new location to the search path
+      for a renderer.
 
     - ``add_jinja2_extension``: Add a list of extensions to the Jinja2
-      environment.
+      environment used by a renderer.
 
-    - ``get_jinja2_environment``: Return the Jinja2 ``environment.Environment``
-      used by ``pyramid_jinja2``.
+    - ``get_jinja2_environment``: Return the ``jinja2.environment.Environment``
+      used by a renderer.
 
     """
     config.add_directive('add_jinja2_renderer', add_jinja2_renderer)
