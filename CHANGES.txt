@@ -12,7 +12,7 @@
   The other APIs are now keyed on the renderer extension, as each extension
   may have different settings. Thus ``config.add_jinja2_search_path``,
   ``config.add_jinja2_extension``, and ``config.get_jinja2_environment``
-  accept a ``renderer_extension`` argument, which defaults to ``.jinja2``.
+  accept a ``name`` argument, which defaults to ``.jinja2``.
 
   This deprecates the old ``pyramid_jinja2.renderer_factory`` mechanism
   for adding renderers with alternate extensions.
