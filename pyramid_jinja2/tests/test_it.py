@@ -338,6 +338,22 @@ class Test_get_jinja2_environment(unittest.TestCase):
                          Environment)
 
 
+class Test_set_jinja2_environment(unittest.TestCase):
+    def test_it(self):
+        from pyramid_jinja2 import includeme, _Jinja2Environment
+
+        class DummyEnvironment(_Jinja2Environment):
+            """
+                Test Environment.
+            """
+
+        config = testing.setUp()
+        includeme(config)
+        config.set_jinja2_environment(DummyEnvironment)
+        self.assertEqual(config.get_jinja2_environment().__class__,
+                         DummyEnvironment)
+
+
 class Test_bytecode_caching(unittest.TestCase):
     def test_default(self):
         from pyramid_jinja2 import includeme

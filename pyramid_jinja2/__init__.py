@@ -1,9 +1,7 @@
 import inspect
 import os
 import sys
-import warnings
 
-from zope.interface import implementer
 from zope.interface import Interface
 
 from jinja2 import Environment as _Jinja2Environment
@@ -245,84 +243,107 @@ def _parse_config_for_settings(settings):
     return environ_args
 
 
+class EnvironmentFactory(object):
+    def __init__(self, registry, environment=Environment):
+        """
+        :params: registry: pyramid.registry object.
+        :params: environment: A Jinja2 Environment that will be used at build
+                 of the ``jinja2.environment.Environment``
+        """
+        self.registry = registry
+        self.environment = environment
+
+    def get(self):
+        """
+        :return: Return current ``jinja2.environment.Environment``
+        """
+        return self.registry.queryUtility(IJinja2Environment)
+
+    def build(self):
+        """
+        :return: Build current ``jinja2.environment.Environment``
+        """
+        registry = self.registry
+        settings = registry.settings
+        kw = {}
+
+        package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
+        debug = asbool(settings.get('debug_templates', False))
+
+        # get basic environment jinja2 settings
+        kw.update(_parse_config_for_settings(settings))
+        reload_templates = settings.get('reload_templates', None)
+        if reload_templates is None:
+            # since version 1.5, both settings are supported
+            reload_templates = settings.get('pyramid.reload_templates', False)
+        reload_templates = asbool(reload_templates)
+        undefined = parse_undefined(settings.get('jinja2.undefined', ''))
+
+        # get supplementary jinja2 settings
+        input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
+        domain = settings.get('jinja2.i18n.domain', package and package.__name__ or 'messages')
+
+        # get jinja2 extensions
+        extensions = parse_multiline(settings.get('jinja2.extensions', ''))
+        if 'jinja2.ext.i18n' not in extensions:
+            extensions.append('jinja2.ext.i18n')
+
+        # get jinja2 directories
+        directories = parse_multiline(settings.get('jinja2.directories') or '')
+        directories = [abspath_from_resource_spec(d, package) for d in directories]
+        loader = SmartAssetSpecLoader(
+            directories,
+            encoding=input_encoding,
+            debug=debug)
+
+        # get jinja2 bytecode caching settings and set up bytecaching
+        bytecode_caching = settings.get('jinja2.bytecode_caching', False)
+        if isinstance(bytecode_caching, BytecodeCache):
+            kw['bytecode_cache'] = bytecode_caching
+        elif asbool(bytecode_caching):
+            bytecode_caching_directory = \
+                settings.get('jinja2.bytecode_caching_directory', None)
+            kw['bytecode_cache'] = \
+                FileSystemBytecodeCache(bytecode_caching_directory)
+
+        # should newstyle gettext calls be enabled?
+        newstyle = asbool(settings.get('jinja2.newstyle', False))
+
+        environment = self.environment(loader=loader,
+                                       auto_reload=reload_templates,
+                                       extensions=extensions,
+                                       undefined=undefined,
+                                       **kw)
+
+        # register pyramid i18n functions
+        wrapper = GetTextWrapper(domain=domain)
+        environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext, newstyle=newstyle)
+
+        # register global repository for templates
+        if package is not None:
+            environment._default_package = package.__name__
+
+        #add custom jinja2 filters
+        filters = parse_config(settings.get('jinja2.filters', ''))
+        environment.filters.update(filters)
+
+        #add custom jinja2 tests
+        tests = parse_config(settings.get('jinja2.tests', ''))
+        environment.tests.update(tests)
+
+        # add custom jinja2 functions
+        jinja_globals = parse_config(settings.get('jinja2.globals', ''))
+        environment.globals.update(jinja_globals)
+
+        registry.registerUtility(environment, IJinja2Environment)
+        return registry.queryUtility(IJinja2Environment)
+
+
 def _get_or_build_default_environment(registry):
-    environment = registry.queryUtility(IJinja2Environment)
-    if environment is not None:
-        return environment
-
-    settings = registry.settings
-    kw = {}
-
-    package = _caller_package(('pyramid_jinja2', 'jinja2', 'pyramid.config'))
-    debug = asbool(settings.get('debug_templates', False))
-
-    # get basic environment jinja2 settings
-    kw.update(_parse_config_for_settings(settings))
-    reload_templates = settings.get('reload_templates', None)
-    if reload_templates is None:
-        # since version 1.5, both settings are supported
-        reload_templates = settings.get('pyramid.reload_templates', False)
-    reload_templates = asbool(reload_templates)
-    undefined = parse_undefined(settings.get('jinja2.undefined', ''))
-
-    # get supplementary jinja2 settings
-    input_encoding = settings.get('jinja2.input_encoding', 'utf-8')
-    domain = settings.get('jinja2.i18n.domain', package and package.__name__ or 'messages')
-
-    # get jinja2 extensions
-    extensions = parse_multiline(settings.get('jinja2.extensions', ''))
-    if 'jinja2.ext.i18n' not in extensions:
-        extensions.append('jinja2.ext.i18n')
-
-    # get jinja2 directories
-    directories = parse_multiline(settings.get('jinja2.directories') or '')
-    directories = [abspath_from_resource_spec(d, package) for d in directories]
-    loader = SmartAssetSpecLoader(
-        directories,
-        encoding=input_encoding,
-        debug=debug)
-
-    # get jinja2 bytecode caching settings and set up bytecaching
-    bytecode_caching = settings.get('jinja2.bytecode_caching', False)
-    if isinstance(bytecode_caching, BytecodeCache):
-        kw['bytecode_cache'] = bytecode_caching
-    elif asbool(bytecode_caching):
-        bytecode_caching_directory = \
-            settings.get('jinja2.bytecode_caching_directory', None)
-        kw['bytecode_cache'] = \
-            FileSystemBytecodeCache(bytecode_caching_directory)
-
-    # should newstyle gettext calls be enabled?
-    newstyle = asbool(settings.get('jinja2.newstyle', False))
-
-    environment = Environment(loader=loader,
-                              auto_reload=reload_templates,
-                              extensions=extensions,
-                              undefined=undefined,
-                              **kw)
-
-    # register pyramid i18n functions
-    wrapper = GetTextWrapper(domain=domain)
-    environment.install_gettext_callables(wrapper.gettext, wrapper.ngettext, newstyle=newstyle)
-
-    # register global repository for templates
-    if package is not None:
-        environment._default_package = package.__name__
-
-    #add custom jinja2 filters
-    filters = parse_config(settings.get('jinja2.filters', ''))
-    environment.filters.update(filters)
-
-    #add custom jinja2 tests
-    tests = parse_config(settings.get('jinja2.tests', ''))
-    environment.tests.update(tests)
-
-    # add custom jinja2 functions
-    jinja_globals = parse_config(settings.get('jinja2.globals', ''))
-    environment.globals.update(jinja_globals)
-
-    registry.registerUtility(environment, IJinja2Environment)
-    return registry.queryUtility(IJinja2Environment)
+    environment = EnvironmentFactory(registry)
+    if environment.get() is not None:
+        return environment.get()
+    return environment.build()
 
 
 class GetTextWrapper(object):
@@ -439,7 +460,25 @@ def get_jinja2_environment(config):
     It will return the current ``jinja2.environment.Environment`` used by
     :mod:`pyramid_jinja2` or ``None`` if no environment has yet been set up.
     """
-    return config.registry.queryUtility(IJinja2Environment)
+    environment = EnvironmentFactory(config.registry)
+    return environment.get()
+
+
+def set_jinja2_environment(config, env):
+    """
+    This function is added as a method of a :term:`Configurator`, and
+    should not be called directly.  Instead it should be called like so after
+    ``pyramid_jinja2`` has been passed to ``config.include``:
+
+    .. code-block:: python
+
+       config.set_jinja2_environment(jinja2_environment)
+
+    It will set the ``jinja2.environment.Environment`` to a given environment.
+    used by :mod: `pyramid_jinja2`
+    """
+    environment = EnvironmentFactory(config.registry, env)
+    return environment.build()
 
 
 def includeme(config):
@@ -468,4 +507,5 @@ def includeme(config):
     config.add_directive('add_jinja2_search_path', add_jinja2_search_path)
     config.add_directive('add_jinja2_extension', add_jinja2_extension)
     config.add_directive('get_jinja2_environment', get_jinja2_environment)
+    config.add_directive('set_jinja2_environment', set_jinja2_environment)
     _get_or_build_default_environment(config.registry)
