@@ -244,6 +244,51 @@ Be sure to configure `jinja2.i18n.domain` according to `setup.cfg` domain
 settings. By default, `jinja2.i18n.domain` is set to the package name of
 the pyramid application.
 
+Supporting Alternate File Extensions and Settings
+-------------------------------------------------
+
+By default, only templates ending in the ``.jinja2`` file extension are
+supported. However, it is very easy to add support for alternate file
+extensions using the :func:`pyramid_jinja2.add_jinja2_renderer` directive.
+
+.. code-block:: python
+
+   config.include('pyramid_jinja2')
+   config.add_jinja2_renderer('.html')
+
+It would now be possible to use templates named ``foo.html`` and
+``foo.jinja2``. Each renderer extension will use its own
+:class:`jinja2.Environment`. These alternate renderers can be extended at
+runtime using the ``name`` parameter to the other directives such as
+:func:`pyramid_jinja2.get_jinja2_environment`.
+
+.. code-block:: python
+
+   config.include('pyramid_jinja2')
+   config.add_jinja2_renderer('.html')
+   config.add_jinja2_search_path('myapp:templates', name='.html')
+
+It is also possible to setup different renderers that use different search
+paths, configuration settings and environments if necessary. This technique
+can come in handy when different defaults are required for rendering templates
+with different content types. For example, a plain text email body versus
+an html page. For this reason, :func:`pyramid_jinja2.add_jinja2_renderer`
+accepts an optional parameter ``settings_prefix`` which can point a renderer
+at a different group of settings.
+
+.. code-block:: python
+
+   settings = {
+       'jinja2.directories': 'myapp:html_templates',
+       'mail.jinja2.directories': 'myapp:email_templates',
+   }
+
+   config = Configurator(settings=settings)
+   config.include('pyramid_jinja2')
+   config.add_jinja2_renderer('.email', settings_prefix='mail.jinja2.')
+
+Now ``foo.email`` will be rendered using the ``mail.jinja2.*`` settings.
+
 
 Settings
 ========
