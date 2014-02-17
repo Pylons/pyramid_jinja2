@@ -1,8 +1,6 @@
 import unittest
 import pyramid.testing
 
-from pyramid_jinja2.tests.base import Mock
-
 
 class DemoTests(unittest.TestCase):
     def test_root_view(self):
@@ -31,3 +29,7 @@ class DemoTests(unittest.TestCase):
         mainer = MyMainer()
         mainer.main()
         self.assertTrue(getattr(mainer, 'serving', False))
+
+class Mock(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)

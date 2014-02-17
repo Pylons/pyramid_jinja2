@@ -27,6 +27,7 @@ else:
 
 requires = [
     'pyramid>=1.0.2', # wsgiref server entry point
+    'zope.deprecation',
 ]
 
 if (3,) < sys.version_info < (3, 3):

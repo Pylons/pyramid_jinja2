@@ -5,6 +5,30 @@
   template to inherit from a template relative to itself, instead of
   forcing the parent to be on the search path. [mmerickel]
 
+- #73: Added a new ``config.add_jinja2_renderer`` API that can create and
+  override multiple Jinja2 renderers, each loaded using potentially different
+  settings and extensions.
+
+  The other APIs are now keyed on the renderer extension, as each extension
+  may have different settings. Thus ``config.add_jinja2_search_path``,
+  ``config.add_jinja2_extension``, and ``config.get_jinja2_environment``
+  accept a ``name`` argument, which defaults to ``.jinja2``.
+
+  This deprecates the old ``pyramid_jinja2.renderer_factory`` mechanism
+  for adding renderers with alternate extensions.
+
+  Configuration of the renderers has been updated to follow Pyramid's
+  standard mechanisms for conflict detection. This means that if two modules
+  both try to add a renderer for the ``.jinja2`` extension, they may raise a
+  conflict or the modifications made by the invocation closest to the
+  ``Configurator`` in the call-stack will win. This behavior can be affected
+  by calling ``config.commit`` at appropriate times to force a configuration
+  to take effect immediately. As such, configuration is deferred until
+  commit-time, meaning that it is now possible
+  ``config.get_jinja2_environment`` will return ``None`` because the changes
+  have not yet been committed.
+  [mmerickel]
+
 
 1.10 (2014-01-11)
 =================

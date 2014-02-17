@@ -1,45 +1,58 @@
 import unittest
-from pyramid_jinja2.tests.base import Base, DummyRendererInfo
+from .base import Base
 
 
-class Test_renderer_factory(Base, unittest.TestCase):
-    def _callFUT(self, info):
-        from pyramid_jinja2 import renderer_factory
-        return renderer_factory(info)
+class TestExtensions(Base, unittest.TestCase):
 
-    def test_with_extension(self):
-        from pyramid_jinja2 import IJinja2Environment
-        self.config.registry.settings.update(
-            {'jinja2.directories': self.templates_dir,
-             'jinja2.extensions': """
-                    pyramid_jinja2.tests.extensions.TestExtension
-                    """})
-        info = DummyRendererInfo({
-            'name': 'helloworld.jinja2',
-            'package': None,
-            'registry': self.config.registry,
-            })
-        renderer = self._callFUT(info)
-        environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.loader.searchpath, [self.templates_dir])
-        self.assertEqual(renderer.info, info)
-        self.assertEqual(renderer.environment, environ)
-        import pyramid_jinja2.tests.extensions
-        ext = environ.extensions[
+    def test_custom_extension(self):
+        from pyramid_jinja2 import create_environment_from_options
+        from pyramid_jinja2.settings import parse_env_options_from_settings
+
+        options = {
+            'extensions': 'pyramid_jinja2.tests.extensions.TestExtension',
+        }
+        settings = parse_env_options_from_settings(options, '', None, None)
+        env = create_environment_from_options(settings, {})
+        ext = env.extensions[
             'pyramid_jinja2.tests.extensions.TestExtension']
+        import pyramid_jinja2.tests.extensions
         self.assertEqual(ext.__class__,
                          pyramid_jinja2.tests.extensions.TestExtension)
 
+    def test_i18n(self):
+        from pyramid_jinja2 import create_environment_from_options
+        from pyramid_jinja2.settings import parse_env_options_from_settings
 
-class TestI18n(Base, unittest.TestCase):
+        settings = parse_env_options_from_settings({}, '', None, None)
+        env = create_environment_from_options(settings, {})
 
-    def test_it(self):
-        from pyramid_jinja2 import _get_or_build_default_environment
-        u = _get_or_build_default_environment(self.config.registry)
-        self.assertTrue(hasattr(u, 'install_gettext_translations'))
+        self.assertTrue(hasattr(env, 'install_gettext_translations'))
 
         self.config.add_translation_dirs('pyramid_jinja2.tests:locale/')
         self.request.locale_name = 'en'
-        template = u.get_template('pyramid_jinja2.tests:templates/i18n.jinja2')
+        template = env.get_template(
+            'pyramid_jinja2.tests:templates/i18n.jinja2')
         self.assertEqual(template.render(),
                          'some untranslated text here\nyay it worked!')
+
+
+class GetTextWrapperTests(unittest.TestCase):
+
+    def test_it(self):
+        from pyramid_jinja2.i18n import GetTextWrapper
+
+        class MyGetTextWrapper(GetTextWrapper):
+            class localizer:
+                @staticmethod
+                def translate(s, domain):
+                    return s
+
+                @staticmethod
+                def pluralize(s1, s2, n, domain):
+                    return s2
+
+            def __init__(self):
+                GetTextWrapper.__init__(self, 'messages')
+
+        self.assertEqual(MyGetTextWrapper().gettext('foo'), 'foo')
+        self.assertEqual(MyGetTextWrapper().ngettext('foo', 'foos', 3), 'foos')

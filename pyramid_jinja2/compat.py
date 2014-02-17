@@ -45,4 +45,3 @@ if PY3: # pragma: no cover
 else: # pragma: no cover
     from StringIO import StringIO
     BytesIO = StringIO
-    
