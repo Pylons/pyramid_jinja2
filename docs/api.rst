@@ -7,6 +7,8 @@
 
 .. autofunction:: includeme
 
+.. autofunction:: add_jinja2_renderer
+
 .. autofunction:: add_jinja2_search_path
 
 .. autofunction:: add_jinja2_extension
