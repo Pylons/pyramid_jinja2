@@ -141,14 +141,12 @@ class Jinja2RendererFactory(object):
     def __call__(self, info):
         # get template based on searchpaths, then try relavtive one
         name = info.name
-        name_with_package = None
-        if ':' not in name and getattr(info, 'package', None) is not None:
-            package = info.package
-            name_with_package = '%s:%s' % (package.__name__, name)
         try:
             template = self.environment.get_template(name)
         except TemplateNotFound:
-            if name_with_package is not None:
+            if ':' not in name and getattr(info, 'package', None) is not None:
+                package = info.package
+                name_with_package = '%s:%s' % (package.__name__, name)
                 template = self.environment.get_template(name_with_package)
             else:
                 raise
