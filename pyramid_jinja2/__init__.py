@@ -114,8 +114,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
 
         try:
             return FileSystemLoader.get_source(self, environment, template)
-        except TemplateNotFound:
-            ex = sys.exc_info()[1]  # py2.5-3.2 compat
+        except TemplateNotFound as ex:
             message = ex.message
             message += ('; asset=%s; searchpath=%r'
                         % (fi.filename, self.searchpath))
@@ -130,8 +129,7 @@ class Jinja2TemplateRenderer(object):
     def __call__(self, value, system):
         try:
             system.update(value)
-        except (TypeError, ValueError):
-            ex = sys.exc_info()[1]  # py2.5 - 3.2 compat
+        except (TypeError, ValueError) as ex:
             raise ValueError('renderer was passed non-dictionary '
                              'as value: %s' % str(ex))
         return self.template.render(system)
