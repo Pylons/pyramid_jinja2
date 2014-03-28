@@ -201,8 +201,8 @@ class TestIntegrationReloading(unittest.TestCase):
             result = app.get('/').body
             self.assertEqual(result, b'foo')
 
-            time.sleep(1) # need mtime to change and most systems
-                          # have 1-second resolution
+            time.sleep(1)  # need mtime to change and most systems
+                           # have 1-second resolution
             with open(path, 'wb') as fp:
                 fp.write(b'bar')
 
@@ -588,7 +588,7 @@ class DummyMemcachedClient(dict):
         self[key] = value               # pragma: no cover
 
 class DummyEnviron(dict):
-    def get_template(self, path):
+    def get_template(self, path):  # pragma: no cover
         return path
 
 class DummyTemplate(object):
