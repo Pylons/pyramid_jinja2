@@ -171,6 +171,45 @@ class TestIntegration2(unittest.TestCase):
         self.assertEqual(result, text_('\nHello föö', 'utf-8'))
 
 
+class TestIntegrationReloading(unittest.TestCase):
+    def setUp(self):
+        config = testing.setUp()
+        config.add_settings({
+            'pyramid.reload_templates': 'true',
+        })
+        config.include('pyramid_jinja2')
+        self.config = config
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_render_reload_templates(self):
+        import os, tempfile, time
+        from webtest import TestApp
+        from pyramid.renderers import render
+
+        _, path = tempfile.mkstemp('.jinja2')
+        try:
+            with open(path, 'wb') as fp:
+                fp.write(b'foo')
+
+            self.config.add_view(lambda r: {}, renderer=path)
+            app = TestApp(self.config.make_wsgi_app())
+
+            result = app.get('/').body
+            self.assertEqual(result, b'foo')
+
+            time.sleep(1) # need mtime to change and most systems
+                          # have 1-second resolution
+            with open(path, 'wb') as fp:
+                fp.write(b'bar')
+
+            result = app.get('/').body
+            self.assertEqual(result, b'bar')
+        finally:
+            os.unlink(path)
+
+
 class Test_filters_and_tests(Base, unittest.TestCase):
 
     def _set_up_environ(self):
