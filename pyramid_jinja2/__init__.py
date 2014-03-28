@@ -123,8 +123,8 @@ class SmartAssetSpecLoader(FileSystemLoader):
 
 class Jinja2TemplateRenderer(object):
     '''Renderer for a jinja2 template'''
-    def __init__(self, template):
-        self.template = template
+    def __init__(self, template_loader):
+        self.template_loader = template_loader
 
     def __call__(self, value, system):
         try:
@@ -132,26 +132,29 @@ class Jinja2TemplateRenderer(object):
         except (TypeError, ValueError) as ex:
             raise ValueError('renderer was passed non-dictionary '
                              'as value: %s' % str(ex))
-        return self.template.render(system)
+        template = self.template_loader()
+        return template.render(system)
 
 
 class Jinja2RendererFactory(object):
     environment = None
 
     def __call__(self, info):
-        # get template based on searchpaths, then try relavtive one
-        name = info.name
-        try:
-            template = self.environment.get_template(name)
-        except TemplateNotFound:
-            if ':' not in name and getattr(info, 'package', None) is not None:
-                package = info.package
-                name_with_package = '%s:%s' % (package.__name__, name)
-                template = self.environment.get_template(name_with_package)
-            else:
-                raise
+        name, package = info.name, info.package
 
-        return Jinja2TemplateRenderer(template)
+        def template_loader():
+            # get template based on searchpaths, then try relavtive one
+            try:
+                template = self.environment.get_template(name)
+            except TemplateNotFound:
+                if ':' not in name and package is not None:
+                    name_with_package = '%s:%s' % (package.__name__, name)
+                    template = self.environment.get_template(name_with_package)
+                else:
+                    raise
+            return template
+
+        return Jinja2TemplateRenderer(template_loader)
 
 
 _factory_lock = threading.Lock()

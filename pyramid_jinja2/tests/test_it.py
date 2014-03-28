@@ -39,7 +39,9 @@ class Test_renderer_factory(Base, unittest.TestCase):
             'package': None,
             'registry': self.config.registry,
             })
-        self.assertRaises(TemplateNotFound, lambda: self._callFUT(info))
+        renderer = self._callFUT(info)
+        self.assertRaises(
+            TemplateNotFound, lambda: renderer({}, {'system': 1}))
 
     def test_no_environment(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -53,7 +55,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
         renderer = self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
         self.assertEqual(environ.loader.searchpath, [self.templates_dir])
-        self.assertTrue(renderer.template is not None)
+        self.assertTrue(renderer.template_loader is not None)
 
     def test_composite_directories_path(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -78,7 +80,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             'registry': self.config.registry,
             })
         renderer = self._callFUT(info)
-        self.assertEqual(renderer.template, 'helloworld.jinja2')
+        self.assertTrue(renderer.template_loader)
 
     def test_with_filters_object(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -123,21 +125,21 @@ class TestJinja2TemplateRenderer(Base, unittest.TestCase):
 
     def test_call(self):
         template = DummyTemplate()
-        instance = self._makeOne(template)
+        instance = self._makeOne(lambda: template)
         result = instance({}, {'system': 1})
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, 'result')
 
     def test_call_with_system_context(self):
         template = DummyTemplate()
-        instance = self._makeOne(template)
+        instance = self._makeOne(lambda: template)
         result = instance({}, {'context': 1})
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, 'result')
 
     def test_call_with_nondict_value(self):
         template = DummyTemplate()
-        instance = self._makeOne(template)
+        instance = self._makeOne(lambda: template)
         self.assertRaises(ValueError, instance, None, {'context': 1})
 
 
