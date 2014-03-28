@@ -82,7 +82,7 @@ setup(name='pyramid_jinja2',
           'docs':docs_extras,
           },
       tests_require=requires + ['WebTest'],
-      test_suite="pyramid_jinja2",
+      test_suite="pyramid_jinja2.tests",
       entry_points="""
         [paste.paster_create_template]
         pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate

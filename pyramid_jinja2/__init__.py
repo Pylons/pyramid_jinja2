@@ -135,6 +135,27 @@ class Jinja2TemplateRenderer(object):
         return self.template.render(system)
 
 
+class Jinja2RendererFactory(object):
+    environment = None
+
+    def __call__(self, info):
+        # get template based on searchpaths, then try relavtive one
+        name = info.name
+        name_with_package = None
+        if ':' not in name and getattr(info, 'package', None) is not None:
+            package = info.package
+            name_with_package = '%s:%s' % (package.__name__, name)
+        try:
+            template = self.environment.get_template(name)
+        except TemplateNotFound:
+            if name_with_package is not None:
+                template = self.environment.get_template(name_with_package)
+            else:
+                raise
+
+        return Jinja2TemplateRenderer(template)
+
+
 _factory_lock = threading.Lock()
 
 
@@ -172,27 +193,6 @@ deprecated(
     'The pyramid_jinja2.renderer_factory was deprecated in version 1.11 and '
     'will be removed in the future. You should upgrade to the newer '
     'config.add_jinja2_renderer() API.')
-
-
-class Jinja2RendererFactory(object):
-    environment = None
-
-    def __call__(self, info):
-        # get template based on searchpaths, then try relavtive one
-        name = info.name
-        name_with_package = None
-        if ':' not in name and getattr(info, 'package', None) is not None:
-            package = info.package
-            name_with_package = '%s:%s' % (package.__name__, name)
-        try:
-            template = self.environment.get_template(name)
-        except TemplateNotFound:
-            if name_with_package is not None:
-                template = self.environment.get_template(name_with_package)
-            else:
-                raise
-
-        return Jinja2TemplateRenderer(template)
 
 
 def add_jinja2_search_path(config, searchpath, name='.jinja2'):
