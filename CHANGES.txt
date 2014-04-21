@@ -1,9 +1,13 @@
-1.11 (unreleased)
+2.0 (unreleased)
 =================
+
+- Claim Python 3.4 support
+  [mmerickel]
 
 - #75: Fix the missing piece of relative template loading by allowing a
   template to inherit from a template relative to itself, instead of
-  forcing the parent to be on the search path. [mmerickel]
+  forcing the parent to be on the search path.
+  [mmerickel]
 
 - #73: Added a new ``config.add_jinja2_renderer`` API that can create and
   override multiple Jinja2 renderers, each loaded using potentially different
