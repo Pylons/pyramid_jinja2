@@ -1,5 +1,5 @@
-2.1 (unreleased)
-================
+2.0.1 (2014-04-23)
+==================
 
 - #86: Fix a regression caused by the new support for extending a template
   relative to itself. Using ``{% extends 'some_asset:spec.jinja2' %}`` was
