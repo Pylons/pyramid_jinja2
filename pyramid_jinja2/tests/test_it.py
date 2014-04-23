@@ -143,7 +143,43 @@ class TestJinja2TemplateRenderer(Base, unittest.TestCase):
         self.assertRaises(ValueError, instance, None, {'context': 1})
 
 
-class TestIntegration(unittest.TestCase):
+class RelativeAndSpecIntegrationTests(object):
+
+    def test_relative_tmpl_helloworld(self):
+        from pyramid.renderers import render
+        result = render('templates/helloworld.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
+
+    def test_relative_tmpl_extends(self):
+        from pyramid.renderers import render
+        result = render('templates/extends.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+
+    def test_relative_tmpl_extends_abs(self):
+        from pyramid.renderers import render
+        result = render('templates/extends_abs.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+
+    def test_asset_tmpl_helloworld(self):
+        from pyramid.renderers import render
+        result = render('pyramid_jinja2.tests:templates/helloworld.jinja2',
+                        {'a': 1})
+        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
+
+    def test_asset_tmpl_extends(self):
+        from pyramid.renderers import render
+        result = render('pyramid_jinja2.tests:templates/extends.jinja2',
+                        {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+
+    def test_asset_tmpl_extends_abs(self):
+        from pyramid.renderers import render
+        result = render('pyramid_jinja2.tests:templates/extends_abs.jinja2',
+                        {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+
+
+class TestIntegration(RelativeAndSpecIntegrationTests, unittest.TestCase):
     def setUp(self):
         config = testing.setUp()
         config.add_settings({'jinja2.directories':
@@ -169,18 +205,14 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
 
-class TestIntegration2(unittest.TestCase):
+class TestIntegrationWithoutDirectories(RelativeAndSpecIntegrationTests,
+                                        unittest.TestCase):
     def setUp(self):
         config = testing.setUp()
         config.include('pyramid_jinja2')
 
     def tearDown(self):
         testing.tearDown()
-
-    def test_render_relative_to_package(self):
-        from pyramid.renderers import render
-        result = render('templates/helloworld.jinja2', {'a': 1})
-        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
 
 
 class TestIntegrationReloading(unittest.TestCase):

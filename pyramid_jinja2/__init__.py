@@ -32,6 +32,9 @@ class IJinja2Environment(Interface):
 
 class Environment(_Jinja2Environment):
     def join_path(self, template, parent):
+        if ':' in template:
+            # we have an asset spec
+            return template
         return os.path.join(os.path.dirname(parent), template)
 
 
