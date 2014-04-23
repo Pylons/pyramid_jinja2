@@ -153,10 +153,20 @@ class TestIntegration(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def test_render(self):
+    def test_tmpl_helloworld(self):
         from pyramid.renderers import render
         result = render('helloworld.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello föö', 'utf-8'))
+
+    def test_tmpl_extends(self):
+        from pyramid.renderers import render
+        result = render('extends.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+
+    def test_tmpl_extends_abs(self):
+        from pyramid.renderers import render
+        result = render('extends_abs.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
 
 class TestIntegration2(unittest.TestCase):
