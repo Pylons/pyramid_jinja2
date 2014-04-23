@@ -598,6 +598,7 @@ More Information
 
    glossary.rst
    api.rst
+   changes.rst
 
 Reporting Bugs / Development Versions
 =====================================
