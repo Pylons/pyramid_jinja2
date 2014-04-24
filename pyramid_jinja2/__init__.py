@@ -35,7 +35,8 @@ class Environment(_Jinja2Environment):
         if os.path.isabs(uri) or ':' in uri:
             # we have an asset spec or absolute path
             return uri
-        if ':' in parent:
+        if not os.path.isabs(parent) and ':' in parent:
+            # parent is an asset spec
             ppkg, ppath = parent.split(':', 1)
             _uri = posixpath.join(posixpath.dirname(ppath), uri)
             return '{0}:{1}'.format(ppkg, _uri)
