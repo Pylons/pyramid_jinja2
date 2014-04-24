@@ -1,5 +1,5 @@
 import os
-import sys
+import posixpath
 import threading
 
 from jinja2 import Environment as _Jinja2Environment
@@ -31,11 +31,15 @@ class IJinja2Environment(Interface):
 
 
 class Environment(_Jinja2Environment):
-    def join_path(self, template, parent):
-        if ':' in template:
-            # we have an asset spec
-            return template
-        return os.path.join(os.path.dirname(parent), template)
+    def join_path(self, uri, parent):
+        if os.path.isabs(uri) or ':' in uri:
+            # we have an asset spec or absolute path
+            return uri
+        if ':' in parent:
+            ppkg, ppath = parent.split(':', 1)
+            _uri = posixpath.join(posixpath.dirname(ppath), uri)
+            return '{0}:{1}'.format(ppkg, _uri)
+        return os.path.join(os.path.dirname(parent), uri)
 
 
 class FileInfo(object):

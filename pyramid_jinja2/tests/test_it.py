@@ -335,6 +335,60 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         testing.tearDown()
 
 
+class Test_joinpath(unittest.TestCase):
+    def _callFUT(self, uri, relativeto):
+        from pyramid_jinja2 import Environment
+        env = Environment()
+        return env.join_path(uri, relativeto)
+
+    def test_spec_relto_spec(self):
+        result = self._callFUT(
+            'pyramid_jinja2.tests:templates/helloworld.jinja2',
+            'pyramid_jinja2.tests:templates/extends.jinja2')
+        self.assertEqual(result,
+                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+
+    def test_spec_relto_path(self):
+        result = self._callFUT(
+            'pyramid_jinja2.tests:templates/helloworld.jinja2',
+            'extends.jinja2')
+        self.assertEqual(result,
+                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+
+    def test_spec_relto_abspath(self):
+        result = self._callFUT(
+            'pyramid_jinja2.tests:templates/helloworld.jinja2',
+            '/foo/extends.jinja2')
+        self.assertEqual(result,
+                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+
+    def test_path_relto_path(self):
+        result = self._callFUT('helloworld.jinja2', 'extends.jinja2')
+        self.assertEqual(result, 'helloworld.jinja2')
+
+    def test_path_relto_abspath(self):
+        result = self._callFUT('helloworld.jinja2', '/foo/extends.jinja2')
+        self.assertEqual(result, '/foo/helloworld.jinja2')
+
+    def test_path_relto_spec(self):
+        result = self._callFUT('helloworld.jinja2',
+                               'pyramid_jinja2.tests:templates/extends.jinja2')
+        self.assertEqual(result,
+                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+
+    def test_path_relto_basespec(self):
+        result = self._callFUT('templates/helloworld.jinja2',
+                               'pyramid_jinja2.tests:foo.jinja2')
+        self.assertEqual(result,
+                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+
+    def test_abspath_relto_spec(self):
+        result = self._callFUT('/foo/helloworld.jinja2',
+                               'pyramid_jinja2.tests:foo.jinja2')
+        self.assertEqual(result, '/foo/helloworld.jinja2')
+
+
+
 class Test_includeme(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
