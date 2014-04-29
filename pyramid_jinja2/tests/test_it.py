@@ -204,7 +204,7 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
 
-class TestIntegrationWithoutSearchPath(unittest.TestCase):
+class TestIntegrationWithoutSearchPath(SearchPathTests, unittest.TestCase):
     def setUp(self):
         config = testing.setUp()
         config.include('pyramid_jinja2')
@@ -429,12 +429,12 @@ class Test_add_jinja2_searchpath(unittest.TestCase):
         includeme(config)
         env = config.get_jinja2_environment()
         self.assertEqual(
-            [x.split(os.sep)[-3:] for x in env.loader.searchpath],
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath][1:],
             [['pyramid_jinja2', 'tests', 'foobar']])
 
         config.add_jinja2_search_path('grrr')
         self.assertEqual(
-            [x.split(os.sep)[-3:] for x in env.loader.searchpath],
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath][1:],
             [['pyramid_jinja2', 'tests', 'foobar'],
              ['pyramid_jinja2', 'tests', 'grrr']])
 
@@ -505,31 +505,37 @@ class Test_bytecode_caching(unittest.TestCase):
 
 class TestSmartAssetSpecLoader(unittest.TestCase):
 
-    def test_list_templates(self):
+    def _makeOne(self, **kw):
         from pyramid_jinja2 import SmartAssetSpecLoader
-        loader = SmartAssetSpecLoader()
+        return SmartAssetSpecLoader(**kw)
+
+    def test_list_templates(self):
+        loader = self._makeOne()
         self.assertRaises(TypeError, loader.list_templates)
 
-    def test_get_source(self):
-        from pyramid_jinja2 import SmartAssetSpecLoader
+    def test_get_source_invalid_spec(self):
         from jinja2.exceptions import TemplateNotFound
-
-        loader = SmartAssetSpecLoader()
-
+        loader = self._makeOne()
         self.assertRaises(TemplateNotFound,
                           loader.get_source, None, 'asset:foobar.jinja2')
-        asset = 'asset:pyramid_jinja2.tests:templates/helloworld.jinja2'
-        self.assertNotEqual(loader.get_source(None, asset), None)
 
-        # make sure new non-prefixed asset spec based loading works
+    def test_get_source_spec(self):
+        loader = self._makeOne()
         asset = 'pyramid_jinja2.tests:templates/helloworld.jinja2'
         self.assertNotEqual(loader.get_source(None, asset), None)
 
-        # make sure new non-prefixed asset spec based loading works
-        # without the leading package name
+    def test_get_source_legacy_spec(self):
+        loader = self._makeOne()
+        # make sure legacy prefixed asset spec based loading works
+        asset = 'asset:pyramid_jinja2.tests:templates/helloworld.jinja2'
+        self.assertNotEqual(loader.get_source(None, asset), None)
+
+    def test_get_source_from_path(self):
+        import os.path
+        here = os.path.abspath(os.path.dirname(__file__))
+        loader = self._makeOne(searchpath=[here])
         asset = 'templates/helloworld.jinja2'
-        env = Mock(_default_package='pyramid_jinja2.tests')
-        self.assertNotEqual(loader.get_source(env, asset), None)
+        self.assertNotEqual(loader.get_source(None, asset), None)
 
 
 class TestFileInfo(unittest.TestCase):
@@ -722,7 +728,3 @@ class DummyRendererInfo(object):
         self.__dict__.update(kw)
         if 'registry' in self.__dict__:
             self.settings = self.registry.settings
-
-class Mock(object):
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)

@@ -73,7 +73,12 @@ def parse_loader_options_from_settings(settings,
 
     # get jinja2 directories
     directories = parse_multiline(sget('directories') or '')
-    directories = [abspath_from_asset_spec(d, package) for d in directories]
+    directories = [abspath_from_asset_spec(d, package or '__main__')
+                   for d in directories]
+
+    # add the package root to the search path by default
+    if package is not None:
+        directories.insert(0, abspath_from_asset_spec('', package))
 
     return dict(
         debug=debug,
@@ -147,10 +152,6 @@ def parse_env_options_from_settings(settings,
 
     # should newstyle gettext calls be enabled?
     opts['newstyle'] = asbool(sget('newstyle', False))
-
-    # register global repository for templates
-    if package is not None:
-        opts['package_name'] = package.__name__
 
     #add custom jinja2 filters
     opts['filters'] = parse_named_assetspecs(sget('filters', ''), maybe_dotted)

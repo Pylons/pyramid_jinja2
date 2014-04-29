@@ -64,6 +64,20 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
         )
         self.assertEqual(options['debug'], True)
         self.assertEqual(options['encoding'], 'ascii')
+        self.assertEqual(len(options['searchpath']), 2)
+        self.assertTrue(
+            options['searchpath'][0].endswith(
+                os.path.join('pyramid_jinja2', 'tests')))
+        self.assertTrue(
+            options['searchpath'][1].endswith(
+                os.path.join('pyramid_jinja2', 'tests', 'templates')))
+
+    def test_options_without_default_searchpath(self):
+        options = self._callFUT(
+            {'p.directories': 'pyramid_jinja2.tests:templates'},
+            'p.', None, None,
+        )
+        self.assertEqual(len(options['searchpath']), 1)
         self.assertTrue(
             options['searchpath'][0].endswith(
                 os.path.join('pyramid_jinja2', 'tests', 'templates')))

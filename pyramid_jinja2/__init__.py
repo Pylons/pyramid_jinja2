@@ -91,11 +91,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
         raise TypeError('this loader cannot iterate over all templates')
 
     def _get_asset_source_fileinfo(self, environment, template):
-        if getattr(environment, '_default_package', None) is not None:
-            pname = environment._default_package
-            filename = abspath_from_asset_spec(template, pname)
-        else:
-            filename = abspath_from_asset_spec(template)
+        filename = abspath_from_asset_spec(template)
         fileinfo = FileInfo(filename, self.encoding)
         return fileinfo
 
@@ -262,7 +258,6 @@ def create_environment_from_options(env_opts, loader_opts):
 
     newstyle = env_opts.pop('newstyle', False)
     gettext = env_opts.pop('gettext', None)
-    package_name = env_opts.pop('package_name', None)
     filters = env_opts.pop('filters', {})
     tests = env_opts.pop('tests', {})
     globals = env_opts.pop('globals', {})
@@ -271,9 +266,6 @@ def create_environment_from_options(env_opts, loader_opts):
         loader=loader,
         **env_opts
     )
-
-    if package_name is not None:
-        env._default_package = package_name
 
     env.install_gettext_callables(
         gettext.gettext, gettext.ngettext, newstyle=newstyle)
