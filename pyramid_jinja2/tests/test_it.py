@@ -177,6 +177,17 @@ class SearchPathTests(object):
                         {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
+    def test_abs_tmpl_extends_missing(self):
+        import os.path
+        from jinja2 import TemplateNotFound
+        from pyramid.renderers import render
+        here = os.path.abspath(os.path.dirname(__file__))
+        templates_dir = os.path.join(here, 'templates')
+        self.assertRaises(
+            TemplateNotFound,
+            lambda: render(
+                os.path.join(templates_dir, '/extends_missing.jinja2'), {}))
+
 
 class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
     def setUp(self):
@@ -211,20 +222,6 @@ class TestIntegrationWithoutSearchPath(SearchPathTests, unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-
-    def test_relative_tmpl_extends(self):
-        from jinja2 import TemplateNotFound
-        from pyramid.renderers import render
-        self.assertRaises(
-            TemplateNotFound, lambda: render('templates/extends.jinja2', {}))
-
-    def test_asset_tmpl_extends(self):
-        from jinja2 import TemplateNotFound
-        from pyramid.renderers import render
-        self.assertRaises(
-            TemplateNotFound,
-            lambda: render(
-                'pyramid_jinja2.tests:templates/extends.jinja2', {}))
 
 
 class TestIntegrationReloading(unittest.TestCase):
@@ -344,64 +341,6 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         # as filter and will pass in tests
         self.assertEqual(result, text_('True is not False True', 'utf-8'))
         testing.tearDown()
-
-
-#class Test_joinpath(unittest.TestCase):
-#    def _callFUT(self, uri, relativeto):
-#        from pyramid_jinja2 import Environment
-#        env = Environment()
-#        return env.join_path(uri, relativeto)
-#
-#    def test_spec_relto_spec(self):
-#        result = self._callFUT(
-#            'pyramid_jinja2.tests:templates/helloworld.jinja2',
-#            'pyramid_jinja2.tests:templates/extends.jinja2')
-#        self.assertEqual(result,
-#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-#
-#    def test_spec_relto_path(self):
-#        result = self._callFUT(
-#            'pyramid_jinja2.tests:templates/helloworld.jinja2',
-#            'extends.jinja2')
-#        self.assertEqual(result,
-#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-#
-#    def test_spec_relto_abspath(self):
-#        result = self._callFUT(
-#            'pyramid_jinja2.tests:templates/helloworld.jinja2',
-#            '/foo/extends.jinja2')
-#        self.assertEqual(result,
-#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-#
-#    def test_path_relto_path(self):
-#        result = self._callFUT('helloworld.jinja2', 'extends.jinja2')
-#        self.assertEqual(result, 'helloworld.jinja2')
-#
-#    def test_path_relto_abspath(self):
-#        result = self._callFUT('helloworld.jinja2', '/foo/extends.jinja2')
-#        self.assertEqual(result, '/foo/helloworld.jinja2')
-#
-#    def test_path_relto_spec(self):
-#        result = self._callFUT('helloworld.jinja2',
-#                               'pyramid_jinja2.tests:templates/extends.jinja2')
-#        self.assertEqual(result,
-#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-#
-#    def test_path_relto_basespec(self):
-#        result = self._callFUT('templates/helloworld.jinja2',
-#                               'pyramid_jinja2.tests:foo.jinja2')
-#        self.assertEqual(result,
-#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-#
-#    def test_abspath_relto_spec(self):
-#        result = self._callFUT('/foo/helloworld.jinja2',
-#                               'pyramid_jinja2.tests:foo.jinja2')
-#        self.assertEqual(result, '/foo/helloworld.jinja2')
-#
-#    def test_specalike_relto_spec(self):
-#        result = self._callFUT('/foo/helloworld.jinja2',
-#                               'pyramid_jinja2.tests:foo.jinja2')
-#        self.assertEqual(result, '/foo/helloworld.jinja2')
 
 
 class Test_includeme(unittest.TestCase):
@@ -617,29 +556,29 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         testapp = TestApp(app2)
         self.assertEqual(testapp.get('/').body, bytes_('bar'))
 
-#    def test_it_relative(self):
-#        from pyramid.config import Configurator
-#        from pyramid_jinja2 import includeme
-#        from webtest import TestApp
-#        import os
-#
-#        here = os.path.abspath(os.path.dirname(__file__))
-#        templates_dir = os.path.join(here, 'templates')
-#
-#        def myview(request):
-#            return {}
-#
-#        config = Configurator(settings={'jinja2.directories': templates_dir})
-#        includeme(config)
-#        config.add_view(view=myview, name='baz1',
-#                        renderer='baz1/mytemplate.jinja2')
-#        config.add_view(view=myview, name='baz2',
-#                        renderer='baz2/mytemplate.jinja2')
-#
-#        app1 = config.make_wsgi_app()
-#        testapp = TestApp(app1)
-#        self.assertEqual(testapp.get('/baz1').body, bytes_('baz1\nbaz1 body'))
-#        self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
+    def test_it_relative(self):
+        from pyramid.config import Configurator
+        from pyramid_jinja2 import includeme
+        from webtest import TestApp
+        import os
+
+        here = os.path.abspath(os.path.dirname(__file__))
+        templates_dir = os.path.join(here, 'templates')
+
+        def myview(request):
+            return {}
+
+        config = Configurator(settings={'jinja2.directories': templates_dir})
+        includeme(config)
+        config.add_view(view=myview, name='baz1',
+                        renderer='baz1/mytemplate.jinja2')
+        config.add_view(view=myview, name='baz2',
+                        renderer='baz2/mytemplate.jinja2')
+
+        app1 = config.make_wsgi_app()
+        testapp = TestApp(app1)
+        self.assertEqual(testapp.get('/baz1').body, bytes_('baz1\nbaz1 body'))
+        self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
 
 
 class TestNewstyle(unittest.TestCase):
