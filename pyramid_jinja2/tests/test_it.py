@@ -143,16 +143,15 @@ class TestJinja2TemplateRenderer(Base, unittest.TestCase):
         self.assertRaises(ValueError, instance, None, {'context': 1})
 
 
-class RelativeAndSpecIntegrationTests(object):
-
+class SearchPathTests(object):
     def test_relative_tmpl_helloworld(self):
         from pyramid.renderers import render
-        result = render('templates/helloworld.jinja2', {'a': 1})
+        result = render('templates/helloworld.jinja2', {})
         self.assertEqual(result, text_('\nHello föö', 'utf-8'))
 
     def test_relative_tmpl_extends(self):
         from pyramid.renderers import render
-        result = render('templates/extends.jinja2', {'a': 1})
+        result = render('templates/extends.jinja2', {})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
     def test_relative_tmpl_extends_abs(self):
@@ -179,7 +178,7 @@ class RelativeAndSpecIntegrationTests(object):
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
 
-class TestIntegration(RelativeAndSpecIntegrationTests, unittest.TestCase):
+class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
     def setUp(self):
         config = testing.setUp()
         config.add_settings({'jinja2.directories':
@@ -205,14 +204,27 @@ class TestIntegration(RelativeAndSpecIntegrationTests, unittest.TestCase):
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
 
-class TestIntegrationWithoutDirectories(RelativeAndSpecIntegrationTests,
-                                        unittest.TestCase):
+class TestIntegrationWithoutSearchPath(unittest.TestCase):
     def setUp(self):
         config = testing.setUp()
         config.include('pyramid_jinja2')
 
     def tearDown(self):
         testing.tearDown()
+
+    def test_relative_tmpl_extends(self):
+        from jinja2 import TemplateNotFound
+        from pyramid.renderers import render
+        self.assertRaises(
+            TemplateNotFound, lambda: render('templates/extends.jinja2', {}))
+
+    def test_asset_tmpl_extends(self):
+        from jinja2 import TemplateNotFound
+        from pyramid.renderers import render
+        self.assertRaises(
+            TemplateNotFound,
+            lambda: render(
+                'pyramid_jinja2.tests:templates/extends.jinja2', {}))
 
 
 class TestIntegrationReloading(unittest.TestCase):
@@ -230,7 +242,6 @@ class TestIntegrationReloading(unittest.TestCase):
     def test_render_reload_templates(self):
         import os, tempfile, time
         from webtest import TestApp
-        from pyramid.renderers import render
 
         _, path = tempfile.mkstemp('.jinja2')
         try:
@@ -335,58 +346,62 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         testing.tearDown()
 
 
-class Test_joinpath(unittest.TestCase):
-    def _callFUT(self, uri, relativeto):
-        from pyramid_jinja2 import Environment
-        env = Environment()
-        return env.join_path(uri, relativeto)
-
-    def test_spec_relto_spec(self):
-        result = self._callFUT(
-            'pyramid_jinja2.tests:templates/helloworld.jinja2',
-            'pyramid_jinja2.tests:templates/extends.jinja2')
-        self.assertEqual(result,
-                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-
-    def test_spec_relto_path(self):
-        result = self._callFUT(
-            'pyramid_jinja2.tests:templates/helloworld.jinja2',
-            'extends.jinja2')
-        self.assertEqual(result,
-                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-
-    def test_spec_relto_abspath(self):
-        result = self._callFUT(
-            'pyramid_jinja2.tests:templates/helloworld.jinja2',
-            '/foo/extends.jinja2')
-        self.assertEqual(result,
-                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-
-    def test_path_relto_path(self):
-        result = self._callFUT('helloworld.jinja2', 'extends.jinja2')
-        self.assertEqual(result, 'helloworld.jinja2')
-
-    def test_path_relto_abspath(self):
-        result = self._callFUT('helloworld.jinja2', '/foo/extends.jinja2')
-        self.assertEqual(result, '/foo/helloworld.jinja2')
-
-    def test_path_relto_spec(self):
-        result = self._callFUT('helloworld.jinja2',
-                               'pyramid_jinja2.tests:templates/extends.jinja2')
-        self.assertEqual(result,
-                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-
-    def test_path_relto_basespec(self):
-        result = self._callFUT('templates/helloworld.jinja2',
-                               'pyramid_jinja2.tests:foo.jinja2')
-        self.assertEqual(result,
-                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
-
-    def test_abspath_relto_spec(self):
-        result = self._callFUT('/foo/helloworld.jinja2',
-                               'pyramid_jinja2.tests:foo.jinja2')
-        self.assertEqual(result, '/foo/helloworld.jinja2')
-
+#class Test_joinpath(unittest.TestCase):
+#    def _callFUT(self, uri, relativeto):
+#        from pyramid_jinja2 import Environment
+#        env = Environment()
+#        return env.join_path(uri, relativeto)
+#
+#    def test_spec_relto_spec(self):
+#        result = self._callFUT(
+#            'pyramid_jinja2.tests:templates/helloworld.jinja2',
+#            'pyramid_jinja2.tests:templates/extends.jinja2')
+#        self.assertEqual(result,
+#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+#
+#    def test_spec_relto_path(self):
+#        result = self._callFUT(
+#            'pyramid_jinja2.tests:templates/helloworld.jinja2',
+#            'extends.jinja2')
+#        self.assertEqual(result,
+#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+#
+#    def test_spec_relto_abspath(self):
+#        result = self._callFUT(
+#            'pyramid_jinja2.tests:templates/helloworld.jinja2',
+#            '/foo/extends.jinja2')
+#        self.assertEqual(result,
+#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+#
+#    def test_path_relto_path(self):
+#        result = self._callFUT('helloworld.jinja2', 'extends.jinja2')
+#        self.assertEqual(result, 'helloworld.jinja2')
+#
+#    def test_path_relto_abspath(self):
+#        result = self._callFUT('helloworld.jinja2', '/foo/extends.jinja2')
+#        self.assertEqual(result, '/foo/helloworld.jinja2')
+#
+#    def test_path_relto_spec(self):
+#        result = self._callFUT('helloworld.jinja2',
+#                               'pyramid_jinja2.tests:templates/extends.jinja2')
+#        self.assertEqual(result,
+#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+#
+#    def test_path_relto_basespec(self):
+#        result = self._callFUT('templates/helloworld.jinja2',
+#                               'pyramid_jinja2.tests:foo.jinja2')
+#        self.assertEqual(result,
+#                         'pyramid_jinja2.tests:templates/helloworld.jinja2')
+#
+#    def test_abspath_relto_spec(self):
+#        result = self._callFUT('/foo/helloworld.jinja2',
+#                               'pyramid_jinja2.tests:foo.jinja2')
+#        self.assertEqual(result, '/foo/helloworld.jinja2')
+#
+#    def test_specalike_relto_spec(self):
+#        result = self._callFUT('/foo/helloworld.jinja2',
+#                               'pyramid_jinja2.tests:foo.jinja2')
+#        self.assertEqual(result, '/foo/helloworld.jinja2')
 
 
 class Test_includeme(unittest.TestCase):
@@ -401,14 +416,16 @@ class Test_includeme(unittest.TestCase):
         self.assertTrue(isinstance(utility, Jinja2RendererFactory))
 
 
-class Test_add_jinja2_assetdirs(unittest.TestCase):
-    def test_it(self):
+class Test_add_jinja2_searchpath(unittest.TestCase):
+    def test_it_relative_to_package(self):
         import pyramid_jinja2.tests
         from pyramid_jinja2 import includeme
         import os
         config = testing.setUp()
+        # silly testing.setUp doesn't properly set package pre-pyramid 1.6
         config.package = pyramid_jinja2.tests
-        config.registry.settings['jinja2.directories'] = 'foobar'
+        config.package_name = 'pyramid_jinja2.tests'
+        config.add_settings({'jinja2.directories': 'foobar'})
         includeme(config)
         env = config.get_jinja2_environment()
         self.assertEqual(
@@ -418,7 +435,9 @@ class Test_add_jinja2_assetdirs(unittest.TestCase):
         config.add_jinja2_search_path('grrr')
         self.assertEqual(
             [x.split(os.sep)[-3:] for x in env.loader.searchpath],
-            [['pyramid_jinja2', 'tests', 'foobar'], ['pyramid_jinja2', 'tests', 'grrr']])
+            [['pyramid_jinja2', 'tests', 'foobar'],
+             ['pyramid_jinja2', 'tests', 'grrr']])
+
 
 class Test_get_jinja2_environment(unittest.TestCase):
     def test_it(self):
@@ -532,6 +551,12 @@ class TestFileInfo(unittest.TestCase):
         fi = FileInfo('foobar')
         assert fi.uptodate() is False
 
+    def test_notfound(self):
+        from jinja2 import TemplateNotFound
+        from pyramid_jinja2 import FileInfo
+        fi = FileInfo('foobar')
+        self.assertRaises(TemplateNotFound, lambda: fi._delay_init())
+
     def test_delay_init(self):
         from pyramid_jinja2 import FileInfo
 
@@ -586,29 +611,29 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         testapp = TestApp(app2)
         self.assertEqual(testapp.get('/').body, bytes_('bar'))
 
-    def test_it_relative(self):
-        from pyramid.config import Configurator
-        from pyramid_jinja2 import includeme
-        from webtest import TestApp
-        import os
-
-        here = os.path.abspath(os.path.dirname(__file__))
-        templates_dir = os.path.join(here, 'templates')
-
-        def myview(request):
-            return {}
-
-        config = Configurator(settings={'jinja2.directories': templates_dir})
-        includeme(config)
-        config.add_view(view=myview, name='baz1',
-                        renderer='baz1/mytemplate.jinja2')
-        config.add_view(view=myview, name='baz2',
-                        renderer='baz2/mytemplate.jinja2')
-
-        app1 = config.make_wsgi_app()
-        testapp = TestApp(app1)
-        self.assertEqual(testapp.get('/baz1').body, bytes_('baz1\nbaz1 body'))
-        self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
+#    def test_it_relative(self):
+#        from pyramid.config import Configurator
+#        from pyramid_jinja2 import includeme
+#        from webtest import TestApp
+#        import os
+#
+#        here = os.path.abspath(os.path.dirname(__file__))
+#        templates_dir = os.path.join(here, 'templates')
+#
+#        def myview(request):
+#            return {}
+#
+#        config = Configurator(settings={'jinja2.directories': templates_dir})
+#        includeme(config)
+#        config.add_view(view=myview, name='baz1',
+#                        renderer='baz1/mytemplate.jinja2')
+#        config.add_view(view=myview, name='baz2',
+#                        renderer='baz2/mytemplate.jinja2')
+#
+#        app1 = config.make_wsgi_app()
+#        testapp = TestApp(app1)
+#        self.assertEqual(testapp.get('/baz1').body, bytes_('baz1\nbaz1 body'))
+#        self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
 
 
 class TestNewstyle(unittest.TestCase):
@@ -672,6 +697,7 @@ class Test_add_jinja2_extension(Base, unittest.TestCase):
         self.assertTrue('foobar' in env_after.extensions)
         self.assertTrue('foobar' not in default_env.extensions)
         self.assertTrue(env_before is env_after)
+
 
 def my_test_func(*args, **kwargs):
     """ Used as a fake filter/test function """

@@ -1,5 +1,4 @@
 import os
-import posixpath
 import threading
 
 from jinja2 import Environment as _Jinja2Environment
@@ -32,15 +31,7 @@ class IJinja2Environment(Interface):
 
 class Environment(_Jinja2Environment):
     def join_path(self, uri, parent):
-        if os.path.isabs(uri) or ':' in uri:
-            # we have an asset spec or absolute path
-            return uri
-        if not os.path.isabs(parent) and ':' in parent:
-            # parent is an asset spec
-            ppkg, ppath = parent.split(':', 1)
-            _uri = posixpath.join(posixpath.dirname(ppath), uri)
-            return '{0}:{1}'.format(ppkg, _uri)
-        return os.path.join(os.path.dirname(parent), uri)
+        return uri
 
 
 class FileInfo(object):
@@ -112,9 +103,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
         # keep legacy asset: prefix checking that bypasses
         # source path checking altogether
         if template.startswith('asset:'):
-            newtemplate = template.split(':', 1)[1]
-            fi = self._get_asset_source_fileinfo(environment, newtemplate)
-            return fi.contents, fi.filename, fi.uptodate
+            template = template[6:]
 
         fi = self._get_asset_source_fileinfo(environment, template)
         if os.path.isfile(fi.filename):
@@ -199,7 +188,7 @@ def renderer_factory(info):
 
 deprecated(
     'renderer_factory',
-    'The pyramid_jinja2.renderer_factory was deprecated in version 1.11 and '
+    'The pyramid_jinja2.renderer_factory was deprecated in version 2.0 and '
     'will be removed in the future. You should upgrade to the newer '
     'config.add_jinja2_renderer() API.')
 
@@ -223,8 +212,8 @@ def add_jinja2_search_path(config, searchpath, name='.jinja2'):
         env = get_jinja2_environment(config, name)
         searchpaths = parse_multiline(searchpath)
         for folder in searchpaths:
-            env.loader.searchpath.append(abspath_from_asset_spec(folder,
-                                         config.package))
+            env.loader.searchpath.append(
+                abspath_from_asset_spec(folder, config.package))
     config.action(None, register, order=EXTRAS_CONFIG_PHASE)
 
 
