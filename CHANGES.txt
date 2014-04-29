@@ -1,8 +1,10 @@
 2.0.2 (unreleased)
 ==================
 
-- Improve relative loading to work with a few corner cases that were breaking
-  including absolute uris and templates relative to an asset spec. [mmerickel]
+- Fix several regressions caused by the template-relative loading features
+  added in 2.0. The lookup will now attempt template-relative loading but
+  fallback to the search path instead of failing. This should bring the
+  release back into conformance with the 1.x series. [mmerickel]
 
 
 2.0.1 (2014-04-23)
