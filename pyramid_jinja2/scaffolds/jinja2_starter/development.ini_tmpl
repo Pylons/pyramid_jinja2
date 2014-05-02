@@ -1,4 +1,4 @@
-[app:{{project}}]
+[app:main]
 use = egg:{{project}}
 reload_templates = true
 debug_authorization = false
@@ -6,11 +6,6 @@ debug_notfound = false
 debug_routematch = false
 debug_templates = true
 default_locale_name = en
-jinja2.directories = {{package}}:templates
-
-[pipeline:main]
-pipeline =
-    {{project}}
 
 [server:main]
 use = egg:pyramid#wsgiref

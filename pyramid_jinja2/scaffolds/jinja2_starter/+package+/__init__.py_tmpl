@@ -17,6 +17,6 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static')
     config.add_view('{{package}}.views.my_view',
                     context='{{package}}.models.MyModel', 
-                    renderer="mytemplate.jinja2")
+                    renderer="templates/mytemplate.jinja2")
 
     return config.make_wsgi_app()
