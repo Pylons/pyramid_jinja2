@@ -52,35 +52,46 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
         self.assertEqual(options['searchpath'], [])
 
     def test_options(self):
-        import pyramid_jinja2.tests
         options = self._callFUT(
             {
                 'debug_templates': 'false',
                 'p.debug_templates': 'true',
                 'p.input_encoding': 'ascii',
-                'p.directories': 'templates',
+                'p.directories': 'pyramid_jinja2.tests:templates',
             },
-            'p.', None, pyramid_jinja2.tests,
+            'p.', None, None,
         )
         self.assertEqual(options['debug'], True)
         self.assertEqual(options['encoding'], 'ascii')
-        self.assertEqual(len(options['searchpath']), 2)
-        self.assertTrue(
-            options['searchpath'][0].endswith(
-                os.path.join('pyramid_jinja2', 'tests')))
-        self.assertTrue(
-            options['searchpath'][1].endswith(
-                os.path.join('pyramid_jinja2', 'tests', 'templates')))
-
-    def test_options_without_default_searchpath(self):
-        options = self._callFUT(
-            {'p.directories': 'pyramid_jinja2.tests:templates'},
-            'p.', None, None,
-        )
         self.assertEqual(len(options['searchpath']), 1)
         self.assertTrue(
             options['searchpath'][0].endswith(
                 os.path.join('pyramid_jinja2', 'tests', 'templates')))
+
+    def test_options_with_spec(self):
+        options = self._callFUT(
+            {'p.directories': 'pyramid_jinja2:'}, 'p.', None, None)
+        self.assertEqual(len(options['searchpath']), 1)
+        self.assertTrue(options['searchpath'][0].endswith('pyramid_jinja2'))
+
+    def test_options_with_abspath(self):
+        import os.path
+        here = os.path.abspath(__file__)
+        options = self._callFUT({'p.directories': here}, 'p.', None, None)
+        self.assertEqual(len(options['searchpath']), 1)
+        self.assertTrue(
+            options['searchpath'][0].endswith(os.path.basename(__file__)))
+
+    def test_options_with_relpath(self):
+        import os
+        import pyramid_jinja2
+        options = self._callFUT(
+            {'p.directories': 'foo'}, 'p.', None, pyramid_jinja2)
+        self.assertEqual(len(options['searchpath']), 2)
+        self.assertEqual(options['searchpath'][0].split(os.sep)[-1:],
+                         ['pyramid_jinja2'])
+        self.assertEqual(options['searchpath'][1].split(os.sep)[-2:],
+                         ['pyramid_jinja2', 'foo'])
 
     def test_debug_fallback(self):
         options = self._callFUT(
@@ -95,8 +106,8 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
 class Test_parse_env_options_from_settings(unittest.TestCase):
 
     def _callFUT(self, settings, prefix=''):
-        from pyramid.path import DottedNameResolver
         import pyramid_jinja2
+        from pyramid.path import DottedNameResolver
         from pyramid_jinja2.settings import parse_env_options_from_settings
         resolver = DottedNameResolver()
         return parse_env_options_from_settings(
@@ -134,6 +145,7 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
         self.assertEqual(opts['optimized'], True)
         self.assertEqual(opts['autoescape'], False)
         self.assertEqual(opts['cache_size'], 300)
+        self.assertEqual(opts['gettext'].domain, 'pyramid_jinja2')
 
     def test_strict_undefined(self):
         from jinja2 import StrictUndefined

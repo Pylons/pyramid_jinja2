@@ -27,7 +27,7 @@ Glossary
       can override. See :ref:`Template Inheritance 
       <jinja2:template-inheritance>` in the Jinja2 documentation.
 
-   Asset spec
+   Asset Specification
        A string representing the path to a directory or file present in a
        Python module. See :ref:`Understanding Asset Specifications 
        <pyramid:asset_specifications>` in the Pyramid documentation for 

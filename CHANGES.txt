@@ -1,11 +1,18 @@
-2.0.2 (unreleased)
-==================
+3.0 (unreleased)
+================
 
-- Fix several regressions caused by the template-relative loading features
-  added in 2.0. The lookup will now attempt template-relative loading but
-  fallback to the search path instead of failing. This should bring the
-  release back into conformance with the 1.x series. [mmerickel]
+- The path of the child template is always considered when inheriting from
+  a base template. Therefore when doing ``render('templates/foo.jinja2')``
+  and ``foo.jinja2`` has an ``{% extends 'base.jinja2' %}``, the template
+  will be searched for as ``'templates/base.jinja2'`` on the search path.
+  Previously the path of the child template was ignored when doing the
+  lookup for the base, causing some very subtle and unrecoverable lookup
+  errors when the child template was found relative to the caller instead
+  of being found on the search path. [mmerickel]
 
+- This release restores the default search path behaviors from the 1.x series
+  that were inadvertently removed in the 2.x series and makes it more explicit
+  what the search paths are and to what are they relative. [mmerickel]
 
 2.0.1 (2014-04-23)
 ==================
@@ -50,6 +57,13 @@
   have not yet been committed.
   [mmerickel]
 
+Backward Incompatible Changes
+-----------------------------
+
+- The creation and configuration of the Jinja2 ``Environment`` is now deferred
+  until commit-type in the Pyramid ``Configurator``. This means that
+  ``config.get_jinja2_environment`` may return ``None``. To resolve this,
+  invoke ``config.commit()`` before attempting to get the environment.
 
 1.10 (2014-01-11)
 =================

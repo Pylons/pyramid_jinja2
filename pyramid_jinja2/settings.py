@@ -57,9 +57,10 @@ def parse_undefined(undefined):
 def parse_loader_options_from_settings(settings,
                                        prefix,
                                        maybe_dotted,
-                                       package,
-                                       ):
+                                       package):
     """ Parse options for use with the SmartAssetSpecLoader."""
+    package = package or '__main__'
+
     def sget(name, default=None):
         return settings.get(prefix + name, default)
 
@@ -73,11 +74,9 @@ def parse_loader_options_from_settings(settings,
 
     # get jinja2 directories
     directories = parse_multiline(sget('directories') or '')
-    directories = [abspath_from_asset_spec(d, package or '__main__')
-                   for d in directories]
+    directories = [abspath_from_asset_spec(d, package) for d in directories]
 
-    # add the package root to the search path by default
-    if package is not None:
+    if package != '__main__':
         directories.insert(0, abspath_from_asset_spec('', package))
 
     return dict(
@@ -153,10 +152,10 @@ def parse_env_options_from_settings(settings,
     # should newstyle gettext calls be enabled?
     opts['newstyle'] = asbool(sget('newstyle', False))
 
-    #add custom jinja2 filters
+    # add custom jinja2 filters
     opts['filters'] = parse_named_assetspecs(sget('filters', ''), maybe_dotted)
 
-    #add custom jinja2 tests
+    # add custom jinja2 tests
     opts['tests'] = parse_named_assetspecs(sget('tests', ''), maybe_dotted)
 
     # add custom jinja2 functions

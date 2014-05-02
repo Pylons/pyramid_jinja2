@@ -16,4 +16,5 @@
 .. autofunction:: get_jinja2_environment
 
 .. autoclass:: Jinja2TemplateRenderer
+
 .. autoclass:: SmartAssetSpecLoader

@@ -1,5 +1,7 @@
+import inspect
 import os
 import posixpath
+import sys
 import threading
 
 from jinja2 import Environment as _Jinja2Environment
@@ -24,7 +26,6 @@ from .settings import (
 
 ENV_CONFIG_PHASE = 0
 EXTRAS_CONFIG_PHASE = 1
-PARENT_RELATIVE_DELIM = '#@#FROM_PARENT#@#'
 
 
 class IJinja2Environment(Interface):
@@ -36,8 +37,16 @@ class Environment(_Jinja2Environment):
         if os.path.isabs(uri) or ':' in uri:
             # we have an asset spec or absolute path
             return uri
-        # uri may be relative to parent, shuffle it through to the loader
-        return uri + PARENT_RELATIVE_DELIM + parent
+
+        # make template lookup parent-relative
+        if not os.path.isabs(parent) and ':' in parent:
+            # parent is an asset spec
+            ppkg, ppath = parent.split(':', 1)
+            reluri = posixpath.join(posixpath.dirname(ppath), uri)
+            return '{0}:{1}'.format(ppkg, reluri)
+
+        # parent is just a normal path
+        return posixpath.join(posixpath.dirname(parent), uri)
 
 
 class FileInfo(object):
@@ -84,6 +93,47 @@ class FileInfo(object):
             return False
 
 
+class _PackageFinder(object):
+    inspect = staticmethod(inspect)
+
+    def caller_package(self, excludes=()):
+        """A list of excluded patterns, optionally containing a `.` suffix.
+        For example, ``'pyramid.'`` would exclude exclude ``'pyramid.config'``
+        but not ``'pyramid'``.
+        """
+        f = None
+        for t in self.inspect.stack():
+            f = t[0]
+            name = f.f_globals.get('__name__')
+            if name:
+                excluded = False
+                for pattern in excludes:
+                    if pattern[-1] == '.' and name.startswith(pattern):
+                        excluded = True
+                        break
+                    elif name == pattern:
+                        excluded = True
+                        break
+                if not excluded:
+                    break
+
+        if f is None:
+            return None
+
+        pname = f.f_globals.get('__name__') or '__main__'
+        m = sys.modules[pname]
+        f = getattr(m, '__file__', '')
+        if (('__init__.py' in f) or ('__init__$py' in f)):  # empty at >>>
+            return m
+
+        pname = m.__name__.rsplit('.', 1)[0]
+
+        return sys.modules[pname]
+
+
+_caller_package = _PackageFinder().caller_package
+
+
 class SmartAssetSpecLoader(FileSystemLoader):
     '''A Jinja2 template loader that knows how to handle
     asset specifications.
@@ -96,45 +146,17 @@ class SmartAssetSpecLoader(FileSystemLoader):
     def list_templates(self):
         raise TypeError('this loader cannot iterate over all templates')
 
-    def _get_absolute_source(self, template):
-        filename = abspath_from_asset_spec(template)
-        fi = FileInfo(filename, self.encoding)
-        if os.path.isfile(fi.filename):
-            return fi.contents, fi.filename, fi.uptodate
-
     def get_source(self, environment, template):
         # keep legacy asset: prefix checking that bypasses
         # source path checking altogether
         if template.startswith('asset:'):
             template = template[6:]
 
-        # check for template-relative paths
-        parts = template.split(PARENT_RELATIVE_DELIM, 1)
-        parent = None
-        if len(parts) == 2:
-            template, parent = parts
-
-            if not os.path.isabs(parent) and ':' in parent:
-                # parent is an asset spec
-                ppkg, ppath = parent.split(':', 1)
-                _uri = posixpath.join(posixpath.dirname(ppath), template)
-                uri = '{0}:{1}'.format(ppkg, _uri)
-                src = self._get_absolute_source(uri)
-                if src is not None:
-                    return src
-
-            elif not os.path.isabs(template):
-                # parent is an ordinary file
-                uri = os.path.join(os.path.dirname(parent), template)
-                try:
-                    return FileSystemLoader.get_source(self, environment, uri)
-                except TemplateNotFound:
-                    pass
-
-        # load template directly
-        src = self._get_absolute_source(template)
-        if src is not None:
-            return src
+        # load template directly from the filesystem
+        filename = abspath_from_asset_spec(template)
+        fi = FileInfo(filename, self.encoding)
+        if os.path.isfile(fi.filename):
+            return fi.contents, fi.filename, fi.uptodate
 
         # fallback to search-path lookup
         try:
@@ -143,8 +165,6 @@ class SmartAssetSpecLoader(FileSystemLoader):
             message = ex.message
             message += ('; asset=%s; searchpath=%r'
                         % (template, self.searchpath))
-            if parent is not None:
-                message += ('; parent=%s' % parent)
             raise TemplateNotFound(name=ex.name, message=message)
 
 
@@ -170,16 +190,16 @@ class Jinja2RendererFactory(object):
         name, package = info.name, info.package
 
         def template_loader():
-            # get template based on searchpaths, then try relavtive one
+            # first try a caller-relative template if possible
             try:
-                template = self.environment.get_template(name)
-            except TemplateNotFound:
                 if ':' not in name and package is not None:
                     name_with_package = '%s:%s' % (package.__name__, name)
-                    template = self.environment.get_template(name_with_package)
-                else:
-                    raise
-            return template
+                    return self.environment.get_template(name_with_package)
+            except TemplateNotFound:
+                pass
+
+            # fallback to search path
+            return self.environment.get_template(name)
 
         return Jinja2TemplateRenderer(template_loader)
 
@@ -204,7 +224,7 @@ def renderer_factory(info):
                 registry.settings,
                 'jinja2.',
                 resolver.maybe_resolve,
-                info.package,
+                info.package
             )
             env = create_environment_from_options(env_opts, loader_opts)
             registry.registerUtility(env, IJinja2Environment)
@@ -261,6 +281,7 @@ def add_jinja2_extension(config, ext, name='.jinja2'):
     :class:`jinja2.Environment` used by the renderer named ``name``.
 
     """
+    ext = config.maybe_dotted(ext)
     def register():
         env = get_jinja2_environment(config, name)
         env.add_extension(ext)
@@ -311,7 +332,7 @@ def create_environment_from_options(env_opts, loader_opts):
     return env
 
 
-def add_jinja2_renderer(config, name, settings_prefix='jinja2.'):
+def add_jinja2_renderer(config, name, settings_prefix='jinja2.', package=None):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -329,6 +350,9 @@ def add_jinja2_renderer(config, name, settings_prefix='jinja2.'):
     renderer_factory = Jinja2RendererFactory()
     config.add_renderer(name, renderer_factory)
 
+    package = package or config.package
+    resolver = DottedNameResolver(package=package)
+
     def register():
         registry = config.registry
         settings = config.get_settings()
@@ -336,14 +360,14 @@ def add_jinja2_renderer(config, name, settings_prefix='jinja2.'):
         loader_opts = parse_loader_options_from_settings(
             settings,
             settings_prefix,
-            config.maybe_dotted,
-            config.package,
+            resolver.maybe_resolve,
+            package,
         )
         env_opts = parse_env_options_from_settings(
             settings,
             settings_prefix,
-            config.maybe_dotted,
-            config.package,
+            resolver.maybe_resolve,
+            package,
         )
         env = create_environment_from_options(env_opts, loader_opts)
         renderer_factory.environment = env
@@ -383,4 +407,6 @@ def includeme(config):
     config.add_directive('add_jinja2_search_path', add_jinja2_search_path)
     config.add_directive('add_jinja2_extension', add_jinja2_extension)
     config.add_directive('get_jinja2_environment', get_jinja2_environment)
-    config.add_jinja2_renderer('.jinja2')
+
+    package = _caller_package(('pyramid', 'pyramid.', 'pyramid_jinja2'))
+    config.add_jinja2_renderer('.jinja2', package=package)

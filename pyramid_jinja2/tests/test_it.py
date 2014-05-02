@@ -9,7 +9,7 @@ from pyramid_jinja2.compat import (
     bytes_,
     StringIO,
 )
-from .base import Base
+from .base import Base, Mock
 
 
 def dummy_filter(value): return 'hoge'
@@ -195,6 +195,7 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         config.add_settings({'jinja2.directories':
                              'pyramid_jinja2.tests:templates'})
         config.include('pyramid_jinja2')
+        self.config = config
 
     def tearDown(self):
         testing.tearDown()
@@ -214,14 +215,35 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         result = render('extends_abs.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
+    def test_relative_tmpl_extends_relbase(self):
+        from pyramid.renderers import render
+        # this should pass as it will fallback to the new search path
+        # and find it from there
+        self.config.add_jinja2_search_path('pyramid_jinja2.tests:')
+        result = render('extends_relbase.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
-class TestIntegrationWithoutSearchPath(SearchPathTests, unittest.TestCase):
+
+class TestIntegrationDefaultSearchPath(SearchPathTests, unittest.TestCase):
     def setUp(self):
         config = testing.setUp()
         config.include('pyramid_jinja2')
 
     def tearDown(self):
         testing.tearDown()
+
+    def test_relative_tmpl_extends_relbase(self):
+        from jinja2 import TemplateNotFound
+        from pyramid.renderers import render
+        # this should fail because the relative lookup will search for
+        # templates/templates/extends_relbase.jinja2
+        try:
+            render('templates/extends_relbase.jinja2', {'a': 1})
+        except TemplateNotFound as ex:
+            self.assertTrue(
+                'templates/templates/helloworld.jinja2' in ex.message)
+        else: # pragma: no cover
+            raise AssertionError
 
 
 class TestIntegrationReloading(unittest.TestCase):
@@ -361,17 +383,24 @@ class Test_add_jinja2_searchpath(unittest.TestCase):
         from pyramid_jinja2 import includeme
         import os
         config = testing.setUp()
-        # silly testing.setUp doesn't properly set package pre-pyramid 1.6
+        # hack because pyramid pre 1.6 doesn't configure testing configurator
+        # with the correct package name
         config.package = pyramid_jinja2.tests
         config.package_name = 'pyramid_jinja2.tests'
         config.add_settings({'jinja2.directories': 'foobar'})
         includeme(config)
         env = config.get_jinja2_environment()
         self.assertEqual(
+            [x.split(os.sep)[-2:] for x in env.loader.searchpath][0],
+            ['pyramid_jinja2', 'tests'])
+        self.assertEqual(
             [x.split(os.sep)[-3:] for x in env.loader.searchpath][1:],
             [['pyramid_jinja2', 'tests', 'foobar']])
 
         config.add_jinja2_search_path('grrr')
+        self.assertEqual(
+            [x.split(os.sep)[-2:] for x in env.loader.searchpath][0],
+            ['pyramid_jinja2', 'tests'])
         self.assertEqual(
             [x.split(os.sep)[-3:] for x in env.loader.searchpath][1:],
             [['pyramid_jinja2', 'tests', 'foobar'],
@@ -560,15 +589,11 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         from pyramid.config import Configurator
         from pyramid_jinja2 import includeme
         from webtest import TestApp
-        import os
-
-        here = os.path.abspath(os.path.dirname(__file__))
-        templates_dir = os.path.join(here, 'templates')
 
         def myview(request):
             return {}
 
-        config = Configurator(settings={'jinja2.directories': templates_dir})
+        config = Configurator(settings={'jinja2.directories': 'templates'})
         includeme(config)
         config.add_view(view=myview, name='baz1',
                         renderer='baz1/mytemplate.jinja2')
@@ -579,6 +604,25 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         testapp = TestApp(app1)
         self.assertEqual(testapp.get('/baz1').body, bytes_('baz1\nbaz1 body'))
         self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
+
+
+class TestPackageFinder(unittest.TestCase):
+
+    def test_caller_package(self):
+        from pyramid_jinja2 import _PackageFinder
+        pf = _PackageFinder()
+
+        class MockInspect(object):
+            def __init__(self, items=()):
+                self.items = items
+
+            def stack(self):
+                return self.items
+        pf.inspect = MockInspect()
+        self.assertEqual(pf.caller_package(), None)
+
+        import xml
+        pf.inspect.items = [(Mock(f_globals={'__name__': 'xml'}),)]
 
 
 class TestNewstyle(unittest.TestCase):

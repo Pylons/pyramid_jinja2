@@ -59,7 +59,8 @@ All are completely equivalent:
 Once activated either of these says, the following happens:
 
 #) Files with the :file:`.jinja2` extension are considered to be
-   :term:`Jinja2` templates.
+   :term:`Jinja2` templates and a :class:`jinja2.Environment` is registered
+   to handle this extension.
 
 #) The :func:`pyramid_jinja2.add_jinja2_renderer` directive is added to the
    :term:`Configurator` instance.
@@ -73,122 +74,144 @@ Once activated either of these says, the following happens:
 #) The :func:`pyramid_jinja2.get_jinja2_environment` directive is added to the
    :term:`Configurator` instance.
 
-#) :py:class:`jinja2.Environment` is constructed and registered globally.
+Preparing for distribution
+--------------------------
 
-To setup the Jinja2 search path either one of the following steps must be taken:
+If you want to make sure your :file:`.jinja2` template files are included in
+your package's source distribution (e.g. when using ``python setup.py sdist``),
+add ``*.jinja2`` to your :file:`MANIFEST.in`::
 
-#) Add :ref:`setting_jinja2_directories` to your :file:`.ini` settings file
-   using a Pyramid :term:`asset spec`::
-
-     jinja2.directories = yourapp:templates
-
-#) Or Alternatively by using the :func:`~pyramid_jinja2.add_jinja2_search_path`
-   directive attached to your application's :term:`Configurator` instance also
-   using a Pyramid :term:`asset spec`::
-
-     config.add_jinja2_search_path("yourapp:templates")
-
-.. warning::
-
-    If you do not explicitly configure your Jinja2 search path it will
-    default to the root of your application. If the specified template
-    is not found in the root of your application and you did not specify
-    a package on the template path it will then try to load the template
-    path relative to the module's caller package. For example:
-
-    Without the search path configured:
-
-    .. code-block:: python
-
-       @view_config(renderer='templates/mytemplate.jinja2')
-
-    With the search path configured:
-
-    .. code-block:: python
-
-       @view_config(renderer='mytemplate.jinja2')
-
-    If your view module is in ``app.module.view`` and your template is
-    under :file:`app/module/templates/mytemplate.jinja2` you can access
-    that asset in a few different ways.
-
-    Using the full path:
-
-    .. code-block:: python
-
-       @view_config(renderer="module/templates/mytemplate.jinja2")
-
-    Using the package:
-
-    .. code-block:: python
-
-       @view_config(renderer="app.module:templates/mytemplate.jinja2")
-
-    Using the relative path to current package:
-
-    .. code-block:: python
-
-       @view_config(renderer="templates/mytemplate.jinja2")
-
-    You need to be careful when using relative paths though, if
-    there is an :file:`app/templates/mytemplate.jinja2` this will be
-    used instead as Jinja2 lookup will first try the path relative
-    to the root of the app and then it will try the path relative
-    to the current package.
-
-Finally, to make sure your :file:`.jinja2` template files are included in your
-package's source distribution (e.g. when using ``python setup.py sdist``), add
-``*.jinja2`` to your :file:`MANIFEST.in`::
-
-  recursive-include yourapp *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.jinja2 *.js *.html *.xml
-
-
-.. _usage:
+    recursive-include yourapp *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.jinja2 *.js *.html *.xml
 
 Usage
 =====
 
-Once :term:`pyramid_jinja2` been activated :file:`.jinja2` templates
-can be loaded either by looking up names that would be found on
-the :term:`Jinja2` search path or by looking up asset specifications.
+Once `pyramid_jinja2` has been activated, :file:`.jinja2` templates can be
+used by the Pyramid rendering system.
 
-.. _template_lookups:
+When used as the ``renderer`` argument of a view, the view must return a
+Python ``dict`` which will be passed into the template as the set of available
+variables.
 
-Template Lookups
-----------------
+Template Lookup Mechanisms
+--------------------------
 
-The default lookup mechanism for templates uses the :term:`Jinja2`
-search path (specified with :ref:`setting_jinja2_directories` or by using
-the :func:`~pyramid_jinja2.add_jinja2_search_path` directive on the
-:term:`Configurator` instance).
+There are several ways to configure `pyramid_jinja2` to find your templates.
 
-Rendering :term:`Jinja2` templates with a view like this is typically
-done as follows (where the :file:`templates` directory is expected to
-live in the search path):
+Asset Specifications
+~~~~~~~~~~~~~~~~~~~~
+
+Templates may always be defined using an :term:`asset specification`. These
+are strings which define an absolute location of the template relative to
+some Python package. For example ``myapp.views:templates/home.jinja2``. These
+specifications are supported throughout Pyramid and provide a fool-proof way
+to find any supporting assets bundled with your application.
+
+Here's an example view configuration which uses an :term:`asset specification`:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import view_config
+   @view_config(renderer='mypackage:templates/foo.jinja2')
+   def hello_world(request):
+       return {'a': 1}
+
+Asset specifications have some significant benefits in Pyramid, as they are
+fully overridable. An addon package can ship with code that renders using
+asset specifications. Later another package can externally override the
+templates without having to actually modify the addon in any way. See
+:ref:`pyramid:overriding_assets_section` for more information.
+
+.. note::
+
+   All lookup mechanisms in `pyramid_jinja2` actually convert a requested
+   template into an :term:`asset specification` underneath the hood except
+   for absolute paths. This means that it's almost always possible to
+   override the actual templates in an addon package without having to fork
+   the addon itself.
+
+Caller-Relative Template Lookup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, templates are discovered relative to the caller's package. This
+means that if you define a view in a Python module, the templates would
+be found relative to the module's directory on the filesystem.
+
+Let's look at an example:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(renderer='templates/mytemplate.jinja2')
+   def my_view(request):
+       return {'foo': 1, 'bar': 2}
+
+Imagine that the above code is in a ``myapp.admin.views`` module. The template
+would be relative to that module on the filesystem, as shown below::
+
+   myapp
+   |- __init__.py
+   `- admin
+      |- views.py
+      `- templates
+         |- base.jinja2
+         `- mytemplate.jinja2
+
+Caller-relative lookup avoids naming collisions which can be common in a
+search path-based approach.
+
+Search Path-Based Template Lookup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When used outside of Pyramid, Jinja2's default lookup mechanism is a search
+path. To use this mechanism within Pyramid, simply define the search path
+using the ``jinja2.directories`` configuration setting or the
+:func:`~pyramid_jinja2.add_jinja2_search_path` configurator directive.
+
+Rendering :term:`Jinja2` templates with a search path is typically done as
+follows:
+
+.. code-block:: python
 
    @view_config(renderer='mytemplate.jinja2')
-   def myview(request):
-       return {'foo':1, 'bar':2}
+   def my_view(request):
+       return {'foo': 1, 'bar': 2}
 
-Rendering templates outside of a view (and without a request) can be
-done using the renderer api:
+If ``mytemplate.jinja2`` is not found in the same directory as the module
+then it will be searched for on the search path. We are now dependent on our
+configuration settings to tell us where the template may be located. Commonly
+a ``templates`` directory is created at the base of the package and the
+configuration file will include the following directive::
 
-.. code-block:: python
-   :linenos:
+    jinja2.directories = mypkg:templates
 
-   from pyramid.renderers import render_to_response
-   render_to_response('mytemplate.jinja2', {'foo':1, 'bar':2})
+.. warning::
 
-:term:`Template Inheritance`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   It is possible to specify a relative path to the templates folder, such
+   as ``jinja2.directories = templates``. This folder will be found relative
+   to the first package that includes `pyramid_jinja2`, which will normally
+   be the root of your application. It is always better to be explicit when
+   in doubt.
 
-:term:`Template inheritance` can use asset specs in the same manner as regular
-template lookups.  An example:
+.. note::
+
+   The package that includes `pyramid_jinja2` or the package that adds a new
+   renderer via :func:`pyramid_jinja2.add_jinja2_renderer` will always be added
+   to the search path.
+
+Templates Extending Templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:term:`Jinja2` allows :term:`template inheritance` as well as other mechanisms
+for templates to load each other. The lookup mechanisms supported in these
+cases include asset specifications and template-relative names. The search
+path will also be consulted, but the name of the requested template will
+always be mounted with respect to its child. For example if had a template
+named ``templates/child.jinja2`` that wanted to extend
+``templates/base.jinja2`` then it would use ``{% extends 'base.jinja2' %}``
+and locate the file relative to itself.
+
+An example:
 
 .. code-block:: html+django
    :linenos:
@@ -221,31 +244,8 @@ For further information on :term:`Template Inheritance` in Jinja2
 templates please see :ref:`Template Inheritance <jinja2:template-inheritance>`
 in Jinja2 documentation.
 
-.. _assets_spec_lookups:
-
-Asset Specification Lookups
----------------------------
-
-Looking up templates via asset specification is a feature specific
-to :term:`Pyramid`.  For further info please see :ref:`Understanding
-Asset Specifications <pyramid:asset_specifications>`.
-Overriding templates in this style uses the standard
-:ref:`pyramid asset overriding technique <pyramid:overriding_assets_section>`.
-
-.. _settings:
-
-Internalization (i18n)
-----------------------
-
-When :term:`pyramid_jinja2` is included as pyramid application,
-:ref:`jinja2.ext.i18n <jinja2:i18n-extension>` is automatically activated.
-
-Be sure to configure `jinja2.i18n.domain` according to `setup.cfg` domain
-settings. By default, `jinja2.i18n.domain` is set to the package name of
-the pyramid application.
-
-Supporting Alternate File Extensions and Settings
--------------------------------------------------
+Adding or Overriding a Renderer
+-------------------------------
 
 By default, only templates ending in the ``.jinja2`` file extension are
 supported. However, it is very easy to add support for alternate file
@@ -289,6 +289,18 @@ at a different group of settings.
 
 Now ``foo.email`` will be rendered using the ``mail.jinja2.*`` settings.
 
+Internalization (i18n)
+----------------------
+
+When :term:`pyramid_jinja2` is included in a Pyramid application,
+:ref:`jinja2.ext.i18n <jinja2:i18n-extension>` is automatically activated.
+
+Be sure to configure `jinja2.i18n.domain` according to `setup.cfg` domain
+settings. By default, `jinja2.i18n.domain` is set to the name of the
+package that included `pyramid_jinja2`. If no package was found, it will use
+``messages``.
+
+.. _settings:
 
 Settings
 ========
@@ -345,10 +357,13 @@ Possible values: ``true`` or ``false``.
 
 .. warning::
 
-   By default Jinja2 sets autoescaping to False.
+   By default Jinja2 sets autoescaping to ``False``.
 
    pyramid_jinja2 sets it to true as it is considered a good security
-   practice.
+   practice in a web setting where we want to prevent XSS attacks from
+   rendering unsanitized user-generated content. To turn off escaping
+   on a case-by-case basis you may use the ``safe`` filter such as
+   ``{{ html_blob | safe }}``.
 
 
 .. _setting_reload_templates:
@@ -419,7 +434,8 @@ locations where each line represents an extension. :ref:`jinja2.ext.i18n
 jinja2.i18n.domain
 ------------------
 Pyramid domain for translations. See :term:`Translation Domain` in Pyramid
-documentation. Defaults to the package name of the pyramid application.
+documentation. Defaults to the name of the package that activated
+`pyramid_jinja2` or if that fails it will use ``messages`` as the domain.
 
 .. _setting_jinja2_filers:
 
