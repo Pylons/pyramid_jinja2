@@ -206,7 +206,7 @@ Templates Extending Templates
 for templates to load each other. The lookup mechanisms supported in these
 cases include asset specifications and template-relative names. The search
 path will also be consulted, but the name of the requested template will
-always be mounted with respect to its child. For example if had a template
+always be mounted with respect to its child. For example if you had a template
 named ``templates/child.jinja2`` that wanted to extend
 ``templates/base.jinja2`` then it would use ``{% extends 'base.jinja2' %}``
 and locate the file relative to itself.

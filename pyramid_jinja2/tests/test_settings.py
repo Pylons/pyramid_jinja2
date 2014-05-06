@@ -49,7 +49,7 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
         options = self._callFUT({}, 'p.', None, None)
         self.assertEqual(options['debug'], False)
         self.assertEqual(options['encoding'], 'utf-8')
-        self.assertEqual(options['searchpath'], [])
+        self.assertEqual(options['searchpath'], [''])
 
     def test_options(self):
         options = self._callFUT(
@@ -63,24 +63,23 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
         )
         self.assertEqual(options['debug'], True)
         self.assertEqual(options['encoding'], 'ascii')
-        self.assertEqual(len(options['searchpath']), 1)
+        self.assertEqual(len(options['searchpath']), 2)
         self.assertTrue(
-            options['searchpath'][0].endswith(
+            options['searchpath'][1].endswith(
                 os.path.join('pyramid_jinja2', 'tests', 'templates')))
 
     def test_options_with_spec(self):
         options = self._callFUT(
             {'p.directories': 'pyramid_jinja2:'}, 'p.', None, None)
-        self.assertEqual(len(options['searchpath']), 1)
-        self.assertTrue(options['searchpath'][0].endswith('pyramid_jinja2'))
+        self.assertEqual(len(options['searchpath']), 2)
+        self.assertTrue(options['searchpath'][1].endswith('pyramid_jinja2'))
 
     def test_options_with_abspath(self):
         import os.path
-        here = os.path.abspath(__file__)
+        here = os.path.dirname(os.path.abspath(__file__))
         options = self._callFUT({'p.directories': here}, 'p.', None, None)
-        self.assertEqual(len(options['searchpath']), 1)
-        self.assertTrue(
-            options['searchpath'][0].endswith(os.path.basename(__file__)))
+        self.assertEqual(len(options['searchpath']), 2)
+        self.assertEqual(options['searchpath'][1], here)
 
     def test_options_with_relpath(self):
         import os

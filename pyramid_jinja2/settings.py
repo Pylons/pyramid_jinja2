@@ -76,8 +76,8 @@ def parse_loader_options_from_settings(settings,
     directories = parse_multiline(sget('directories') or '')
     directories = [abspath_from_asset_spec(d, package) for d in directories]
 
-    if package != '__main__':
-        directories.insert(0, abspath_from_asset_spec('', package))
+    # always insert default search path relative to package
+    directories.insert(0, abspath_from_asset_spec('', package))
 
     return dict(
         debug=debug,

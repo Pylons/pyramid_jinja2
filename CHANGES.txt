@@ -1,4 +1,4 @@
-3.0 (unreleased)
+2.0.2 (unreleased)
 ================
 
 - The path of the child template is always considered when inheriting from
@@ -11,8 +11,8 @@
   of being found on the search path. [mmerickel]
 
 - This release restores the default search path behaviors from the 1.x series
-  that were inadvertently removed in the 2.x series and makes it more explicit
-  what the search paths are and to what are they relative. [mmerickel]
+  that were inadvertently removed in the 2.x. The project's root package is
+  added to the search path by default. [mmerickel]
 
 2.0.1 (2014-04-23)
 ==================
