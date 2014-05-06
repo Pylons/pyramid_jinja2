@@ -612,9 +612,9 @@ More Information
 .. toctree::
    :maxdepth: 1
 
-   glossary.rst
    api.rst
    changes.rst
+   glossary.rst
 
 Reporting Bugs / Development Versions
 =====================================
