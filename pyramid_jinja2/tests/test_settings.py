@@ -49,7 +49,7 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
         options = self._callFUT({}, 'p.', None, None)
         self.assertEqual(options['debug'], False)
         self.assertEqual(options['encoding'], 'utf-8')
-        self.assertEqual(options['searchpath'], [''])
+        self.assertEqual(len(options['searchpath']), 1)
 
     def test_options(self):
         options = self._callFUT(

@@ -54,7 +54,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             })
         renderer = self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.loader.searchpath, ['', self.templates_dir])
+        self.assertEqual(environ.loader.searchpath[1:], [self.templates_dir])
         self.assertTrue(renderer.template_loader is not None)
 
     def test_composite_directories_path(self):
@@ -68,8 +68,8 @@ class Test_renderer_factory(Base, unittest.TestCase):
             })
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.loader.searchpath,
-                         [''] + [self.templates_dir] * 2)
+        self.assertEqual(environ.loader.searchpath[1:],
+                         [self.templates_dir] * 2)
 
     def test_with_environ(self):
         from pyramid_jinja2 import IJinja2Environment
