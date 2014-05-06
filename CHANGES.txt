@@ -1,5 +1,5 @@
-2.0.2 (unreleased)
-================
+2.0.2 (2014-05-06)
+==================
 
 - The path of the child template is always considered when inheriting from
   a base template. Therefore when doing ``render('templates/foo.jinja2')``
