@@ -54,7 +54,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             })
         renderer = self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.loader.searchpath[1:], [self.templates_dir])
+        self.assertEqual(environ.loader.searchpath, [self.templates_dir])
         self.assertTrue(renderer.template_loader is not None)
 
     def test_composite_directories_path(self):
@@ -68,8 +68,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             })
         self._callFUT(info)
         environ = self.config.registry.getUtility(IJinja2Environment)
-        self.assertEqual(environ.loader.searchpath[1:],
-                         [self.templates_dir] * 2)
+        self.assertEqual(environ.loader.searchpath, [self.templates_dir] * 2)
 
     def test_with_environ(self):
         from pyramid_jinja2 import IJinja2Environment
@@ -391,21 +390,25 @@ class Test_add_jinja2_searchpath(unittest.TestCase):
         config.add_settings({'jinja2.directories': 'foobar'})
         includeme(config)
         env = config.get_jinja2_environment()
+        self.assertEqual(len(env.loader.searchpath), 2)
         self.assertEqual(
-            [x.split(os.sep)[-2:] for x in env.loader.searchpath][0],
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath][0],
+            ['pyramid_jinja2', 'tests', 'foobar'])
+        self.assertEqual(
+            [x.split(os.sep)[-2:] for x in env.loader.searchpath][1],
             ['pyramid_jinja2', 'tests'])
-        self.assertEqual(
-            [x.split(os.sep)[-3:] for x in env.loader.searchpath][1:],
-            [['pyramid_jinja2', 'tests', 'foobar']])
 
         config.add_jinja2_search_path('grrr')
+        self.assertEqual(len(env.loader.searchpath), 3)
         self.assertEqual(
-            [x.split(os.sep)[-2:] for x in env.loader.searchpath][0],
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath][0],
+            ['pyramid_jinja2', 'tests', 'foobar'])
+        self.assertEqual(
+            [x.split(os.sep)[-2:] for x in env.loader.searchpath][1],
             ['pyramid_jinja2', 'tests'])
         self.assertEqual(
-            [x.split(os.sep)[-3:] for x in env.loader.searchpath][1:],
-            [['pyramid_jinja2', 'tests', 'foobar'],
-             ['pyramid_jinja2', 'tests', 'grrr']])
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath][2],
+            ['pyramid_jinja2', 'tests', 'grrr'])
 
 
 class Test_get_jinja2_environment(unittest.TestCase):

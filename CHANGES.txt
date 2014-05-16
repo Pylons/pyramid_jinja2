@@ -1,3 +1,18 @@
+next release
+============
+
+- The 2.0 series started adding the package that invoked
+  ``config.add_jinja2_renderer`` to the template search path. This is
+  being removed in favor of explicit search paths and will hopefully not
+  affect many people as it has only been available for a couple weeks. The
+  only automatic search path left is the one added by the default ``.jinja2``
+  renderer created when including ``pyramid_jinja2``. [mmerickel]
+
+- Adjust the ``config.include('pyramid_jinja2')`` to add any packages from
+  ``jinja2.directories`` **before** the default search path at the base of
+  the app. Previously there was no way to override that search path.
+  [mmerickel]
+
 2.0.2 (2014-05-06)
 ==================
 
