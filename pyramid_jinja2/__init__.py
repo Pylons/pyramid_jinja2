@@ -253,9 +253,9 @@ def add_jinja2_search_path(config, searchpath, name='.jinja2'):
 
        config.add_jinja2_search_path('anotherpackage:templates/')
 
-    It will add the directory or :term:`asset spec` passed as ``searchpath``
-    to the current search path of the :class:`jinja2.Environment` used
-    by the renderer identified by ``name``.
+    It will add the directory or :term:`asset specification` passed as
+    ``searchpath`` to the current search path of the
+    :class:`jinja2.Environment` used by the renderer identified by ``name``.
 
     """
     def register():
