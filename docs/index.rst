@@ -122,14 +122,6 @@ asset specifications. Later another package can externally override the
 templates without having to actually modify the addon in any way. See
 :ref:`pyramid:overriding_assets_section` for more information.
 
-.. note::
-
-   All lookup mechanisms in `pyramid_jinja2` actually convert a requested
-   template into an :term:`asset specification` underneath the hood except
-   for absolute paths. This means that it's almost always possible to
-   override the actual templates in an addon package without having to fork
-   the addon itself.
-
 Caller-Relative Template Lookup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -159,6 +151,21 @@ would be relative to that module on the filesystem, as shown below::
 
 Caller-relative lookup avoids naming collisions which can be common in a
 search path-based approach.
+
+A caller-relative template lookup is converted to a :term:`asset specification`
+underneath the hood. This means that it's almost always possible to override
+the actual template in an addon package without having to fork the addon
+itself. For example, the full asset spec for the view above would be
+``myapp.admin.views:templates/mytemplate.jinja2``. This template, or the
+entire ``templates`` folder may be overridden.
+
+.. code-block:: python
+
+   config.override_asset(
+       to_override='myapp.admin.views:templates/mytemplate.jinja2',
+       override_with='yourapp:templates/sometemplate.jinja2')
+
+See :ref:`pyramid:overriding_assets_section` for more information.
 
 Search Path-Based Template Lookup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -195,9 +202,10 @@ configuration file will include the following directive::
 
 .. note::
 
-   The package that includes `pyramid_jinja2` or the package that adds a new
-   renderer via :func:`pyramid_jinja2.add_jinja2_renderer` will always be added
-   to the search path.
+   The package that includes `pyramid_jinja2` will always be added
+   to the search path (in most cases this is top-level package in your
+   application). This behavior may be deprecated or removed in the future,
+   it is always better to specify your search path explicitly.
 
 Templates Extending Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
