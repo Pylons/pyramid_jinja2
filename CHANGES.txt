@@ -1,5 +1,5 @@
-next release
-============
+2.1 (2014-05-16)
+================
 
 - The 2.0 series started adding the package that invoked
   ``config.add_jinja2_renderer`` to the template search path. This is
