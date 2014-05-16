@@ -410,3 +410,7 @@ def includeme(config):
 
     package = _caller_package(('pyramid', 'pyramid.', 'pyramid_jinja2'))
     config.add_jinja2_renderer('.jinja2', package=package)
+
+    # always insert default search path relative to package
+    default_search_path = '%s:' % (package.__name__,)
+    config.add_jinja2_search_path(default_search_path, name='.jinja2')
