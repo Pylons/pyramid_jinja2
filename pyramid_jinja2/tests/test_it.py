@@ -393,17 +393,17 @@ class Test_add_jinja2_searchpath(unittest.TestCase):
             [x.split(os.sep)[-2:] for x in env.loader.searchpath][1],
             ['pyramid_jinja2', 'tests'])
 
-        config.add_jinja2_search_path('grrr')
+        config.add_jinja2_search_path('grrr', prepend=True)
         self.assertEqual(len(env.loader.searchpath), 3)
         self.assertEqual(
             [x.split(os.sep)[-3:] for x in env.loader.searchpath][0],
+            ['pyramid_jinja2', 'tests', 'grrr'])
+        self.assertEqual(
+            [x.split(os.sep)[-3:] for x in env.loader.searchpath][1],
             ['pyramid_jinja2', 'tests', 'foobar'])
         self.assertEqual(
-            [x.split(os.sep)[-2:] for x in env.loader.searchpath][1],
+            [x.split(os.sep)[-2:] for x in env.loader.searchpath][2],
             ['pyramid_jinja2', 'tests'])
-        self.assertEqual(
-            [x.split(os.sep)[-3:] for x in env.loader.searchpath][2],
-            ['pyramid_jinja2', 'tests', 'grrr'])
 
 
 class Test_get_jinja2_environment(unittest.TestCase):

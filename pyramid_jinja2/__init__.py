@@ -266,7 +266,7 @@ deprecated(
     'config.add_jinja2_renderer() API.')
 
 
-def add_jinja2_search_path(config, searchpath, name='.jinja2'):
+def add_jinja2_search_path(config, searchpath, name='.jinja2', prepend=False):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -280,13 +280,20 @@ def add_jinja2_search_path(config, searchpath, name='.jinja2'):
     ``searchpath`` to the current search path of the
     :class:`jinja2.Environment` used by the renderer identified by ``name``.
 
+    By default the path is appended to the end of the search path. If
+    ``prepend`` is set to ``True`` then the path will be inserted at the start
+    of the search path.
+
     """
     def register():
         env = get_jinja2_environment(config, name)
         searchpaths = parse_multiline(searchpath)
         for folder in searchpaths:
-            env.loader.searchpath.append(
-                abspath_from_asset_spec(folder, config.package))
+            path = abspath_from_asset_spec(folder, config.package)
+            if prepend:
+                env.loader.searchpath.insert(0, path)
+            else:
+                env.loader.searchpath.append(path)
     config.action(None, register, order=EXTRAS_CONFIG_PHASE)
 
 

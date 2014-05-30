@@ -6,6 +6,10 @@ next release
   parent template. If not found, the lookup will fallback to the search path.
   [mmerickel]
 
+- Add ``prepend`` option to ``config.add_jinja2_search_path`` to allow
+  prepending of paths to the beginning of the search path if a path should
+  override previously defined paths.
+
 2.1 (2014-05-16)
 ================
 
