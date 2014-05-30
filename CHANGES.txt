@@ -1,5 +1,5 @@
-next release
-============
+2.2 (2014-05-30)
+================
 
 - #88: Formalize template loading order and allow all lookups to fallback to
   the search path. A template is now always searched for relative to its
