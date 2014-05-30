@@ -1,3 +1,11 @@
+next release
+============
+
+- #88: Formalize template loading order and allow all lookups to fallback to
+  the search path. A template is now always searched for relative to its
+  parent template. If not found, the lookup will fallback to the search path.
+  [mmerickel]
+
 2.1 (2014-05-16)
 ================
 

@@ -215,12 +215,20 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         result = render('extends_abs.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
-    def test_relative_tmpl_extends_relbase(self):
+    def test_tmpl_extends_relbase(self):
         from pyramid.renderers import render
         # this should pass as it will fallback to the new search path
         # and find it from there
         self.config.add_jinja2_search_path('pyramid_jinja2.tests:')
         result = render('extends_relbase.jinja2', {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+
+    def test_caller_relative_tmpl_extends_relbase(self):
+        from pyramid.renderers import render
+        # this should pass as it will fallback to the new search path
+        # and find it from there
+        self.config.add_jinja2_search_path('pyramid_jinja2.tests:')
+        result = render('templates/extends_relbase.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
 
@@ -231,19 +239,6 @@ class TestIntegrationDefaultSearchPath(SearchPathTests, unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-
-    def test_relative_tmpl_extends_relbase(self):
-        from jinja2 import TemplateNotFound
-        from pyramid.renderers import render
-        # this should fail because the relative lookup will search for
-        # templates/templates/extends_relbase.jinja2
-        try:
-            render('templates/extends_relbase.jinja2', {'a': 1})
-        except TemplateNotFound as ex:
-            self.assertTrue(
-                'templates/templates/helloworld.jinja2' in ex.message)
-        else: # pragma: no cover
-            raise AssertionError
 
 
 class TestIntegrationReloading(unittest.TestCase):
@@ -589,7 +584,7 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
         testapp = TestApp(app2)
         self.assertEqual(testapp.get('/').body, bytes_('bar'))
 
-    def test_it_relative(self):
+    def test_it_relative_to_template(self):
         from pyramid.config import Configurator
         from pyramid_jinja2 import includeme
         from webtest import TestApp
