@@ -1,3 +1,27 @@
+2.3 (2014-05-30)
+================
+
+- Require ``pyramid_jinja2`` to be included even when using
+  ``pyramid_jinja2.renderer_factory``. It is now a thin wrapper around the
+  default renderer and can be used to share the same settings with another
+  file extension. [mmerickel]
+
+Backward Incompatible Changes
+-----------------------------
+
+- ``pyramid_jinja2`` **must** be included into the ``Configurator`` in order
+  to use ``pyramid_jinja2.renderer_factory`` otherwise you may see the
+  exception::
+
+    ValueError: As of pyramid_jinja2 2.3, the use of the
+    "pyramid_jinja2.renderer_factory" requires that pyramid_jinja2 be
+    configured via config.include("pyramid_jinja2") or the equivalent
+    "pyramid.includes" setting.
+
+  The fix is to include ``pyramid_jinja2``::
+
+    config.include('pyramid_jinja2')
+
 2.2 (2014-05-30)
 ================
 
@@ -8,7 +32,7 @@
 
 - Add ``prepend`` option to ``config.add_jinja2_search_path`` to allow
   prepending of paths to the beginning of the search path if a path should
-  override previously defined paths.
+  override previously defined paths. [mmerickel]
 
 2.1 (2014-05-16)
 ================

@@ -2,7 +2,6 @@ import inspect
 import os
 import posixpath
 import sys
-import threading
 
 from jinja2 import Environment as _Jinja2Environment
 
@@ -227,33 +226,15 @@ class Jinja2RendererFactory(object):
         return Jinja2TemplateRenderer(template_loader)
 
 
-_factory_lock = threading.Lock()
-
-
 def renderer_factory(info):
-    _factory_lock.acquire()
-    try:
-        registry = info.registry
-        env = registry.queryUtility(IJinja2Environment)
-        if env is None:
-            resolver = DottedNameResolver(package=info.package)
-            loader_opts = parse_loader_options_from_settings(
-                registry.settings,
-                'jinja2.',
-                resolver.maybe_resolve,
-                info.package,
-            )
-            env_opts = parse_env_options_from_settings(
-                registry.settings,
-                'jinja2.',
-                resolver.maybe_resolve,
-                info.package
-            )
-            env = create_environment_from_options(env_opts, loader_opts)
-            registry.registerUtility(env, IJinja2Environment)
-    finally:
-        _factory_lock.release()
-
+    registry = info.registry
+    env = registry.queryUtility(IJinja2Environment, name='.jinja2')
+    if env is None:
+        raise ValueError(
+            'As of pyramid_jinja2 2.3, the use of the '
+            '"pyramid_jinja2.renderer_factory" requires that pyramid_jinja2 '
+            'be configured via config.include("pyramid_jinja2") or the '
+            'equivalent "pyramid.includes" setting.')
     factory = Jinja2RendererFactory()
     factory.environment = env
     return factory(info)
