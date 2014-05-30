@@ -171,8 +171,8 @@ Search Path-Based Template Lookup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When used outside of Pyramid, Jinja2's default lookup mechanism is a search
-path. To use this mechanism within Pyramid, simply define the search path
-using the ``jinja2.directories`` configuration setting or the
+path. To use a search path within Pyramid, simply define the
+``jinja2.directories`` configuration setting or use the
 :func:`~pyramid_jinja2.add_jinja2_search_path` configurator directive.
 
 Rendering :term:`Jinja2` templates with a search path is typically done as
@@ -207,17 +207,20 @@ configuration file will include the following directive::
    application). This behavior may be deprecated or removed in the future,
    it is always better to specify your search path explicitly.
 
-Templates Extending Templates
+Templates Including Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :term:`Jinja2` allows :term:`template inheritance` as well as other mechanisms
 for templates to load each other. The lookup mechanisms supported in these
-cases include asset specifications and template-relative names. The search
-path will also be consulted, but the name of the requested template will
-always be mounted with respect to its child. For example if you had a template
-named ``templates/child.jinja2`` that wanted to extend
-``templates/base.jinja2`` then it would use ``{% extends 'base.jinja2' %}``
-and locate the file relative to itself.
+cases include asset specifications, template-relative names and normal
+template names found on the search path. The search path will always be
+consulted if a template cannot be found relative to the parent
+template. For example if you had a template named ``templates/child.jinja2``
+that wanted to extend ``templates/base.jinja2`` then it could use
+``{% extends 'base.jinja2' %}`` and locate the file relative to itself **or**
+it could use ``{% extends 'templates/base.jinja2' %}`` to find the template
+in a ``templates`` subfolder rooted on the search path. The template-relative
+option will always override the search path.
 
 An example:
 
