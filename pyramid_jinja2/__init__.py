@@ -26,6 +26,7 @@ from .settings import (
 
 ENV_CONFIG_PHASE = 0
 EXTRAS_CONFIG_PHASE = 1
+PARENT_RELATIVE_DELIM = '@@FROM_PARENT@@'
 
 
 class IJinja2Environment(Interface):
@@ -38,15 +39,8 @@ class Environment(_Jinja2Environment):
             # we have an asset spec or absolute path
             return uri
 
-        # make template lookup parent-relative
-        if not os.path.isabs(parent) and ':' in parent:
-            # parent is an asset spec
-            ppkg, ppath = parent.split(':', 1)
-            reluri = posixpath.join(posixpath.dirname(ppath), uri)
-            return '{0}:{1}'.format(ppkg, reluri)
-
-        # parent is just a normal path
-        return posixpath.join(posixpath.dirname(parent), uri)
+        # uri may be relative to the parent, shuffle it through to the loader
+        return uri + PARENT_RELATIVE_DELIM + parent
 
 
 class FileInfo(object):
@@ -146,17 +140,45 @@ class SmartAssetSpecLoader(FileSystemLoader):
     def list_templates(self):
         raise TypeError('this loader cannot iterate over all templates')
 
+    def _get_absolute_source(self, template):
+        filename = abspath_from_asset_spec(template)
+        fi = FileInfo(filename, self.encoding)
+        if os.path.isfile(fi.filename):
+            return fi.contents, fi.filename, fi.uptodate
+
     def get_source(self, environment, template):
         # keep legacy asset: prefix checking that bypasses
         # source path checking altogether
         if template.startswith('asset:'):
             template = template[6:]
 
+        # check for potentially template-relative include
+        parts = template.split(PARENT_RELATIVE_DELIM, 1)
+        parent = None
+        if len(parts) == 2:
+            template, parent = parts
+
+            if not os.path.isabs(parent) and ':' in parent:
+                # parent is an asset spec
+                ppkg, ppath = parent.split(':', 1)
+                _uri = posixpath.join(posixpath.dirname(ppath), template)
+                uri = '{0}:{1}'.format(ppkg, _uri)
+                src = self._get_absolute_source(uri)
+                if src is not None:
+                    return src
+
+            elif not os.path.isabs(template):
+                # parent is an ordinary file
+                uri = os.path.join(os.path.dirname(parent), template)
+                try:
+                    return FileSystemLoader.get_source(self, environment, uri)
+                except TemplateNotFound:
+                    pass
+
         # load template directly from the filesystem
-        filename = abspath_from_asset_spec(template)
-        fi = FileInfo(filename, self.encoding)
-        if os.path.isfile(fi.filename):
-            return fi.contents, fi.filename, fi.uptodate
+        src = self._get_absolute_source(template)
+        if src is not None:
+            return src
 
         # fallback to search-path lookup
         try:
@@ -165,6 +187,8 @@ class SmartAssetSpecLoader(FileSystemLoader):
             message = ex.message
             message += ('; asset=%s; searchpath=%r'
                         % (template, self.searchpath))
+            if parent is not None:
+                message += ('; parent=%s' % (parent,))
             raise TemplateNotFound(name=ex.name, message=message)
 
 
@@ -190,15 +214,14 @@ class Jinja2RendererFactory(object):
         name, package = info.name, info.package
 
         def template_loader():
-            # first try a caller-relative template if possible
-            try:
-                if ':' not in name and package is not None:
+            # attempt to turn the name into a caller-relative asset spec
+            if ':' not in name and package is not None:
+                try:
                     name_with_package = '%s:%s' % (package.__name__, name)
                     return self.environment.get_template(name_with_package)
-            except TemplateNotFound:
-                pass
+                except TemplateNotFound:
+                    pass
 
-            # fallback to search path
             return self.environment.get_template(name)
 
         return Jinja2TemplateRenderer(template_loader)
