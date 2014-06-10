@@ -145,50 +145,101 @@ class SmartAssetSpecLoader(FileSystemLoader):
         if os.path.isfile(fi.filename):
             return fi.contents, fi.filename, fi.uptodate
 
+    def _relative_searchpath(self, chain):
+        """ Combine paths in the chain to construct search paths.
+
+        The precedence is for the most-specific paths to be tested first,
+        anchored at an absolute path or asset spec. From there, less-specific
+        paths are tested.
+
+        For example::
+            chain = [
+                '../forms.jinja2', 'sub/nav.jinja2',
+                'base.jinja2', 'myapp:templates/index.jinja2',
+            ]
+            searchpath = ['myapp:templates/sub/..', 'sub/..', '..', '']
+        """
+        # the initial empty string is important because not only does it allow
+        # the stack to always contain something join, but it allows the
+        # later for-loops to fallback to the original search path by
+        # joining to an empty string since os.path.join('', 'foo') == 'foo'
+        stack = ['']
+        for path in chain:
+            is_abspath = os.path.isabs(path)
+            is_spec = not is_abspath and ':' in path
+
+            if is_abspath:
+                path = os.path.dirname(path)
+            elif is_spec:
+                ppkg, ppath = path.split(':', 1)
+                path = '{0}:{1}'.format(ppkg, posixpath.dirname(ppath))
+            else:
+                # this should split windows and posix paths
+                path = os.path.dirname(path)
+
+            if not path:
+                # skip empty directories
+                continue
+
+            subpath = stack[-1]
+            path = os.path.join(path, subpath)
+            stack.append(path)
+
+            # do not continue further, all paths are relative to this
+            if is_abspath or is_spec:
+                break
+        return list(reversed(stack[1:]))
+
     def get_source(self, environment, template):
         # keep legacy asset: prefix checking that bypasses
         # source path checking altogether
         if template.startswith('asset:'):
             template = template[6:]
 
-        # check for potentially template-relative include
-        parts = template.split(PARENT_RELATIVE_DELIM, 1)
-        parent = None
-        if len(parts) == 2:
-            template, parent = parts
+        # split the template into the chain of relative-imports
+        rel_chain = template.split(PARENT_RELATIVE_DELIM)
+        template, rel_chain = rel_chain[0], rel_chain[1:]
 
-            if not os.path.isabs(parent) and ':' in parent:
+        # load the template directly if it's an absolute path or asset spec
+        if os.path.isabs(template) or ':' in template:
+            src = self._get_absolute_source(template)
+            if src is not None:
+                return src
+            else:
+                # fallback to the search path just incase
+                return FileSystemLoader.get_source(self, environment, template)
+
+        # try to import the template as an asset spec or absolute path
+        # relative to its parents
+        rel_searchpath = self._relative_searchpath(rel_chain)
+        for parent in rel_searchpath:
+            if os.path.isabs(parent):
+                uri = os.path.join(parent, template)
+                src = self._get_absolute_source(uri)
+                if src is not None:
+                    return src
+            # avoid doing "':' in" and then redundant "split"
+            parts = parent.split(':', 1)
+            if len(parts) > 1:
                 # parent is an asset spec
-                ppkg, ppath = parent.split(':', 1)
-                _uri = posixpath.join(posixpath.dirname(ppath), template)
-                uri = '{0}:{1}'.format(ppkg, _uri)
+                ppkg, ppath = parts
+                ppath = posixpath.join(ppath, template)
+                uri = '{0}:{1}'.format(ppkg, ppath)
                 src = self._get_absolute_source(uri)
                 if src is not None:
                     return src
 
-            elif not os.path.isabs(template):
-                # parent is an ordinary file
-                uri = os.path.join(os.path.dirname(parent), template)
-                try:
-                    return FileSystemLoader.get_source(self, environment, uri)
-                except TemplateNotFound:
-                    pass
+        # try to load the template from the default search path
+        for parent in rel_searchpath:
+            try:
+                uri = os.path.join(parent, template)
+                return FileSystemLoader.get_source(self, environment, uri)
+            except TemplateNotFound as ex:
+                message = ex.message
 
-        # load template directly from the filesystem
-        src = self._get_absolute_source(template)
-        if src is not None:
-            return src
-
-        # fallback to search-path lookup
-        try:
-            return FileSystemLoader.get_source(self, environment, template)
-        except TemplateNotFound as ex:
-            message = ex.message
-            message += ('; asset=%s; searchpath=%r'
-                        % (template, self.searchpath))
-            if parent is not None:
-                message += ('; parent=%s' % (parent,))
-            raise TemplateNotFound(name=ex.name, message=message)
+        searchpath = filter(None, rel_searchpath) + self.searchpath
+        message += '; asset=%s; searchpath=%r' % (template, searchpath)
+        raise TemplateNotFound(name=ex.name, message=message)
 
 
 class Jinja2TemplateRenderer(object):
