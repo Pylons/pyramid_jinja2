@@ -186,6 +186,18 @@ class SearchPathTests(object):
                         {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
+    def test_asset_tmpl_deep_sub_leaf(self):
+        from pyramid.renderers import render
+        result = render('pyramid_jinja2.tests:templates/deep/sub/leaf.jinja2', {})
+        self.assertEqual(result, text_('deep-base sub-base sub-leaf', 'utf-8'))
+
+    def test_asset_tmpl_deep_leaf(self):
+        from pyramid.renderers import render
+        result = render('pyramid_jinja2.tests:templates/deep/leaf.jinja2', {})
+        self.assertEqual(
+            result,
+            text_('sub-nav\n\ndeep-formsdeep-base deep-leaf', 'utf-8'))
+
     def test_abs_tmpl_extends_missing(self):
         import os.path
         from jinja2 import TemplateNotFound

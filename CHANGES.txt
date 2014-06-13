@@ -1,3 +1,11 @@
+next release
+============
+
+- Improve the template-relative searchpath logic to search more possibilities
+  in the include-chain built up from templates including or extending
+  other templates. The logic for when the chain was longer than just one
+  template including another template was broken.
+
 2.3 (2014-05-30)
 ================
 
