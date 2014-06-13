@@ -1,3 +1,9 @@
+2.3.2 (2014-06-13)
+==================
+
+- Fix 2.3.1 brownbag release. It had some erroneous didn't-mean-to-push
+  changes that are now solved. Brought coverage back up to 100%.
+
 2.3.1 (2014-06-13)
 ==================
 
