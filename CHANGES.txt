@@ -1,5 +1,5 @@
-next release
-============
+2.3.1 (2014-06-13)
+==================
 
 - Improve the template-relative searchpath logic to search more possibilities
   in the include-chain built up from templates including or extending
