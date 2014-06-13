@@ -163,9 +163,9 @@ class SearchPathTests(object):
         result = render('templates/extends.jinja2', {})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
-    def test_relative_tmpl_extends_abs(self):
+    def test_relative_tmpl_extends_spec(self):
         from pyramid.renderers import render
-        result = render('templates/extends_abs.jinja2', {'a': 1})
+        result = render('templates/extends_spec.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
     def test_asset_tmpl_helloworld(self):
@@ -180,9 +180,9 @@ class SearchPathTests(object):
                         {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
-    def test_asset_tmpl_extends_abs(self):
+    def test_asset_tmpl_extends_spec(self):
         from pyramid.renderers import render
-        result = render('pyramid_jinja2.tests:templates/extends_abs.jinja2',
+        result = render('pyramid_jinja2.tests:templates/extends_spec.jinja2',
                         {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
@@ -197,6 +197,14 @@ class SearchPathTests(object):
         self.assertEqual(
             result,
             text_('sub-nav\n\ndeep-formsdeep-base deep-leaf', 'utf-8'))
+
+    def test_abs_tmpl_extends(self):
+        import os.path
+        from pyramid.renderers import render
+        here = os.path.abspath(os.path.dirname(__file__))
+        result = render(os.path.join(here, 'templates', 'extends.jinja2'),
+                        {'a': 1})
+        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
     def test_abs_tmpl_extends_missing(self):
         import os.path
@@ -231,9 +239,9 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         result = render('extends.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
-    def test_tmpl_extends_abs(self):
+    def test_tmpl_extends_spec(self):
         from pyramid.renderers import render
-        result = render('extends_abs.jinja2', {'a': 1})
+        result = render('extends_spec.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
     def test_tmpl_extends_relbase(self):
