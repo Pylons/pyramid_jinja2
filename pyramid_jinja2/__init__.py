@@ -188,7 +188,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
             # do not continue further, all paths are relative to this
             if is_abspath or is_spec:
                 break
-        return list(reversed(stack[1:]))
+        return list(reversed(stack))
 
     def get_source(self, environment, template):
         # keep legacy asset: prefix checking that bypasses
@@ -237,9 +237,9 @@ class SmartAssetSpecLoader(FileSystemLoader):
             except TemplateNotFound as ex:
                 message = ex.message
 
-        searchpath = filter(None, rel_searchpath) + self.searchpath
-        message += '; asset=%s; searchpath=%r' % (template, searchpath)
-        raise TemplateNotFound(name=ex.name, message=message)
+        searchpath = [p for p in rel_searchpath if p] + self.searchpath
+        message += '; searchpath={0}'.format(searchpath)
+        raise TemplateNotFound(name=template, message=message)
 
 
 class Jinja2TemplateRenderer(object):
