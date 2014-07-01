@@ -168,9 +168,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
             is_abspath = os.path.isabs(path)
             is_spec = not is_abspath and ':' in path
 
-            if is_abspath:
-                path = os.path.dirname(path)
-            elif is_spec:
+            if not is_abspath and is_spec:
                 ppkg, ppath = path.split(':', 1)
                 path = '{0}:{1}'.format(ppkg, posixpath.dirname(ppath))
             else:
