@@ -232,15 +232,15 @@ class SmartAssetSpecLoader(FileSystemLoader):
             try:
                 uri = os.path.join(parent, template)
                 return FileSystemLoader.get_source(self, environment, uri)
-            except TemplateNotFound as ex:
-                message = ex.message
+            except TemplateNotFound:
+                pass
 
         # we're here because of an exception during the last step so extend
         # the message and raise an appropriate error
         # there should always be an exception because the rel_searchpath is
         # guaranteed to contain at least one element ('')
         searchpath = [p for p in rel_searchpath if p] + self.searchpath
-        message += '; searchpath={0}'.format(searchpath)
+        message = '{0}; searchpath={1}'.format(template, searchpath)
         raise TemplateNotFound(name=template, message=message)
 
 
