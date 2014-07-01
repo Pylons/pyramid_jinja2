@@ -213,9 +213,11 @@ class SmartAssetSpecLoader(FileSystemLoader):
         for parent in rel_searchpath:
             if os.path.isabs(parent):
                 uri = os.path.join(parent, template)
-                src = self._get_absolute_source(uri)
-                if src is not None:
-                    return src
+                # avoid recursive includes
+                if uri not in rel_chain:
+                    src = self._get_absolute_source(uri)
+                    if src is not None:
+                        return src
             # avoid doing "':' in" and then redundant "split"
             parts = parent.split(':', 1)
             if len(parts) > 1:
@@ -223,15 +225,19 @@ class SmartAssetSpecLoader(FileSystemLoader):
                 ppkg, ppath = parts
                 ppath = posixpath.join(ppath, template)
                 uri = '{0}:{1}'.format(ppkg, ppath)
-                src = self._get_absolute_source(uri)
-                if src is not None:
-                    return src
+                # avoid recursive includes
+                if uri not in rel_chain:
+                    src = self._get_absolute_source(uri)
+                    if src is not None:
+                        return src
 
         # try to load the template from the default search path
         for parent in rel_searchpath:
             try:
                 uri = os.path.join(parent, template)
-                return FileSystemLoader.get_source(self, environment, uri)
+                # avoid recursive includes
+                if uri not in rel_chain:
+                    return FileSystemLoader.get_source(self, environment, uri)
             except TemplateNotFound:
                 pass
 
