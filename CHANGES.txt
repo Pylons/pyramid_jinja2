@@ -182,7 +182,7 @@ Backward Incompatible Changes
 ================
 
 - #56: python3.3: Non-ASCII characters in changelog breaks pip installation
-  [Domen Kožar]
+  [Domen Kozar]
 
 - #57: Remove useless warning: `DeprecationWarning: reload_templates setting
   is deprecated, use pyramid.reload_templates instead.`
@@ -194,24 +194,24 @@ Backward Incompatible Changes
 
 - Set `jinja2.i18n.domain` default to the package name
   of the pyramid application.
-  [Domen Kožar]
+  [Domen Kozar]
 
 - Add `jinja2.globals` setting to add global objects into 
   the template context
   [Eugene Fominykh]
 
 - Add `jinja2.newstyle` setting to enable newstyle gettext calls
-  [Thomas Schüßler]
+  [Thomas Schussler]
 
 1.5 (2012-11-24)
 ================
 
 - Add `pyramid.reload_templates` to set `jinja2.auto_reload` instead of
   using `reload_templates`. Deprecate the latter.
-  [Domen Kožar]
+  [Domen Kozar]
 
 - Clear bytecode cache on atexit
-  [Domen Kožar]
+  [Domen Kozar]
 
 - Add support for more Jinja2 options. Note support for jinja2.autoescape is
   limited to boolean only.
@@ -239,11 +239,11 @@ Backward Incompatible Changes
   [Robert Buchholz]
 
 - Remove redundant decoding error handling
-  [Domen Kožar]
+  [Domen Kozar]
 
 - Configure bytecode caching by default. Introduce `jinja2.bytecode_caching`
   and `jinja2.bytecode_caching_directory` settings.
-  [Domen Kožar]
+  [Domen Kozar]
 
 - Allow to add custom Jinja2 tests in `jinja2.tests` setting.
   [Sebastian Kalinowski]
@@ -252,7 +252,7 @@ Backward Incompatible Changes
 ==================
 
 - Fix brown-bag release
-  [Domen Kožar]
+  [Domen Kozar]
 
 
 1.4 (2012-09-12)
@@ -260,13 +260,13 @@ Backward Incompatible Changes
 
 - Correctly resolve relative search paths passed to ``add_jinja2_search_path``
   and ``jinja2.directories``
-  [Domen Kožar]
+  [Domen Kozar]
 
 - #34: Don't recreate ``jinja2.Environment`` for ``add_jinja2_extension``
-  [Domen Kožar]
+  [Domen Kozar]
 
 - Drop Python 2.5 compatibility
-  [Domen Kožar]
+  [Domen Kozar]
 
 - Addition of ``static_url`` filter.
 
