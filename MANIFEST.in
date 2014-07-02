@@ -1,3 +1,4 @@
 graft pyramid_jinja2
 graft docs
+prune docs/_themes/.git
 include *.txt *.ini *.rst
