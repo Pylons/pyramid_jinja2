@@ -1,5 +1,5 @@
-unreleased
-==========
+2.3.3 (2014-07-01)
+==================
 
 - #91: Fix a recursion error while attempting to include a template with the
   same name as one of the parents that was already loaded. [mmerickel]
