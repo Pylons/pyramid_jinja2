@@ -260,6 +260,14 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         result = render('templates/extends_relbase.jinja2', {'a': 1})
         self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
 
+    def test_recursive_tmpl(self):
+        from pyramid.renderers import render
+        self.config.add_jinja2_renderer('.html')
+        self.config.add_jinja2_search_path(
+            'pyramid_jinja2.tests:templates/recursive', name='.html')
+        result = render('admin/index.html', {})
+        self.assertEqual(result, text_('foo'))
+
 
 class TestIntegrationDefaultSearchPath(SearchPathTests, unittest.TestCase):
     def setUp(self):

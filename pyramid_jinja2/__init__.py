@@ -168,9 +168,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
             is_abspath = os.path.isabs(path)
             is_spec = not is_abspath and ':' in path
 
-            if is_abspath:
-                path = os.path.dirname(path)
-            elif is_spec:
+            if not is_abspath and is_spec:
                 ppkg, ppath = path.split(':', 1)
                 path = '{0}:{1}'.format(ppkg, posixpath.dirname(ppath))
             else:
@@ -215,9 +213,11 @@ class SmartAssetSpecLoader(FileSystemLoader):
         for parent in rel_searchpath:
             if os.path.isabs(parent):
                 uri = os.path.join(parent, template)
-                src = self._get_absolute_source(uri)
-                if src is not None:
-                    return src
+                # avoid recursive includes
+                if uri not in rel_chain:
+                    src = self._get_absolute_source(uri)
+                    if src is not None:
+                        return src
             # avoid doing "':' in" and then redundant "split"
             parts = parent.split(':', 1)
             if len(parts) > 1:
@@ -225,20 +225,28 @@ class SmartAssetSpecLoader(FileSystemLoader):
                 ppkg, ppath = parts
                 ppath = posixpath.join(ppath, template)
                 uri = '{0}:{1}'.format(ppkg, ppath)
-                src = self._get_absolute_source(uri)
-                if src is not None:
-                    return src
+                # avoid recursive includes
+                if uri not in rel_chain:
+                    src = self._get_absolute_source(uri)
+                    if src is not None:
+                        return src
 
         # try to load the template from the default search path
         for parent in rel_searchpath:
             try:
                 uri = os.path.join(parent, template)
-                return FileSystemLoader.get_source(self, environment, uri)
-            except TemplateNotFound as ex:
-                message = ex.message
+                # avoid recursive includes
+                if uri not in rel_chain:
+                    return FileSystemLoader.get_source(self, environment, uri)
+            except TemplateNotFound:
+                pass
 
+        # we're here because of an exception during the last step so extend
+        # the message and raise an appropriate error
+        # there should always be an exception because the rel_searchpath is
+        # guaranteed to contain at least one element ('')
         searchpath = [p for p in rel_searchpath if p] + self.searchpath
-        message += '; searchpath={0}'.format(searchpath)
+        message = '{0}; searchpath={1}'.format(template, searchpath)
         raise TemplateNotFound(name=template, message=message)
 
 
