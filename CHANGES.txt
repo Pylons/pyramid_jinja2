@@ -1,4 +1,4 @@
-2.3.3 (2014-07-01)
+2.3.3 (2014-07-02)
 ==================
 
 - #91: Fix a recursion error while attempting to include a template with the
