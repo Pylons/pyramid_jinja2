@@ -140,7 +140,7 @@ Backward Incompatible Changes
 =================
 
 - #77: Change semantics of ``jinja2.bytecode_caching`` setting.  The new
-  default is false (no bytecode caching) — ``bytecode_caching`` must
+  default is false (no bytecode caching) -- ``bytecode_caching`` must
   explicitly be set to true to enable a filesystem bytecode cache.
   In addition, an atexit callback to clean the cache is no longer
   registered (as this seemed to defeat most of the purpose of having
