@@ -1,3 +1,9 @@
+unreleased
+==========
+
+- #91: Fix a recursion error while attempting to include a template with the
+  same name as one of the parents that was already loaded. [mmerickel]
+
 2.3.2 (2014-06-13)
 ==================
 
