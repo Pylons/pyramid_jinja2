@@ -294,7 +294,7 @@ class TestIntegrationReloading(unittest.TestCase):
         import os, tempfile, time
         from webtest import TestApp
 
-        _, path = tempfile.mkstemp('.jinja2')
+        fd, path = tempfile.mkstemp('.jinja2')
         try:
             with open(path, 'wb') as fp:
                 fp.write(b'foo')
@@ -313,6 +313,7 @@ class TestIntegrationReloading(unittest.TestCase):
             result = app.get('/').body
             self.assertEqual(result, b'bar')
         finally:
+            os.close(fd)
             os.unlink(path)
 
 
