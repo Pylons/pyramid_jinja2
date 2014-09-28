@@ -180,7 +180,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
                 continue
 
             subpath = stack[-1]
-            path = os.path.join(path, subpath)
+            path = posixpath.join(path, subpath)
             stack.append(path)
 
             # do not continue further, all paths are relative to this
