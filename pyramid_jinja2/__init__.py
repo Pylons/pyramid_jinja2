@@ -478,7 +478,11 @@ def includeme(config):
     config.add_directive('add_jinja2_extension', add_jinja2_extension)
     config.add_directive('get_jinja2_environment', get_jinja2_environment)
 
-    package = _caller_package(('pyramid', 'pyramid.', 'pyramid_jinja2'))
+    # use root_package if available in pyramid 1.6 and hopefully
+    # we can remove the _caller_package in the future
+    package = getattr(config, 'root_package', None)
+    if package is None:
+        package = _caller_package(('pyramid', 'pyramid.', 'pyramid_jinja2'))
     config.add_jinja2_renderer('.jinja2', package=package)
 
     # always insert default search path relative to package
