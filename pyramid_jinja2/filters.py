@@ -23,6 +23,15 @@ def model_url_filter(ctx, model, *elements, **kw):
 
 
 @contextfilter
+def model_path_filter(ctx, model, *elements, **kw):
+    """A filter from ``model`` to a string representing the relative URL.
+    This filter calls :py:meth:`pyramid.request.Request.resource_path`.
+    """
+    request = ctx.get('request') or get_current_request()
+    return request.resource_path(model, *elements, **kw)
+
+
+@contextfilter
 def route_url_filter(ctx, route_name, *elements, **kw):
     """A filter from ``route_name`` to a string representing the absolute URL.
     This filter calls :py:func:`pyramid.url.route_url`.
