@@ -1,5 +1,5 @@
 from pyramid.config import Configurator
-from {{package}}.models import get_root
+from {{package}}.resources import get_root
 
 
 def main(global_config, **settings):
