@@ -44,6 +44,22 @@ class Test_model_url_filter(Base, unittest.TestCase):
         rendered = self._callFUT({'model': model}, "{{model|model_url('edit')}}")
         self.assertEqual(rendered, 'http://example.com/dummy/edit')
 
+class Test_model__filter(Base, unittest.TestCase):
+
+    def _addFilters(self):
+        from pyramid_jinja2.filters import model_path_filter
+        self.environment.filters['model_path'] = model_path_filter
+
+    def test_filter(self):
+        model = DummyModel()
+        rendered = self._callFUT({'model': model}, '{{model|model_path}}')
+        self.assertEqual(rendered, '/dummy/')
+
+    def test_filter_with_elements(self):
+        model = DummyModel()
+        rendered = self._callFUT({'model': model}, "{{model|model_path('edit')}}")
+        self.assertEqual(rendered, '/dummy/edit')
+
 class Test_route_url_filter(Base, unittest.TestCase):
     def _addFilters(self):
         from pyramid_jinja2.filters import route_url_filter
