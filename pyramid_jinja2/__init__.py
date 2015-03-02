@@ -4,12 +4,14 @@ import posixpath
 import sys
 
 from jinja2 import Environment as _Jinja2Environment
+from jinja2 import Template as _Jinja2Template
 
 from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
 from jinja2.utils import open_if_exists
 
 from pyramid.asset import abspath_from_asset_spec
+from pyramid.threadlocal import get_current_request
 from pyramid.path import DottedNameResolver
 
 from zope.deprecation import deprecated
@@ -40,6 +42,22 @@ class Environment(_Jinja2Environment):
 
         # uri may be relative to the parent, shuffle it through to the loader
         return uri + PARENT_RELATIVE_DELIM + parent
+
+
+class Template(object):
+
+    def __init__(self, template):
+        self.template = template
+
+    def render(self, **context):
+
+        if context is None:
+            context = {}
+
+        if 'request' not in context:
+            context['request'] = get_current_request()
+
+        return self.template.render(**context)
 
 
 class FileInfo(object):
