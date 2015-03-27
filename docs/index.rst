@@ -535,6 +535,13 @@ jinja2.newstyle
 
 See `Newstyle Gettext http://jinja.pocoo.org/docs/extensions/#newstyle-gettext`
 
+.. _setting_jinja2_finalize:
+
+jinja2.finalize
+---------------
+
+A callable or a dotted-import string.
+
 .. _jinja2_filters:
 
 Jinja2 Filters
