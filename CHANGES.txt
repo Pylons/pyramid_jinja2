@@ -1,3 +1,8 @@
+unreleased
+==========
+
+- #105: Support ``jinja2.finalize`` configuration setting. [dstufft]
+
 2.3.3 (2014-07-02)
 ==================
 
