@@ -143,6 +143,14 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
         self.assertEqual(opts['autoescape'], False)
         self.assertEqual(opts['cache_size'], 300)
         self.assertEqual(opts['gettext'].domain, 'pyramid_jinja2')
+        self.assertFalse('finalize' in opts)
+
+    def test_finalize(self):
+        settings = {
+            'j2.finalize': 'pyramid_jinja2.tests.test_settings._fake_finalize',
+        }
+        opts = self._callFUT(settings, 'j2.')
+        self.assertTrue(opts['finalize'] is _fake_finalize)
 
     def test_strict_undefined(self):
         from jinja2 import StrictUndefined
@@ -161,3 +169,8 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
         settings = {'j2.undefined': ''}
         opts = self._callFUT(settings, 'j2.')
         self.assertEqual(opts['undefined'], Undefined)
+
+
+# This is just a fake top level name that we can pass into maybe_dotted that
+# will resolve.
+_fake_finalize = object()

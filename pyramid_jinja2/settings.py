@@ -149,6 +149,11 @@ def parse_env_options_from_settings(settings,
     # should newstyle gettext calls be enabled?
     opts['newstyle'] = asbool(sget('newstyle', False))
 
+    # Do we have a finalize function?
+    finalize = sget('finalize')
+    if finalize is not None:
+        opts['finalize'] = maybe_dotted(finalize)
+
     # add custom jinja2 filters
     opts['filters'] = parse_named_assetspecs(sget('filters', ''), maybe_dotted)
 
