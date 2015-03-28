@@ -112,6 +112,7 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
         )
 
     def test_most_settings(self):
+        from pyramid_jinja2.i18n import GetTextWrapper
         settings = {
             'j2.block_start_string': '<<<',
             'j2.block_end_string': '>>>',
@@ -144,6 +145,7 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
         self.assertEqual(opts['cache_size'], 300)
         self.assertEqual(opts['gettext'].domain, 'pyramid_jinja2')
         self.assertFalse('finalize' in opts)
+        self.assertTrue(isinstance(opts['gettext'], GetTextWrapper))
 
     def test_finalize(self):
         settings = {
@@ -151,6 +153,19 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
         }
         opts = self._callFUT(settings, 'j2.')
         self.assertTrue(opts['finalize'] is _fake_finalize)
+
+    def test_override_gettext(self):
+        class FakeGettextWrapper(object):
+            def __init__(self, domain):
+                self.domain = domain
+
+        settings = {
+            'j2.i18n.gettext':  FakeGettextWrapper,
+            'j2.i18n.domain': 'testdomain',
+        }
+        opts = self._callFUT(settings, 'j2.')
+        self.assertTrue(isinstance(opts['gettext'], FakeGettextWrapper))
+        self.assertEqual(opts['gettext'].domain, 'testdomain')
 
     def test_strict_undefined(self):
         from jinja2 import StrictUndefined
