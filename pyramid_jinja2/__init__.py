@@ -232,12 +232,16 @@ class SmartAssetSpecLoader(FileSystemLoader):
                         return src
 
         # try to load the template from the default search path
-        try:
-            # avoid recursive includes
-            if template not in rel_chain:
-                return FileSystemLoader.get_source(self, environment, template)
-        except TemplateNotFound:
-            pass
+        for parent in rel_searchpath:
+            try:
+                uri = os.path.join(parent, template)
+                # avoid recursive includes
+                if uri not in rel_chain:
+                    return FileSystemLoader.get_source(self, environment, uri)
+            except TemplateNotFound:
+                pass
+            except OSError:
+                pass
 
         # we're here because of an exception during the last step so extend
         # the message and raise an appropriate error
