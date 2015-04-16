@@ -3,6 +3,16 @@
 
 - #105: Support ``jinja2.finalize`` configuration setting. [dstufft]
 
+- #94: Fix loading of templates with relative names on Windows [zart]
+
+- Support Python 3.4 [mmerickel]
+
+- Improve scaffold [marioidival]
+
+- #98: Avoid get_current_request where possible [housleyjk]
+
+- #99: Add resource_path filter [javex]
+
 2.3.3 (2014-07-02)
 ==================
 
