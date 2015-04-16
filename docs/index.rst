@@ -436,6 +436,7 @@ debug information in some cases.  See `Undefined Types <http://jinja.pocoo.org/d
 
 jinja2.extensions
 -----------------
+
 A list of extension objects or a newline-delimited set of dotted import
 locations where each line represents an extension. :ref:`jinja2.ext.i18n
 <jinja2:i18n-extension>` is automatically activated.
@@ -444,9 +445,20 @@ locations where each line represents an extension. :ref:`jinja2.ext.i18n
 
 jinja2.i18n.domain
 ------------------
+
 Pyramid domain for translations. See :term:`Translation Domain` in Pyramid
 documentation. Defaults to the name of the package that activated
 `pyramid_jinja2` or if that fails it will use ``messages`` as the domain.
+
+.. _setting_jinja2_i18n_gettext:
+
+jinja2.i18n.gettext
+-------------------
+
+A subclass of :class:`pyramid_jinja2.i18n.GetTextWrapper` to override `gettext`,
+`ngettext` methods for Jinja i18n extension. Subclass can be either a dotted name
+or the subclass itself.
+
 
 .. _setting_jinja2_filers:
 

@@ -18,3 +18,6 @@
 .. autoclass:: Jinja2TemplateRenderer
 
 .. autoclass:: SmartAssetSpecLoader
+
+.. automodule:: pyramid_jinja2.i18n
+    :members:
