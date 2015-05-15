@@ -1,8 +1,8 @@
-`Jinja2 <http://http://jinja.pocoo.org>`_ bindings for Pyramid
-==============================================================
+Jinja2 bindings for Pyramid
+===========================
 
 These are bindings for the `Jinja2 templating system
-<http://http://jinja.pocoo.org>`_ for the `Pyramid
+<http://jinja.pocoo.org>`_ for the `Pyramid
 <http://docs.pylonsproject.org/en/latest/docs/pyramid.html>`_
 web framework.
 
