@@ -26,7 +26,7 @@ else:
     CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'pyramid>=1.0.2', # wsgiref server entry point
+    'pyramid>=1.3.0', # pyramid.path.DottedNameResolver
     'zope.deprecation',
 ]
 
