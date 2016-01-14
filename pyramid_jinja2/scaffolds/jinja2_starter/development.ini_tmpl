@@ -1,20 +1,37 @@
+###
+# app configuration
+# http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/environment.html
+###
+
 [app:main]
 use = egg:{{project}}
-reload_templates = true
-debug_authorization = false
-debug_notfound = false
-debug_routematch = false
-debug_templates = true
-default_locale_name = en
+
+pyramid.reload_templates = true
+pyramid.debug_authorization = false
+pyramid.debug_notfound = false
+pyramid.debug_routematch = false
+pyramid.debug_templates = true
+pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_debugtoolbar
 
+# By default, the toolbar only appears for clients from IP addresses
+# '127.0.0.1' and '::1'.
+# debugtoolbar.hosts = 127.0.0.1 ::1
+
+###
+# wsgi server configuration
+###
+
 [server:main]
 use = egg:waitress#main
-host = 0.0.0.0
+host = 127.0.0.1
 port = 6543
 
-# Begin logging configuration
+###
+# logging configuration
+# http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/logging.html
+###
 
 [loggers]
 keys = root, {{package_logger}}
@@ -41,6 +58,4 @@ level = NOTSET
 formatter = generic
 
 [formatter_generic]
-format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
-
-# End logging configuration
+format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
