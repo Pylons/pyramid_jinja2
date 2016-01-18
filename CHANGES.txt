@@ -1,8 +1,8 @@
 2.6 (unreleased)
 ================
 
-- Nothing changed yet.
-
+- #116: Update scaffold to be consistent with Pyramid's default scaffolds
+  [stevepiercy]
 
 2.5 (2015-04-16)
 ================
