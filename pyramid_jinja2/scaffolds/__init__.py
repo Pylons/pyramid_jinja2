@@ -13,5 +13,5 @@ except ImportError: # pragma: no cover
 
 class Jinja2ProjectTemplate(PyramidTemplate):
     _template_dir = 'jinja2_starter'
-    summary = 'pyramid jinja2 starter project'
+    summary = 'Pyramid Jinja2 starter project'
     template_renderer = staticmethod(paste_script_template_renderer)
