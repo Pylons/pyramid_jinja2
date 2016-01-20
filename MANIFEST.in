@@ -1,4 +1,7 @@
-graft pyramid_jinja2
-graft docs
-prune docs/_themes/.git
+recursive-include docs *
+recursive-include pyramid_jinja2 *
+
+recursive-exclude docs *.pyc
+recursive-exclude pyramid_jinja2 *.pyc
+
 include *.txt *.ini *.rst
