@@ -1,5 +1,5 @@
-2.6.1 (XXX)
-===========
+2.6.1 (2016-01-20)
+==================
 
 - Don't include .pyc in wheel file [Domen Kozar]
 
