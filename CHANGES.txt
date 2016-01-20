@@ -1,4 +1,4 @@
-2.6 (unreleased)
+2.6 (2016-01-20)
 ================
 
 - #116: Update scaffold to be consistent with Pyramid's default scaffolds
