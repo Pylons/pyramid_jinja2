@@ -3,9 +3,10 @@ env:
     - TOXENV=py26
     - TOXENV=py27
     - TOXENV=pypy
-    - TOXENV=py32 # no u"" support
+    - TOXENV=pypy3
     - TOXENV=py33
     - TOXENV=py34
+    - TOXENV=py35
     - TOXENV=docs
     - TOXENV=py2-cover,py3-cover,coverage
 install:
