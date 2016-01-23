@@ -44,6 +44,22 @@ class Test_model_url_filter(Base, unittest.TestCase):
         rendered = self._callFUT({'model': model}, "{{model|model_url('edit')}}")
         self.assertEqual(rendered, 'http://example.com/dummy/edit')
 
+class Test_resource_url_filter(Base, unittest.TestCase):
+
+    def _addFilters(self):
+        from pyramid_jinja2.filters import resource_url_filter
+        self.environment.filters['resource_url'] = resource_url_filter
+
+    def test_filter(self):
+        model = DummyModel()
+        rendered = self._callFUT({'model': model}, '{{model|resource_url}}')
+        self.assertEqual(rendered, 'http://example.com/dummy/')
+
+    def test_filter_with_elements(self):
+        model = DummyModel()
+        rendered = self._callFUT({'model': model}, "{{model|resource_url('edit')}}")
+        self.assertEqual(rendered, 'http://example.com/dummy/edit')
+
 class Test_model__filter(Base, unittest.TestCase):
 
     def _addFilters(self):

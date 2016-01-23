@@ -1,8 +1,7 @@
 2.6.3 (unreleased)
 ==================
 
-- Nothing changed yet.
-
+- Prefer ``resource_url`` over deprecated ``model_url``. Pyramid has changed its vocabulary, so let's reflect the changes. [Mikko Ohtamaa]
 
 2.6.2 (2016-01-23)
 ==================
