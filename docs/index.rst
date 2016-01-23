@@ -559,15 +559,10 @@ A callable or a dotted-import string.
 Jinja2 Filters
 ==============
 
-``pyramid_jinja2`` provides following filters.
+``pyramid_jinja2`` comes with Pyramid routing specific filters. All Jinja2 built-in filters are enabled in templates. `Read how filters work in Jinja2 <http://jinja.pocoo.org/docs/dev/templates/#list-of-builtin-filters/>`_.
 
-.. currentmodule:: pyramid_jinja2.filters
-.. autofunction:: model_url_filter
-.. autofunction:: route_url_filter
-.. autofunction:: static_url_filter
-.. autofunction:: model_path_filter
-.. autofunction:: route_path_filter
-.. autofunction:: static_path_filter
+Installing filters
+------------------
 
 To use these filters, configure the settings of ``jinja2.filters``:
 
@@ -581,16 +576,17 @@ To use these filters, configure the settings of ``jinja2.filters``:
        route_url = pyramid_jinja2.filters:route_url_filter
        static_url = pyramid_jinja2.filters:static_url_filter
 
-And use the filters in template.
+Filter reference
+----------------
 
-.. code-block:: html
-
-   <a href="{{context|model_url('edit')}}">Edit</a>
-
-   <a href="{{'top'|route_url}}">Top</a>
-
-   <link rel="stylesheet" href="{{'yourapp:static/css/style.css'|static_url}}" />
-
+.. currentmodule:: pyramid_jinja2.filters
+.. autofunction:: resource_url_filter
+.. autofunction:: model_url_filter
+.. autofunction:: route_url_filter
+.. autofunction:: static_url_filter
+.. autofunction:: model_path_filter
+.. autofunction:: route_path_filter
+.. autofunction:: static_path_filter
 
 .. _jinja2_starter_template:
 
