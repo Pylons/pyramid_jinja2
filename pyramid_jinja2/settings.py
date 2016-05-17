@@ -114,7 +114,7 @@ def parse_env_options_from_settings(settings,
             opts[key_name] = value
 
     # boolean settings
-    for key_name in ('autoescape', 'trim_blocks', 'optimized'):
+    for key_name in ('autoescape', 'trim_blocks', 'optimized', 'lstrip_blocks'):
         value = sget(key_name, defaults.get(key_name))
         if value is not None:
             opts[key_name] = asbool(value)
