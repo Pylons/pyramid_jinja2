@@ -15,9 +15,9 @@ Overview
 Installation
 ============
 
-Install using setuptools, e.g. (within a virtualenv)::
+Install using pip, e.g. (within a virtualenv)::
 
-  $ $VENV/bin/easy_install pyramid_jinja2
+  $ $VENV/bin/pip install pyramid_jinja2
 
 .. _setup:
 
@@ -596,11 +596,7 @@ Creating a Jinja2 ``Pyramid`` Project
 After you've got ``pyramid_jinja2`` installed, you can invoke one of the
 following commands to create a Jinja2-based Pyramid project.
 
-On Pyramid 1.0, 1.1, or 1.2::
-
-  $ $VENV/bin/paster create -t pyramid_jinja2_starter myproject
-
-On Pyramid 1.3+::
+.. code-block:: console
 
   $ $VENV/bin/pcreate -s pyramid_jinja2_starter myproject
 
@@ -623,15 +619,15 @@ The usual pattern for working with i18n in pyramid_jinja2 is as follows:
    :linenos:
 
    # make sure Babel is installed
-   easy_install Babel
+   $VENV/bin/pip Babel
 
    # extract translatable strings from *.jinja2 / *.py
-   python setup.py extract_messages
-   python setup.py update_catalog
+   $VENV/bin/python setup.py extract_messages
+   $VENV/bin/python setup.py update_catalog
 
    # Translate strings in <mypackage>/locale/<mylocale>/LC_MESSAGES/<myproject>.po
    # and re-compile *.po files
-   python setup.py compile_catalog
+   $VENV/bin/python setup.py compile_catalog
 
 More Information
 ================
