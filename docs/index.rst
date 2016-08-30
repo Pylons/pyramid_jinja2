@@ -10,7 +10,7 @@ Overview
 :term:`pyramid_jinja2` is a set of bindings that make templates written for the
 :term:`Jinja2` templating system work under the :term:`Pyramid` web framework.
 
-.. _instalation:
+.. _installation:
 
 Installation
 ============
