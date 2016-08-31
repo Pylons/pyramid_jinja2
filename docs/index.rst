@@ -10,17 +10,20 @@ Overview
 :term:`pyramid_jinja2` is a set of bindings that make templates written for the
 :term:`Jinja2` templating system work under the :term:`Pyramid` web framework.
 
+
 .. _installation:
 
 Installation
 ============
 
-Install using pip, e.g. (within a virtualenv)::
+Install using ``pip``, where ``$VENV`` is the path to a virtual environment.
+
+.. code-block:: bash
 
   $ $VENV/bin/pip install pyramid_jinja2
 
-.. _setup:
 
+.. _setup:
 
 Setup
 =====
@@ -35,16 +38,20 @@ There are multiple ways to make sure that ``pyramid_jinja2`` is active.
 All are completely equivalent:
 
 #) Use the :py:func:`~pyramid_jinja2.includeme` function via
-   :py:meth:`~pyramid.config.Configurator.include`::
+   :py:meth:`~pyramid.config.Configurator.include`.
 
-    config = Configurator()
-    config.include('pyramid_jinja2')
+   .. code-block:: python
+
+        config = Configurator()
+        config.include('pyramid_jinja2')
 
 #) Add ``pyramid_jinja2`` to the list of your ``pyramid.includes`` in your
-   :file:`.ini` settings file::
+   :file:`.ini` settings file.
 
-    pyramid.includes =
-        pyramid_jinja2
+   .. code-block:: python
+
+        pyramid.includes =
+            pyramid_jinja2
 
 #) If you're using `pyramid_zcml
    <http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/>`_
@@ -56,7 +63,7 @@ All are completely equivalent:
 
         <include package="pyramid_jinja2"/>
 
-Once activated either of these says, the following happens:
+Once activated in any of these ways, the following happens:
 
 #) Files with the :file:`.jinja2` extension are considered to be
    :term:`Jinja2` templates and a :class:`jinja2.Environment` is registered
@@ -73,6 +80,7 @@ Once activated either of these says, the following happens:
 
 #) The :func:`pyramid_jinja2.get_jinja2_environment` directive is added to the
    :term:`Configurator` instance.
+
 
 Preparing for distribution
 --------------------------
