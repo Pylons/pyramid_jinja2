@@ -86,10 +86,13 @@ Preparing for distribution
 --------------------------
 
 If you want to make sure your :file:`.jinja2` template files are included in
-your package's source distribution (e.g. when using ``python setup.py sdist``),
-add ``*.jinja2`` to your :file:`MANIFEST.in`::
+your package's source distribution (e.g., when using ``python setup.py
+sdist``), add ``*.jinja2`` to your :file:`MANIFEST.in`:
+
+.. code-block:: text
 
     recursive-include yourapp *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.jinja2 *.js *.html *.xml
+
 
 Usage
 =====
@@ -101,10 +104,12 @@ When used as the ``renderer`` argument of a view, the view must return a
 Python ``dict`` which will be passed into the template as the set of available
 variables.
 
+
 Template Lookup Mechanisms
 --------------------------
 
 There are several ways to configure `pyramid_jinja2` to find your templates.
+
 
 Asset Specifications
 ~~~~~~~~~~~~~~~~~~~~
@@ -124,11 +129,12 @@ Here's an example view configuration which uses an :term:`asset specification`:
    def hello_world(request):
        return {'a': 1}
 
-Asset specifications have some significant benefits in Pyramid, as they are
-fully overridable. An addon package can ship with code that renders using
-asset specifications. Later another package can externally override the
-templates without having to actually modify the addon in any way. See
+Asset specifications have some significant benefits in Pyramid, as they can be
+fully overridden. An add-on package can ship with code that renders using
+asset specifications. Later, another package can externally override the
+templates without having to actually modify the add-on in any way. See
 :ref:`pyramid:overriding_assets_section` for more information.
+
 
 Caller-Relative Template Lookup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
