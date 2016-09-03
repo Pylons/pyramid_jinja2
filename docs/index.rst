@@ -153,7 +153,9 @@ Let's look at an example:
        return {'foo': 1, 'bar': 2}
 
 Imagine that the above code is in a ``myapp.admin.views`` module. The template
-would be relative to that module on the filesystem, as shown below::
+would be relative to that module on the filesystem, as shown below:
+
+.. code-block:: text
 
    myapp
    |- __init__.py
@@ -168,10 +170,10 @@ search path-based approach.
 
 A caller-relative template lookup is converted to a :term:`asset specification`
 underneath the hood. This means that it's almost always possible to override
-the actual template in an addon package without having to fork the addon
-itself. For example, the full asset spec for the view above would be
+the actual template in an add-on package without having to fork the add-on
+itself. For example, the full asset specification for the view above would be
 ``myapp.admin.views:templates/mytemplate.jinja2``. This template, or the
-entire ``templates`` folder may be overridden.
+entire ``templates`` folder, may be overridden.
 
 .. code-block:: python
 
@@ -181,12 +183,13 @@ entire ``templates`` folder may be overridden.
 
 See :ref:`pyramid:overriding_assets_section` for more information.
 
+
 Search Path-Based Template Lookup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When used outside of Pyramid, Jinja2's default lookup mechanism is a search
 path. To use a search path within Pyramid, simply define the
-``jinja2.directories`` configuration setting or use the
+``jinja2.directories`` configuration setting, or use the
 :func:`~pyramid_jinja2.add_jinja2_search_path` configurator directive.
 
 Rendering :term:`Jinja2` templates with a search path is typically done as
@@ -198,11 +201,13 @@ follows:
    def my_view(request):
        return {'foo': 1, 'bar': 2}
 
-If ``mytemplate.jinja2`` is not found in the same directory as the module
+If ``mytemplate.jinja2`` is not found in the same directory as the module,
 then it will be searched for on the search path. We are now dependent on our
 configuration settings to tell us where the template may be located. Commonly
 a ``templates`` directory is created at the base of the package and the
-configuration file will include the following directive::
+configuration file will include the following directive:
+
+.. code-block:: python
 
     jinja2.directories = mypkg:templates
 
@@ -216,42 +221,44 @@ configuration file will include the following directive::
 
 .. note::
 
-   The package that includes `pyramid_jinja2` will always be added
-   to the search path (in most cases this is top-level package in your
-   application). This behavior may be deprecated or removed in the future,
-   it is always better to specify your search path explicitly.
+   The package that includes ``pyramid_jinja2`` will always be added
+   to the search path (in most cases this is the top-level package in your
+   application). This behavior may be deprecated or removed in the future.
+   It is always better to specify your search path explicitly.
+
 
 Templates Including Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :term:`Jinja2` allows :term:`template inheritance` as well as other mechanisms
 for templates to load each other. The lookup mechanisms supported in these
-cases include asset specifications, template-relative names and normal
+cases include asset specifications, template-relative names, and normal
 template names found on the search path. The search path will always be
 consulted if a template cannot be found relative to the parent
-template. For example if you had a template named ``templates/child.jinja2``
-that wanted to extend ``templates/base.jinja2`` then it could use
-``{% extends 'base.jinja2' %}`` and locate the file relative to itself **or**
-it could use ``{% extends 'templates/base.jinja2' %}`` to find the template
-in a ``templates`` subfolder rooted on the search path. The template-relative
-option will always override the search path.
+template. For example, if you had a template named ``templates/child.jinja2``
+that wanted to extend ``templates/base.jinja2``, then it could use
+``{% extends 'base.jinja2' %}`` and locate the file relative to itself.
+Alternatively it could use ``{% extends 'templates/base.jinja2' %}`` to find
+the template in a ``templates`` sub-folder rooted on the search path. The
+template-relative option will always override the search path.
 
 An example:
 
 .. code-block:: html+django
    :linenos:
 
-   <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
    <!-- templates/layout.jinja2 -->
-
+   <!DOCTYPE html>
    <html lang="en">
-   <html xmlns="http://www.w3.org/1999/xhtml">
    <head>
-     <link rel="stylesheet" href="style.css" />
+     <meta charset="utf-8">
+     <title>Hello World!</title>
+     <link rel="stylesheet" href="style.css">
    </head>
    <body>
      <div id="content">{% block content %}{% endblock %}</div>
    </body>
+   </html>
 
 .. code-block:: html+django
    :linenos:
@@ -268,6 +275,7 @@ An example:
 For further information on :term:`Template Inheritance` in Jinja2
 templates please see :ref:`Template Inheritance <jinja2:template-inheritance>`
 in Jinja2 documentation.
+
 
 Adding or Overriding a Renderer
 -------------------------------
