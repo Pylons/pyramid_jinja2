@@ -169,6 +169,7 @@ htmlhelp_basename = 'atemplatedoc'
 intersphinx_mapping = {
     'jinja2': ('http://jinja.pocoo.org/docs/', None),
     'pyramid': ('http://docs.pylonsproject.org/projects/pyramid/en/latest/', None),
+    'pytest': ('http://pytest.org/latest/', None),
 }
 
 

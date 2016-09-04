@@ -1,7 +1,12 @@
 2.6.3 (unreleased)
 ==================
 
-- Prefer ``resource_url`` over deprecated ``model_url``. Pyramid has changed its vocabulary, so let's reflect the changes. [Mikko Ohtamaa]
+- #123: Switch to pytest and pip for testing and installation in the
+  documentation and scaffold. nose and coverage are still used in the core
+  pyramid_jinja2 package [stevepiercy].
+
+- Prefer ``resource_url`` over deprecated ``model_url``. Pyramid has changed
+  its vocabulary, so let's reflect the changes. [Mikko Ohtamaa]
 
 2.6.2 (2016-01-23)
 ==================
