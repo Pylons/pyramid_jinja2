@@ -610,24 +610,71 @@ Filter reference
 .. autofunction:: route_path_filter
 .. autofunction:: static_path_filter
 
+
 .. _jinja2_starter_template:
 
-Creating a Jinja2 ``Pyramid`` Project
-=====================================
+Creating a Jinja2 Pyramid project
+=================================
 
-After you've got ``pyramid_jinja2`` installed, you can invoke one of the
-following commands to create a Jinja2-based Pyramid project.
+After you have installed ``pyramid_jinja2``, you can invoke the following
+command to create a Jinja2-based Pyramid project from its included scaffold.
 
-.. code-block:: console
+.. code-block:: bash
 
   $ $VENV/bin/pcreate -s pyramid_jinja2_starter myproject
 
-After it's created, you can visit the ``myproject`` directory and run
-``setup.py develop``.  At that point you can start the application like any
-other Pyramid application.
+After it's created, you can visit the ``myproject`` directory and install the
+project in development mode.
+
+.. code-block:: bash
+
+   $ cd myproject
+   $ $VENV/bin/pip install -e .
+
+At this point you can start the application like any other Pyramid application.
+
+.. code-block:: bash
+
+   $ $VENV/bin/pserve development.ini
 
 This is a good way to see a working Pyramid application that uses Jinja2, even
-if you wind up not using the result.
+if you do not end up using the result.
+
+.. seealso:: See also :ref:`pyramid:project_narr`.
+
+
+Running tests for your application
+----------------------------------
+
+The scaffold provides a convenience for the developer to install ``pytest`` and
+``pytest-cov`` as the test runner and test coverage. To run unit tests for your
+application, you must first install the testing dependencies.
+
+.. code-block:: bash
+
+   $ $VENV/bin/pip install -e ".[testing]"
+
+Once the testing requirements are installed, then you can run the tests using
+the ``py.test`` command that was just installed in the ``bin`` directory of
+your virtual environment. The ``-q`` option means "quiet" output, and the
+``--cov`` option includes test coverage.
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test -q --cov
+
+The scaffold includes configuration defaults for ``py.test`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
+the root of your package. Without these defaults, we would need to specify the
+path to the module on which we want to run tests and coverage.
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test -q --cov=myproject myproject/tests.py
+
+.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
+   ``py.test -h`` to see its full set of options.
+
 
 Paster Template I18N
 --------------------
