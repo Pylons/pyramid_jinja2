@@ -53,11 +53,9 @@ All are completely equivalent:
         pyramid.includes =
             pyramid_jinja2
 
-#) If you're using `pyramid_zcml
-   <http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/>`_
-   instead of imperative configuration, ensure that some ZCML file with an
-   analogue of the following contents is executed by your Pyramid
-   application:
+#) If you use :ref:`pyramid_zcml:index` instead of imperative configuration,
+   ensure that some ZCML file with an analogue of the following contents is
+   executed by your Pyramid application:
 
    .. code-block:: xml
 
@@ -97,7 +95,7 @@ sdist``), add ``*.jinja2`` to your :file:`MANIFEST.in`:
 Usage
 =====
 
-Once `pyramid_jinja2` has been activated, :file:`.jinja2` templates can be
+Once ``pyramid_jinja2`` has been activated, :file:`.jinja2` templates can be
 used by the Pyramid rendering system.
 
 When used as the ``renderer`` argument of a view, the view must return a
@@ -108,7 +106,7 @@ variables.
 Template Lookup Mechanisms
 --------------------------
 
-There are several ways to configure `pyramid_jinja2` to find your templates.
+There are several ways to configure ``pyramid_jinja2`` to find your templates.
 
 
 Asset Specifications
@@ -215,7 +213,7 @@ configuration file will include the following directive:
 
    It is possible to specify a relative path to the templates folder, such
    as ``jinja2.directories = templates``. This folder will be found relative
-   to the first package that includes `pyramid_jinja2`, which will normally
+   to the first package that includes ``pyramid_jinja2``, which will normally
    be the root of your application. It is always better to be explicit when
    in doubt.
 
@@ -281,7 +279,7 @@ Adding or Overriding a Renderer
 -------------------------------
 
 By default, only templates ending in the ``.jinja2`` file extension are
-supported. However, it is very easy to add support for alternate file
+supported. However, it is very easy to add support for alternative file
 extensions using the :func:`pyramid_jinja2.add_jinja2_renderer` directive.
 
 .. code-block:: python
@@ -291,7 +289,7 @@ extensions using the :func:`pyramid_jinja2.add_jinja2_renderer` directive.
 
 It would now be possible to use templates named ``foo.html`` and
 ``foo.jinja2``. Each renderer extension will use its own
-:class:`jinja2.Environment`. These alternate renderers can be extended at
+:class:`jinja2.Environment`. These alternative renderers can be extended at
 runtime using the ``name`` parameter to the other directives such as
 :func:`pyramid_jinja2.get_jinja2_environment`.
 
@@ -301,11 +299,11 @@ runtime using the ``name`` parameter to the other directives such as
    config.add_jinja2_renderer('.html')
    config.add_jinja2_search_path('myapp:templates', name='.html')
 
-It is also possible to setup different renderers that use different search
-paths, configuration settings and environments if necessary. This technique
+It is also possible to set up different renderers that use different search
+paths, configuration settings, and environments if necessary. This technique
 can come in handy when different defaults are required for rendering templates
 with different content types. For example, a plain text email body versus
-an html page. For this reason, :func:`pyramid_jinja2.add_jinja2_renderer`
+an HTML page. For this reason, :func:`pyramid_jinja2.add_jinja2_renderer`
 accepts an optional parameter ``settings_prefix`` which can point a renderer
 at a different group of settings.
 
@@ -322,15 +320,16 @@ at a different group of settings.
 
 Now ``foo.email`` will be rendered using the ``mail.jinja2.*`` settings.
 
+
 Internalization (i18n)
 ----------------------
 
 When :term:`pyramid_jinja2` is included in a Pyramid application,
 :ref:`jinja2.ext.i18n <jinja2:i18n-extension>` is automatically activated.
 
-Be sure to configure `jinja2.i18n.domain` according to `setup.cfg` domain
-settings. By default, `jinja2.i18n.domain` is set to the name of the
-package that included `pyramid_jinja2`. If no package was found, it will use
+Be sure to configure ``jinja2.i18n.domain`` according to ``setup.cfg`` domain
+settings. By default, ``jinja2.i18n.domain`` is set to the name of the
+package that included ``pyramid_jinja2``. If no package was found, it will use
 ``messages``.
 
 .. _settings:
@@ -497,7 +496,7 @@ representing :ref:`Jinja2 filters <jinja2:writing-filters>`.
 .. _setting_jinja2_globals:
 
 jinja2.globals
----------------
+--------------
 
 A dictionary mapping global name to global template object,
 or a newline-delimited string with each line in the format::
