@@ -332,6 +332,7 @@ settings. By default, ``jinja2.i18n.domain`` is set to the name of the
 package that included ``pyramid_jinja2``. If no package was found, it will use
 ``messages``.
 
+
 .. _settings:
 
 Settings
@@ -344,17 +345,18 @@ different from the default.  The below values can be present in the
 section representing your Pyramid app) or they can be passed directly within
 the ``settings`` argument passed to a Pyramid Configurator.
 
+
 Generic Settings
 ----------------
 
-These settings correspond to the ones documented in Jinja2.
-Set them accordingly.
+These settings correspond to the ones documented in Jinja2. Set them
+accordingly.
 
 For reference please see: http://jinja.pocoo.org/docs/api/#high-level-api
 
 .. note::
 
-   For the boolean settings please use ``true`` or ``false``
+   For the boolean settings, use ``true`` or ``false``.
 
 jinja2.block_start_string
 
@@ -380,6 +382,7 @@ jinja2.optimized
 
 jinja2.cache_size
 
+
 jinja2.autoescape
 -----------------
 
@@ -389,12 +392,12 @@ Possible values: ``true`` or ``false``.
 
 .. warning::
 
-   By default Jinja2 sets autoescaping to ``False``.
+   By default Jinja2 sets ``autoescape`` to ``False``.
 
-   pyramid_jinja2 sets it to true as it is considered a good security
+   pyramid_jinja2 sets it to ``True`` as it is considered a good security
    practice in a web setting where we want to prevent XSS attacks from
    rendering unsanitized user-generated content. To turn off escaping
-   on a case-by-case basis you may use the ``safe`` filter such as
+   on a case-by-case basis, you may use the ``safe`` filter such as
    ``{{ html_blob | safe }}``.
 
 
@@ -406,16 +409,18 @@ pyramid.reload_templates
 For usage see :ref:`Pyramid: Automatically Reloading Templates
 <pyramid:reload_templates_section>`.
 
-``true`` or ``false`` representing whether Jinja2 templates should be
-reloaded when they change on disk.  Useful for development to be ``true``.
+``True`` or ``False`` represent whether Jinja2 templates should be reloaded
+when they change on disk. In development, it is useful to set it to ``True``.
 This setting sets the Jinja2 ``auto_reload`` setting.
+
 
 reload_templates
 ----------------
 
 .. warning::
 
-   Deprecated as of version 1.5, use :ref:`setting_reload_templates` instead
+   Deprecated as of version 1.5, use :ref:`setting_reload_templates` instead.
+
 
 .. _setting_jinja2_autoreload:
 
@@ -426,13 +431,15 @@ Use Pyramid :ref:`setting_reload_templates` setting.
 
 .. _setting_jinja2_directories:
 
+
 jinja2.directories
 ------------------
 
-A list of directory names or a newline-delimited string with each line
-representing a directory name.  These locations are where Jinja2 will
-search for templates.  Each can optionally be an absolute resource
-specification (e.g. ``package:subdirectory/``).
+A list of directory names, or a newline-delimited string, where each line
+represents a directory name.  These locations are where Jinja2 will search for
+templates. Each can optionally be an absolute resource specification (e.g.,
+``package:subdirectory/``).
+
 
 .. _setting_jinja2_input_encoding:
 
@@ -440,6 +447,7 @@ jinja2.input_encoding
 ---------------------
 
 The input encoding of templates.  Defaults to ``utf-8``.
+
 
 .. _setting_jinja2_undefined:
 
@@ -449,27 +457,31 @@ jinja2.undefined
 Changes the undefined types that are used when a variable name lookup fails.
 If unset, defaults to :py:class:`~jinja2.Undefined` (silent ignore). Setting
 it to ``strict`` will trigger :py:class:`~jinja2.StrictUndefined` behavior
-(raising an error, this is recommended for development). Setting it to
+(which raises an error, and is recommended for development). Setting it to
 ``debug`` will trigger :py:class:`~jinja2.DebugUndefined`, which outputs
-debug information in some cases.  See `Undefined Types <http://jinja.pocoo.org/docs/api/#undefined-types>`_
+debug information in some cases. See `Undefined Types
+<http://jinja.pocoo.org/docs/api/#undefined-types>`_.
+
 
 .. _setting_jinja2_extensions:
 
 jinja2.extensions
 -----------------
 
-A list of extension objects or a newline-delimited set of dotted import
-locations where each line represents an extension. :ref:`jinja2.ext.i18n
+A list of extension objects, or a newline-delimited set of dotted import
+locations, where each line represents an extension. :ref:`jinja2.ext.i18n
 <jinja2:i18n-extension>` is automatically activated.
+
 
 .. _setting_jinja2_i18n_domain:
 
 jinja2.i18n.domain
 ------------------
 
-Pyramid domain for translations. See :term:`Translation Domain` in Pyramid
-documentation. Defaults to the name of the package that activated
+Pyramid domain for translations. See :term:`pyramid:Translation Domain` in the
+Pyramid documentation. Defaults to the name of the package that activated
 `pyramid_jinja2` or if that fails it will use ``messages`` as the domain.
+
 
 .. _setting_jinja2_i18n_gettext:
 
