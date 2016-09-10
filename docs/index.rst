@@ -488,9 +488,9 @@ Pyramid documentation. Defaults to the name of the package that activated
 jinja2.i18n.gettext
 -------------------
 
-A subclass of :class:`pyramid_jinja2.i18n.GetTextWrapper` to override `gettext`,
-`ngettext` methods for Jinja i18n extension. Subclass can be either a dotted name
-or the subclass itself.
+A subclass of :class:`pyramid_jinja2.i18n.GetTextWrapper` to override
+``gettext`` and ``ngettext`` methods in Jinja i18n extension. The Subclass can
+be either a dotted name or the subclass itself.
 
 
 .. _setting_jinja2_filers:
@@ -498,87 +498,97 @@ or the subclass itself.
 jinja2.filters
 --------------
 
-A dictionary mapping filter name to filter object, or a newline-delimted
-string with each line in the format::
+A dictionary mapping a filter name to a filter object, or a newline-delimited
+string with each line in the format:
+
+.. code-block:: python
 
     name = dotted.name.to.filter
 
 representing :ref:`Jinja2 filters <jinja2:writing-filters>`.
+
 
 .. _setting_jinja2_globals:
 
 jinja2.globals
 --------------
 
-A dictionary mapping global name to global template object,
-or a newline-delimited string with each line in the format::
+A dictionary mapping a global name to a global template object, or a
+newline-delimited string with each line in the format:
+
+.. code-block:: python
 
     name = dotted.name.to.globals
 
 representing :ref:`Jinja2 globals <jinja2:global-namespace>`
+
 
 .. _setting_jinja2_tests:
 
 jinja2.tests
 ------------
 
-A dictionary mapping test name to test object, or a newline-delimted
-string with each line in the format::
+A dictionary mapping a test name to a test object, or a newline-delimited
+string with each line in the format:
+
+.. code-block:: python
 
     name = dotted.name.to.test
 
 representing :ref:`Jinja2 tests <jinja2:writing-tests>`.
+
 
 .. _setting_jinja2_byte_cache:
 
 jinja2.bytecode_caching
 -----------------------
 
-If set to ``true``, a filesystem bytecode cache will be configured
-(in a directory determined by :ref:`setting_jinja2_byte_cache_dir`.)
-To configure other types of bytecode caching, ``jinja2.bytecode_caching``
-may also be set directly to an instance of :class:`jinja2.BytecodeCache`
-(This can not be done in a paste ``.ini`` file, however, it must be done
-programatically.)
+If set to ``true``, a file system bytecode cache will be configured in a
+directory determined by :ref:`setting_jinja2_byte_cache_dir`. To configure
+other types of bytecode caching, ``jinja2.bytecode_caching`` may also be set
+directly to an instance of :class:`jinja2.BytecodeCache`. However doing so
+cannot be done in a paste ``.ini`` file and it must be done programmatically.
 By default, no bytecode cache is configured.
 
 .. versionchanged:: 1.10
 
    Previously, ``jinja2.bytecode_caching`` defaulted to ``true``.
 
-Note that configuring a filesystem bytecode cache will (not surprisiningly)
-generate files in the cache directory.  As templates are changed, some
-of these will become stale, pointless wastes of disk space.
-You are advised to consider a clean up
-strategy (such as a cron job) to check for and remove such files.
+Note that configuring a filesystem bytecode cache will (not surprisingly)
+generate files in the cache directory.  As templates are changed, some of these
+will become stale, pointless wastes of disk space. You are advised to consider
+a clean up strategy (such as a cron job) to check for and remove such files.
 
-See the :ref:`Jinja2 Documentation <jinja2:bytecode-cache>`
-for more information on bytecode caching.
+See the :ref:`Jinja2 Documentation <jinja2:bytecode-cache>` for more
+information on bytecode caching.
 
 .. versionchanged:: 1.10
 
-   Previously, an atexit callback which called
+   Previously, an ``atexit`` callback which called
    :py:meth:`jinja2.BytecodeCache.clear` was registered in an effort
    to delete the cache files.  This is no longer done.
+
 
 .. _setting_jinja2_byte_cache_dir:
 
 jinja2.bytecode_caching_directory
 ---------------------------------
 
-Absolute path to directory to store bytecode cache files. Defaults to
-the system temporary directory.
-This is only used if ``jinja2.bytecode_caching`` is set to ``true``.
+Absolute path to directory to store bytecode cache files. Defaults to the
+system temporary directory. This is only used if ``jinja2.bytecode_caching`` is
+set to ``true``.
+
 
 .. _setting_jinja2_newstyle:
 
 jinja2.newstyle
 ---------------
 
-``true`` or ``false`` to enable the use of newstyle gettext calls. Defaults to
-``false``.
+``true`` or ``false`` to enable the use of ``newstyle`` ``gettext`` calls.
+Defaults to ``false``.
 
-See `Newstyle Gettext http://jinja.pocoo.org/docs/extensions/#newstyle-gettext`
+See :ref:`jinja2:newstyle-gettext`.
+
 
 .. _setting_jinja2_finalize:
 
@@ -587,12 +597,15 @@ jinja2.finalize
 
 A callable or a dotted-import string.
 
+
 .. _jinja2_filters:
 
 Jinja2 Filters
 ==============
 
-``pyramid_jinja2`` comes with Pyramid routing specific filters. All Jinja2 built-in filters are enabled in templates. `Read how filters work in Jinja2 <http://jinja.pocoo.org/docs/dev/templates/#list-of-builtin-filters/>`_.
+``pyramid_jinja2`` comes with Pyramid routing specific filters. All Jinja2
+built-in filters are enabled in templates. Read how :ref:`jinja2:filters` work
+in Jinja2.
 
 Installing filters
 ------------------
