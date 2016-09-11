@@ -607,6 +607,7 @@ Jinja2 Filters
 built-in filters are enabled in templates. Read how :ref:`jinja2:filters` work
 in Jinja2.
 
+
 Installing filters
 ------------------
 
@@ -621,6 +622,7 @@ To use these filters, configure the settings of ``jinja2.filters``:
        model_url = pyramid_jinja2.filters:model_url_filter
        route_url = pyramid_jinja2.filters:route_url_filter
        static_url = pyramid_jinja2.filters:static_url_filter
+
 
 Filter reference
 ----------------
@@ -708,19 +710,19 @@ with the generated project.
 
 The usual pattern for working with i18n in pyramid_jinja2 is as follows:
 
-.. code-block:: text
-   :linenos:
+.. code-block:: bash
 
    # make sure Babel is installed
-   $VENV/bin/pip Babel
+   $ $VENV/bin/pip install Babel
 
    # extract translatable strings from *.jinja2 / *.py
-   $VENV/bin/python setup.py extract_messages
-   $VENV/bin/python setup.py update_catalog
+   $ $VENV/bin/python setup.py extract_messages
+   $ $VENV/bin/python setup.py update_catalog
 
    # Translate strings in <mypackage>/locale/<mylocale>/LC_MESSAGES/<myproject>.po
    # and re-compile *.po files
-   $VENV/bin/python setup.py compile_catalog
+   $ $VENV/bin/python setup.py compile_catalog
+
 
 More Information
 ================
@@ -732,6 +734,7 @@ More Information
    changes.rst
    glossary.rst
 
+
 Reporting Bugs / Development Versions
 =====================================
 
@@ -739,6 +742,7 @@ Visit http://github.com/Pylons/pyramid_jinja2 to download development or tagged
 versions.
 
 Visit http://github.com/Pylons/pyramid_jinja2/issues to report bugs.
+
 
 Indices and tables
 ------------------
