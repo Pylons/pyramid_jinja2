@@ -369,9 +369,18 @@ def get_jinja2_environment(config, name='.jinja2'):
        config.get_jinja2_environment()
 
     It will return the configured ``jinja2.Environment`` for the
-    renderer named ``name``. Configuration is delayed until a call to
-    ``config.commit()`` or ``config.make_wsgi_app()``. As such, if this
-    method is called prior to committing the changes, it may return ``None``.
+    renderer named ``name``. The environment is created as an :term:`action`
+    which is deferred to allow users to override the configuration. In order
+    to get back the configured environment, you must either force a commit
+    via ``config.commit`` or schedule an action which can setup the
+    environment after it has been created:
+
+    .. code-block:: python
+
+       def setup_jinja2_env():
+           env = config.get_jinja2_environment()
+           # ...
+       config.action(None, setup_jinja2_env, order=999)
 
     """
     registry = config.registry
