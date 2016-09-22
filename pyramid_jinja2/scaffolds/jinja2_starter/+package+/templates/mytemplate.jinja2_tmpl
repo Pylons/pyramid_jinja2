@@ -38,7 +38,7 @@
                 <span class="smaller">Jinja2 scaffold</span>
               </h1>
               <p class="lead">
-                {% trans %}Hello{% endtrans %} to <span class="font-normal">\{\{ project \}\}</span>, an&nbsp;application generated&nbsp;by<br>the <span class="font-normal">Pyramid Web Framework {{pyramid_version}}</span>.</p>
+                {% trans %}Hello!{% endtrans %} to <span class="font-normal">\{\{ project \}\}</span>, an&nbsp;application generated&nbsp;by<br>the <span class="font-normal">Pyramid Web Framework {{pyramid_version}}</span>.</p>
             </div>
           </div>
         </div>
