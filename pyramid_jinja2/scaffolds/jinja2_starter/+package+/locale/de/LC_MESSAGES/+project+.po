@@ -17,5 +17,5 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-msgid "Hello!"
-msgstr "Hallo!"
+msgid "Welcome to"
+msgstr "Willkommen zum"
