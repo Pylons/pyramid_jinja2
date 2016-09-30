@@ -702,11 +702,11 @@ path to the module on which we want to run tests and coverage.
    ``py.test -h`` to see its full set of options.
 
 
-Paster Template I18N
---------------------
+pcreate template i18n
+---------------------
 
-The paster template automatically sets up pot/po/mo locale files for use
-with the generated project.
+The pcreate template automatically sets up pot/po/mo locale files for use with
+the generated project.
 
 The usual pattern for working with i18n in pyramid_jinja2 is as follows:
 
@@ -722,6 +722,55 @@ The usual pattern for working with i18n in pyramid_jinja2 is as follows:
    # Translate strings in <mypackage>/locale/<mylocale>/LC_MESSAGES/<myproject>.po
    # and re-compile *.po files
    $ $VENV/bin/python setup.py compile_catalog
+
+If you see the following output:
+
+.. code-block:: text
+
+   running compile_catalog
+   1 of 1 messages (100%) translated in myproject/locale/de/LC_MESSAGES/myproject.po
+   catalog myproject/locale/de/LC_MESSAGES/myproject.po is marked as fuzzy, skipping
+   1 of 1 messages (100%) translated in myproject/locale/fr/LC_MESSAGES/myproject.po
+   catalog myproject/locale/fr/LC_MESSAGES/myproject.po is marked as fuzzy, skipping
+
+When an item is marked as fuzzy, then you should review your `.po` files to
+make sure translations are correct. Fuzzy is not exact matching, but matches
+most of a word (its root) or phrase.
+
+When you are satisfied that the translations are good, you can either remove
+the line marked with `#, fuzzy` immediately above its related `msgid` line
+(preferred) or force Babel to compile the message catalog with the `-f` flag.
+
+.. code-block:: bash
+
+   $ $VENV/bin/python setup.py compile_catalog -f
+
+Assuming you have already created a project following the instructions under
+:ref:`jinja2_starter_template`, and started your application with ``pserve``,
+then you should be able to view the various translations. Simply append a GET
+parameter, such as http://localhost:6543/?_LOCALE_=de for German,
+http://localhost:6543/?_LOCALE_=fr for French, or
+http://localhost:6543/?_LOCALE_=en for English. The default language does not
+require GET parameter.
+
+The application could set the user's language preference with a cookie based on
+request parameters sent on the first request. Alternatively, and usually as a
+fallback, the application could read the web browser's `Accept-Language` header
+sent with each request and set the appropriate language. For example:
+
+.. code-block:: python
+
+    @subscriber(NewRequest)
+    def prepare_env(event):
+        request = event.request
+        # set locale depending on browser settings
+        settings = request.registry.settings
+        locale = settings.get('pyramid.default_locale_name', 'en')
+        available = [loc['code'] for loc in AVAILABLE_LOCALES]
+        if request.accept_language:
+            accepted = request.accept_language
+            locale = accepted.best_match(available, locale)
+        request._LOCALE_ = locale
 
 
 More Information
