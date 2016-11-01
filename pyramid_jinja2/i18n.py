@@ -12,7 +12,11 @@ class GetTextWrapper(object):
 
     @property
     def localizer(self):
-        return i18n.get_localizer(get_current_request())
+        request = get_current_request()
+        try:
+            return request.localizer
+        except AttributeError: # pragma: nocover (pyramid < 1.5)
+            return i18n.get_localizer(request)
 
     def gettext(self, message):
         """Implements jinja.ext.i18n `gettext` function"""
