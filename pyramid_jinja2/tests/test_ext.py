@@ -1,5 +1,6 @@
 import unittest
 from .base import Base
+from pyramid.path import DottedNameResolver
 
 
 class TestExtensions(Base, unittest.TestCase):
@@ -11,7 +12,8 @@ class TestExtensions(Base, unittest.TestCase):
         options = {
             'extensions': 'pyramid_jinja2.tests.extensions.TestExtension',
         }
-        settings = parse_env_options_from_settings(options, '', None, None)
+        settings = parse_env_options_from_settings(
+            options, '', maybe_dotted, None)
         env = create_environment_from_options(settings, {})
         ext = env.extensions[
             'pyramid_jinja2.tests.extensions.TestExtension']
@@ -23,7 +25,7 @@ class TestExtensions(Base, unittest.TestCase):
         from pyramid_jinja2 import create_environment_from_options
         from pyramid_jinja2.settings import parse_env_options_from_settings
 
-        settings = parse_env_options_from_settings({}, '', None, None)
+        settings = parse_env_options_from_settings({}, '', maybe_dotted, None)
         env = create_environment_from_options(settings, {})
 
         self.assertTrue(hasattr(env, 'install_gettext_translations'))
@@ -34,6 +36,10 @@ class TestExtensions(Base, unittest.TestCase):
             'pyramid_jinja2.tests:templates/i18n.jinja2')
         self.assertEqual(template.render(),
                          'some untranslated text here\nyay it worked!')
+
+
+resolver = DottedNameResolver()
+maybe_dotted = resolver.maybe_resolve
 
 
 class GetTextWrapperTests(unittest.TestCase):

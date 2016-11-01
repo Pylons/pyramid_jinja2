@@ -129,9 +129,7 @@ def parse_env_options_from_settings(settings,
 
     # get supplementary jinja2 settings
     domain = sget('i18n.domain', package and package.__name__ or 'messages')
-    gettext_wrapper = sget('i18n.gettext', GetTextWrapper)
-    if not issubclass(gettext_wrapper, GetTextWrapper):
-        gettext_wrapper = maybe_dotted(gettext_wrapper)
+    gettext_wrapper = maybe_dotted(sget('i18n.gettext', GetTextWrapper))
     opts['gettext'] = gettext_wrapper(domain=domain)
 
     # get jinja2 extensions
