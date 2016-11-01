@@ -1,6 +1,10 @@
 2.6.3 (unreleased)
 ==================
 
+- Drop Python 2.6 and 3.2 support.
+
+- Add Python 3.5 support.
+
 - #123: Switch to pytest and pip for testing and installation in the
   documentation and scaffold. nose and coverage are still used in the core
   pyramid_jinja2 package [stevepiercy].
