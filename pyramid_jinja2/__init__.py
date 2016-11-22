@@ -203,7 +203,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
             src = self._get_absolute_source(template)
             if src is not None:
                 return src
-            else:
+            elif ':' not in template or os.name is not 'nt':
                 # fallback to the search path just incase
                 return FileSystemLoader.get_source(self, environment, template)
 
@@ -236,7 +236,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
             try:
                 uri = os.path.join(parent, template)
                 # avoid recursive includes
-                if uri not in rel_chain:
+                if uri not in rel_chain and (os.name is not 'nt' or ':' not in uri):
                     return FileSystemLoader.get_source(self, environment, uri)
             except TemplateNotFound:
                 pass
