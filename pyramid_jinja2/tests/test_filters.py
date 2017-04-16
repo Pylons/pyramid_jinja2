@@ -25,7 +25,9 @@ class Base(object):
     def _addFilters(self): pass
 
     def _callFUT(self, context, tmpl):
+        from pyramid_jinja2 import Template
         tmpl = self.environment.from_string(tmpl)
+        tmpl = Template(tmpl)
         return tmpl.render(**context)
 
 class Test_model_url_filter(Base, unittest.TestCase):
