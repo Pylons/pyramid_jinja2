@@ -21,3 +21,7 @@ msgstr ""
 msgid "some translated text here"
 msgstr ""
 
+#: templates/i18n.jinja2:3
+msgid "some translated text with ${var} here"
+msgstr ""
+

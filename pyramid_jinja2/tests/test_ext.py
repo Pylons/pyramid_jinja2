@@ -34,8 +34,10 @@ class TestExtensions(Base, unittest.TestCase):
         self.request.locale_name = 'en'
         template = env.get_template(
             'pyramid_jinja2.tests:templates/i18n.jinja2')
-        self.assertEqual(template.render(),
-                         'some untranslated text here\nyay it worked!')
+        context = {'var' : 'variables'}
+        self.assertEqual(template.render(**context),
+                         'some untranslated text here\nyay it worked!\n'
+                         'yay it works with variables too!')
 
 
 resolver = DottedNameResolver()
@@ -50,7 +52,7 @@ class GetTextWrapperTests(unittest.TestCase):
         class MyGetTextWrapper(GetTextWrapper):
             class localizer:
                 @staticmethod
-                def translate(s, domain):
+                def translate(s, domain, mapping):
                     return s
 
                 @staticmethod
