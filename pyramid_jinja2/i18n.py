@@ -18,11 +18,11 @@ class GetTextWrapper(object):
         except AttributeError: # pragma: nocover (pyramid < 1.5)
             return i18n.get_localizer(request)
 
-    def gettext(self, message, **kwargs):
+    def gettext(self, message, mapping=None):
         """Implements jinja.ext.i18n `gettext` function"""
         return self.localizer.translate(message,
                                         domain=self.domain,
-                                        mapping=kwargs)
+                                        mapping=mapping)
 
     def ngettext(self, singular, plural, n):
         """Implements jinja.ext.i18n `ngettext` function"""
