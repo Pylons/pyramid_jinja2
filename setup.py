@@ -26,7 +26,7 @@ else:
     CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'Jinja2',
+    'Jinja2>=2.5.0',
     'MarkupSafe',
     'pyramid>=1.3.0', # pyramid.path.DottedNameResolver
     'zope.deprecation',
