@@ -1,8 +1,5 @@
 /build
-/env
-/env26
-/env27
-/env32
+/env*
 *.egg
 *.egg-info
 *.pyc
