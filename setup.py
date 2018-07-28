@@ -26,28 +26,26 @@ else:
     CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
+    'Jinja2',
+    'MarkupSafe',
     'pyramid>=1.3.0', # pyramid.path.DottedNameResolver
     'zope.deprecation',
 ]
-
-if (3,) < sys.version_info < (3, 3):
-    requires.extend([
-        'Jinja2>=2.5.0,<2.7dev', #2.7 drops Python 3.2 compat.
-        'MarkupSafe<0.16', #0.16 drops Python 3.2 compat
-        ])
-else:
-    requires.extend([
-        'Jinja2>=2.5.0',
-        'MarkupSafe',
-        ])
 
 try:
     import wsgiref
 except ImportError:
     requires.append('wsgiref')
 
-testing_extras = ['WebTest', 'nose>=1.2.0', 'coverage']
-docs_extras = ['Sphinx', 'pylons-sphinx-themes >= 0.3']
+testing_extras = [
+    'coverage',
+    'nose>=1.2.0',
+    'WebTest',
+]
+docs_extras = [
+    'pylons-sphinx-themes >= 0.3',
+    'Sphinx>=1.7.5',
+]
 
 setup(name='pyramid_jinja2',
       version='2.7',
@@ -61,13 +59,13 @@ setup(name='pyramid_jinja2',
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Framework :: Pyramid",
         "License :: Repoze Public License",
         ],
-      keywords='web wsgi pylons pyramid',
+      keywords='web wsgi pylons pyramid jinja2',
       author="Rocky Burt",
       author_email="pylons-discuss@googlegroups.com",
       maintainer="Domen Kozar",
