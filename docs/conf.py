@@ -16,7 +16,8 @@
 # directory is relative to the documentation root, use os.path.abspath to
 # make it absolute, like shown here.
 #sys.path.append(os.path.abspath('some/directory'))
-
+import datetime
+import pylons_sphinx_themes
 import sys
 import os
 
@@ -38,7 +39,8 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'pyramid_jinja2'
-copyright = '2011, Agendaless Consulting <chrism@plope.com>'
+thisyear = datetime.datetime.now().year
+copyright = '2011-%s, Agendaless Consulting' % thisyear
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -87,8 +89,6 @@ exclude_patterns = ['_themes/README.rst',]
 # -----------------------
 
 # Add and use Pylons theme
-sys.path.append(os.path.abspath('_themes'))
-import pylons_sphinx_themes
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme = 'pyramid'
 
@@ -130,9 +130,8 @@ html_theme_options = {
 # bottom, using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
 
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-#html_use_smartypants = True
+# Do not use smart quotes.
+smartquotes = False
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -188,7 +187,7 @@ intersphinx_mapping = {
 #  author, document class [howto/manual]).
 latex_documents = [
   ('index', 'pyramid_jinja2.tex', 'pyramid_jinja2 Documentation',
-   'Pylons Developers', 'manual'),
+   'Pylons Project Developers', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the
