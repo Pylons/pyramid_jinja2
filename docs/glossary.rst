@@ -12,7 +12,7 @@ Glossary
 
    Pyramid
       A `web framework
-      <http://docs.pylonsproject.org/en/latest/docs/pyramid.html>`_.
+      <https://docs.pylonsproject.org/projects/pyramid/en/latest/>`_.
 
    Configurator
       :py:class:`pyramid.config.Configurator`

@@ -787,10 +787,10 @@ More Information
 Reporting Bugs / Development Versions
 =====================================
 
-Visit http://github.com/Pylons/pyramid_jinja2 to download development or tagged
+Visit https://github.com/Pylons/pyramid_jinja2 to download development or tagged
 versions.
 
-Visit http://github.com/Pylons/pyramid_jinja2/issues to report bugs.
+Visit https://github.com/Pylons/pyramid_jinja2/issues to report bugs.
 
 
 Indices and tables
