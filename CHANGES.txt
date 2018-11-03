@@ -414,7 +414,7 @@ Backward Incompatible Changes
 - Add ``includeme`` function (meant to be used via ``config.include``).
 
 - Fix documentation bug related to ``paster create`` reported at
-  https://github.com/Pylons/pyramid_jinja2/issues#issue/12
+  https://github.com/Pylons/pyramid_jinja2/issues/12
 
 - Depend upon Pyramid 1.0a10 + (to make ZCML work).
 
