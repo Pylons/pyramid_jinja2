@@ -174,9 +174,9 @@ htmlhelp_basename = 'atemplatedoc'
 # for cross referencing documentations
 intersphinx_mapping = {
     'jinja2': ('http://jinja.pocoo.org/docs/', None),
-    'pyramid': ('http://docs.pylonsproject.org/projects/pyramid/en/latest/', None),
-    'pyramid_zcml': ('http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/', None),
-    'pytest': ('http://pytest.org/latest/', None),
+    'pyramid': ('https://docs.pylonsproject.org/projects/pyramid/en/latest/', None),
+    'pyramid_zcml': ('https://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/', None),
+    'pytest': ('https://docs.pytest.org/en/latest/', None),
 }
 
 
