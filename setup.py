@@ -12,18 +12,10 @@
 #
 ##############################################################################
 
-import os
-import sys
-
 from setuptools import setup, find_packages
 
-here = os.path.abspath(os.path.dirname(__file__))
-if sys.version_info[0] > 2:
-    README = open(os.path.join(here, 'README.rst'), encoding="utf-8").read()
-    CHANGES = open(os.path.join(here, 'CHANGES.txt'), encoding="utf-8").read()
-else:
-    README = open(os.path.join(here, 'README.rst')).read()
-    CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+README = open('README.rst').read()
+CHANGES = open('CHANGES.txt').read()
 
 requires = [
     'Jinja2>=2.5.0',
@@ -31,11 +23,6 @@ requires = [
     'pyramid>=1.3.0', # pyramid.path.DottedNameResolver
     'zope.deprecation',
 ]
-
-try:
-    import wsgiref
-except ImportError:
-    requires.append('wsgiref')
 
 testing_extras = [
     'coverage',
