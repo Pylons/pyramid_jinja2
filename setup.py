@@ -35,7 +35,7 @@ docs_extras = [
 ]
 
 setup(name='pyramid_jinja2',
-      version='2.7',
+      version='2.8',
       description='Jinja2 template bindings for the Pyramid web framework',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[

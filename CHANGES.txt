@@ -1,11 +1,9 @@
-Unreleased
-==========
+2.8 (2019-01-25)
+================
 
 - Drop Python 3.3 support.
 
-- Add Python 3.6 support.
-
-- Add testing for Python 3.7 support with allowed failures.
+- Add Python 3.6 and 3.7 support.
 
 - Support the ``mapping`` argument in the injected ``gettext`` function.
   See https://github.com/Pylons/pyramid_jinja2/pull/143
