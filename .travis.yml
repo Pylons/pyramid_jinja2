@@ -18,7 +18,7 @@ matrix:
           dist: xenial
           sudo: true
         # aws s3 ls s3://travis-python-archives/binaries/ubuntu/14.04/x86_64/ | grep 'pypy.*bz2$'
-        - python: pypy-5.4.1
+        - python: pypy3.6-7.1.1
           env: TOXENV=pypy
         - python: 3.5
           env: TOXENV=py2-cover,py3-cover,coverage
