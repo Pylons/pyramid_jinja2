@@ -392,7 +392,7 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         })
         config.add_jinja2_renderer('.jinja2')
         result = render('tests_and_filters.jinja2', {})
-        #my_test_func returs "True" - it will be render as True when usign
+        #my_test_func returns "True" - it will be render as True when usign
         # as filter and will pass in tests
         self.assertEqual(result, text_('True is not False True', 'utf-8'))
         testing.tearDown()
