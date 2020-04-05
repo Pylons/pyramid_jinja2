@@ -40,7 +40,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v1
               with:
-                  python-version: 3.8
+                  python-version: 3.5
                   architecture: x64
             - run: pip install tox
             - run: tox -e py2-cover,py3-cover,coverage
