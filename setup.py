@@ -18,7 +18,7 @@ README = open("README.rst").read()
 CHANGES = open("CHANGES.txt").read()
 
 requires = [
-    "Jinja2>=2.5.0",
+    "Jinja2>=2.5.0,!=2.11.0,!=2.11.1",
     "MarkupSafe",
     "pyramid>=1.3.0",  # pyramid.path.DottedNameResolver
     "zope.deprecation",
