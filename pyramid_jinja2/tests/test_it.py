@@ -1,14 +1,8 @@
-## come on python gimme some of that sweet, sweet -*- coding: utf-8 -*-
+from io import StringIO
 
 import unittest
 from pyramid import testing
 
-from pyramid_jinja2.compat import (
-    text_type,
-    text_,
-    bytes_,
-    StringIO,
-)
 from .base import Base, Mock
 
 
@@ -136,14 +130,14 @@ class TestJinja2TemplateRenderer(Base, unittest.TestCase):
         template = DummyTemplate()
         instance = self._makeOne(lambda: template)
         result = instance({}, {'system': 1})
-        self.assertTrue(isinstance(result, text_type))
+        self.assertTrue(isinstance(result, str))
         self.assertEqual(result, 'result')
 
     def test_call_with_system_context(self):
         template = DummyTemplate()
         instance = self._makeOne(lambda: template)
         result = instance({}, {'context': 1})
-        self.assertTrue(isinstance(result, text_type))
+        self.assertTrue(isinstance(result, str))
         self.assertEqual(result, 'result')
 
     def test_call_with_nondict_value(self):
@@ -156,47 +150,47 @@ class SearchPathTests(object):
     def test_relative_tmpl_helloworld(self):
         from pyramid.renderers import render
         result = render('templates/helloworld.jinja2', {})
-        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
+        self.assertEqual(result, '\nHello föö')
 
     def test_relative_tmpl_extends(self):
         from pyramid.renderers import render
         result = render('templates/extends.jinja2', {})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_relative_tmpl_extends_spec(self):
         from pyramid.renderers import render
         result = render('templates/extends_spec.jinja2', {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_asset_tmpl_helloworld(self):
         from pyramid.renderers import render
         result = render('pyramid_jinja2.tests:templates/helloworld.jinja2',
                         {'a': 1})
-        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
+        self.assertEqual(result, '\nHello föö')
 
     def test_asset_tmpl_extends(self):
         from pyramid.renderers import render
         result = render('pyramid_jinja2.tests:templates/extends.jinja2',
                         {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_asset_tmpl_extends_spec(self):
         from pyramid.renderers import render
         result = render('pyramid_jinja2.tests:templates/extends_spec.jinja2',
                         {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_asset_tmpl_deep_sub_leaf(self):
         from pyramid.renderers import render
         result = render('pyramid_jinja2.tests:templates/deep/sub/leaf.jinja2', {})
-        self.assertEqual(result, text_('deep-base sub-base sub-leaf', 'utf-8'))
+        self.assertEqual(result, 'deep-base sub-base sub-leaf')
 
     def test_asset_tmpl_deep_leaf(self):
         from pyramid.renderers import render
         result = render('pyramid_jinja2.tests:templates/deep/leaf.jinja2', {})
         self.assertEqual(
             result,
-            text_('sub-nav\n\ndeep-formsdeep-base deep-leaf', 'utf-8'))
+            'sub-nav\n\ndeep-formsdeep-base deep-leaf')
 
     def test_abs_tmpl_extends(self):
         import os.path
@@ -204,7 +198,7 @@ class SearchPathTests(object):
         here = os.path.abspath(os.path.dirname(__file__))
         result = render(os.path.join(here, 'templates', 'extends.jinja2'),
                         {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_abs_tmpl_extends_missing(self):
         import os.path
@@ -232,17 +226,17 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
     def test_tmpl_helloworld(self):
         from pyramid.renderers import render
         result = render('helloworld.jinja2', {'a': 1})
-        self.assertEqual(result, text_('\nHello föö', 'utf-8'))
+        self.assertEqual(result, '\nHello föö')
 
     def test_tmpl_extends(self):
         from pyramid.renderers import render
         result = render('extends.jinja2', {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_tmpl_extends_spec(self):
         from pyramid.renderers import render
         result = render('extends_spec.jinja2', {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_tmpl_extends_relbase(self):
         from pyramid.renderers import render
@@ -250,7 +244,7 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         # and find it from there
         self.config.add_jinja2_search_path('pyramid_jinja2.tests:')
         result = render('extends_relbase.jinja2', {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_caller_relative_tmpl_extends_relbase(self):
         from pyramid.renderers import render
@@ -258,7 +252,7 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         # and find it from there
         self.config.add_jinja2_search_path('pyramid_jinja2.tests:')
         result = render('templates/extends_relbase.jinja2', {'a': 1})
-        self.assertEqual(result, text_('\nHello fööYo!', 'utf-8'))
+        self.assertEqual(result, '\nHello fööYo!')
 
     def test_recursive_tmpl(self):
         from pyramid.renderers import render
@@ -266,7 +260,7 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         self.config.add_jinja2_search_path(
             'pyramid_jinja2.tests:templates/recursive', name='.html')
         result = render('admin/index.html', {})
-        self.assertEqual(result, text_('foo'))
+        self.assertEqual(result, 'foo')
 
 
 class TestIntegrationDefaultSearchPath(SearchPathTests, unittest.TestCase):
@@ -394,7 +388,7 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         result = render('tests_and_filters.jinja2', {})
         #my_test_func returns "True" - it will be render as True when usign
         # as filter and will pass in tests
-        self.assertEqual(result, text_('True is not False True', 'utf-8'))
+        self.assertEqual(result, 'True is not False True')
         testing.tearDown()
 
 
@@ -584,7 +578,7 @@ class TestFileInfo(unittest.TestCase):
             def getmtime(self, fname):
                 return 1
 
-        mi = MyFileInfo(text_('nothing good here, move along'))
+        mi = MyFileInfo('nothing good here, move along')
         mi._delay_init()
         self.assertEqual(mi._contents, mi.data)
 
@@ -616,11 +610,11 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
 
         app1 = config1.make_wsgi_app()
         testapp = TestApp(app1)
-        self.assertEqual(testapp.get('/').body, bytes_('foo'))
+        self.assertEqual(testapp.get('/').body, b'foo')
 
         app2 = config2.make_wsgi_app()
         testapp = TestApp(app2)
-        self.assertEqual(testapp.get('/').body, bytes_('bar'))
+        self.assertEqual(testapp.get('/').body, b'bar')
 
     def test_it_relative_to_template(self):
         from pyramid.config import Configurator
@@ -639,8 +633,8 @@ class TestJinja2SearchPathIntegration(unittest.TestCase):
 
         app1 = config.make_wsgi_app()
         testapp = TestApp(app1)
-        self.assertEqual(testapp.get('/baz1').body, bytes_('baz1\nbaz1 body'))
-        self.assertEqual(testapp.get('/baz2').body, bytes_('baz2\nbaz2 body'))
+        self.assertEqual(testapp.get('/baz1').body, b'baz1\nbaz1 body')
+        self.assertEqual(testapp.get('/baz2').body, b'baz2\nbaz2 body')
 
 
 class TestPackageFinder(unittest.TestCase):
@@ -683,7 +677,7 @@ class TestNewstyle(unittest.TestCase):
 
         app = config.make_wsgi_app()
         testapp = TestApp(app)
-        self.assertEqual(testapp.get('/').body.decode('utf-8'), text_('my hovercraft is full of eels!'))
+        self.assertEqual(testapp.get('/').body.decode('utf-8'), 'my hovercraft is full of eels!')
 
 
 class Test_add_jinja2_extension(Base, unittest.TestCase):
