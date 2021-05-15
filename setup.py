@@ -44,13 +44,11 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Framework :: Pyramid",
         "License :: Repoze Public License",
     ],
@@ -68,10 +66,8 @@ setup(
     extras_require={"testing": testing_extras, "docs": docs_extras,},
     tests_require=requires + ["WebTest"],
     test_suite="pyramid_jinja2.tests",
-    python_requires=">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*",
+    python_requires=">=3.6",
     entry_points="""
-        [paste.paster_create_template]
-        pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate
         [pyramid.scaffold]
         pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate
       """,
