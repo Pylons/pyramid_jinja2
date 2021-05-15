@@ -8,12 +8,10 @@ jobs:
         strategy:
             matrix:
                 py: [
-                    '2.7',
-                    '3.5',
                     '3.6',
                     '3.7',
                     '3.8',
-                    'pypy2',
+                    '3.9',
                     'pypy3'
                 ]
         name: "Python: ${{ matrix.py }}"
@@ -29,21 +27,16 @@ jobs:
               run: tox -e py
     coverage:
         runs-on: ubuntu-latest
-        name: Validate coverage for Python 2/3
+        name: Validate coverage
         steps:
             - uses: actions/checkout@master
             - name: Setup python
               uses: actions/setup-python@v1
               with:
-                  python-version: 2.7
-                  architecture: x64
-            - name: Setup python
-              uses: actions/setup-python@v1
-              with:
-                  python-version: 3.5
+                  python-version: 3.9
                   architecture: x64
             - run: pip install tox
-            - run: tox -e py2-cover,py3-cover,coverage
+            - run: tox -e py39-coverage
     docs:
         runs-on: ubuntu-latest
         name: Build the documentation
@@ -52,7 +45,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v1
               with:
-                  python-version: 3.5
+                  python-version: 3.9
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs

@@ -8,11 +8,10 @@ jobs:
         strategy:
             matrix:
                 py: [
-                    '2.7',
-                    '3.5',
                     '3.6',
                     '3.7',
-                    '3.8'
+                    '3.8',
+                    '3.9'
                 ]
                 architecture: ['x86', 'x64']
         name: "Python: ${{ matrix.py }} (${{ matrix.architecture }})"
