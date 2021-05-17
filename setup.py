@@ -4,11 +4,11 @@
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
-# http://www.repoze.org/LICENSE.txt.  A copy of the license should accompany
-# this distribution.  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL
-# EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO,
-# THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND
-# FITNESS FOR A PARTICULAR PURPOSE
+# https://pylonsproject.org/license.html. A copy of the license should
+# accompany this distribution.  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND
+# ALL EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT,
+# AND FITNESS FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
 
@@ -58,7 +58,7 @@ setup(
     maintainer="Domen Kozar",
     maintainer_email="domen@dev.si",
     url="https://github.com/Pylons/pyramid_jinja2",
-    license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
+    license="BSD-derived (https://pylonsproject.org/license.html)",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
