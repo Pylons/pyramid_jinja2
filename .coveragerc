@@ -1,0 +1,13 @@
+[run]
+source =
+    pyramid_jinja2
+
+[paths]
+source =
+    pyramid_jinja2
+    */pyramid_jinja2
+    */site-packages/pyramid_jinja2
+
+[report]
+show_missing = true
+precision = 2
