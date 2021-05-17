@@ -4,9 +4,11 @@ from pyramid import testing
 class DummyRoot(object):
     __name__ = __parent__ = None
 
+
 class DummyModel(object):
     __name__ = 'dummy'
     __parent__ = DummyRoot()
+
 
 class Base(object):
     def setUp(self):
@@ -22,7 +24,8 @@ class Base(object):
     def tearDown(self):
         testing.tearDown()
 
-    def _addFilters(self): pass
+    def _addFilters(self):
+        pass  # pragma: nocover
 
     def _callFUT(self, context, tmpl):
         tmpl = self.environment.from_string(tmpl)

@@ -6,7 +6,8 @@ from pyramid import testing
 from .base import Base, Mock
 
 
-def dummy_filter(value): return 'hoge'
+def dummy_filter(value):
+    return 'hoge'  # pragma: nocover
 
 
 class Test_renderer_factory(Base, unittest.TestCase):
