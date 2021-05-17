@@ -14,8 +14,8 @@
 
 from setuptools import find_packages, setup
 
-README = open("README.rst").read()
-CHANGES = open("CHANGES.txt").read()
+README = open('README.rst').read()
+CHANGES = open('CHANGES.rst').read()
 
 requires = [
     "Jinja2>=2.5.0,!=2.11.0,!=2.11.1",
@@ -67,8 +67,9 @@ setup(
     tests_require=requires + ["WebTest"],
     test_suite="pyramid_jinja2.tests",
     python_requires=">=3.6",
-    entry_points="""
-        [pyramid.scaffold]
-        pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate
-      """,
+    entry_points={
+        'pyramid.scaffold': [
+            'pyramid_jinja2_starter = pyramid_jinja2.scaffolds:Jinja2ProjectTemplate',  # noqa: E501
+        ],
+    },
 )
