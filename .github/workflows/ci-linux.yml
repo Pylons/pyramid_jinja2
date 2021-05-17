@@ -14,11 +14,11 @@ jobs:
                     '3.9',
                     'pypy3'
                 ]
-        name: "Python: ${{ matrix.py }}"
+        name: 'Python: ${{ matrix.py }}'
         steps:
-            - uses: actions/checkout@master
+            - uses: actions/checkout@v2
             - name: Setup python
-              uses: actions/setup-python@v1
+              uses: actions/setup-python@v2
               with:
                   python-version: ${{ matrix.py }}
                   architecture: x64
@@ -29,9 +29,9 @@ jobs:
         runs-on: ubuntu-latest
         name: Validate coverage
         steps:
-            - uses: actions/checkout@master
+            - uses: actions/checkout@v2
             - name: Setup python
-              uses: actions/setup-python@v1
+              uses: actions/setup-python@v2
               with:
                   python-version: 3.9
                   architecture: x64
@@ -41,9 +41,9 @@ jobs:
         runs-on: ubuntu-latest
         name: Build the documentation
         steps:
-            - uses: actions/checkout@master
+            - uses: actions/checkout@v2
             - name: Setup python
-              uses: actions/setup-python@v1
+              uses: actions/setup-python@v2
               with:
                   python-version: 3.9
                   architecture: x64
@@ -53,11 +53,11 @@ jobs:
 #        runs-on: ubuntu-latest
 #        name: Lint the package
 #        steps:
-#            - uses: actions/checkout@master
+#            - uses: actions/checkout@v2
 #            - name: Setup python
-#              uses: actions/setup-python@v1
+#              uses: actions/setup-python@v2
 #              with:
-#                  python-version: 3.8
+#                  python-version: 3.9
 #                  architecture: x64
 #            - run: pip install tox
 #            - run: tox -e lint
