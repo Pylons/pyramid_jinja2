@@ -6,4 +6,4 @@ class TestExtension(Extension):
     tags = {'test_ext'}
 
     def parse(self, parser):
-        return nodes.Const('This is test extension')  # pragma: nocover
+        return nodes.Const("This is test extension")  # pragma: nocover
