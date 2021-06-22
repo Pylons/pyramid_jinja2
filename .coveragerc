@@ -1,6 +1,8 @@
 [run]
 source =
     pyramid_jinja2
+omit =
+    pyramid_jinja2/scaffolds/__init__.py
 
 [paths]
 source =
