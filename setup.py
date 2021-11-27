@@ -4,34 +4,41 @@
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
-# http://www.repoze.org/LICENSE.txt.  A copy of the license should accompany
-# this distribution.  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL
-# EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO,
-# THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND
-# FITNESS FOR A PARTICULAR PURPOSE
+# https://pylonsproject.org/license.html. A copy of the license should
+# accompany this distribution.  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND
+# ALL EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT,
+# AND FITNESS FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
 
 from setuptools import find_packages, setup
 
 README = open("README.rst").read()
-CHANGES = open("CHANGES.txt").read()
+CHANGES = open("CHANGES.rst").read()
 
 requires = [
-    "Jinja2>=2.5.0,!=2.11.0,!=2.11.1",
-    "MarkupSafe",
+    "jinja2>=2.5.0,!=2.11.0,!=2.11.1",
+    "markupsafe",
     "pyramid>=1.3.0",  # pyramid.path.DottedNameResolver
     "zope.deprecation",
 ]
 
-testing_extras = [
-    "coverage",
-    "nose>=1.2.0",
-    "WebTest",
+tests_require = [
+    "jinja2>=2.5.0,!=2.11.0,!=2.11.1",
+    "pyramid>=1.3.0",  # pyramid.path.DottedNameResolver
+    "webtest",
 ]
+
 docs_extras = [
     "pylons-sphinx-themes >= 0.3",
-    "Sphinx>=1.7.5",
+    "sphinx>=1.7.5",
+]
+
+testing_extras = tests_require + [
+    "coverage",
+    "pytest>=5.4.2",
+    "pytest-cov",
 ]
 
 setup(
@@ -44,13 +51,11 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Framework :: Pyramid",
         "License :: Repoze Public License",
     ],
@@ -60,19 +65,18 @@ setup(
     maintainer="Domen Kozar",
     maintainer_email="domen@dev.si",
     url="https://github.com/Pylons/pyramid_jinja2",
-    license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
+    license="BSD-derived (https://pylonsproject.org/license.html)",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     install_requires=requires,
-    extras_require={"testing": testing_extras, "docs": docs_extras,},
-    tests_require=requires + ["WebTest"],
+    extras_require={"testing": testing_extras, "docs": docs_extras},
+    tests_require=tests_require,
     test_suite="pyramid_jinja2.tests",
-    python_requires=">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*",
-    entry_points="""
-        [paste.paster_create_template]
-        pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate
-        [pyramid.scaffold]
-        pyramid_jinja2_starter=pyramid_jinja2.scaffolds:Jinja2ProjectTemplate
-      """,
+    python_requires=">=3.6",
+    entry_points={
+        "pyramid.scaffold": [
+            "pyramid_jinja2_starter = pyramid_jinja2.scaffolds:Jinja2ProjectTemplate",  # noqa: E501
+        ],
+    },
 )

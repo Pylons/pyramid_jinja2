@@ -1,0 +1,15 @@
+[run]
+source =
+    pyramid_jinja2
+omit =
+    pyramid_jinja2/scaffolds/__init__.py
+
+[paths]
+source =
+    pyramid_jinja2
+    */pyramid_jinja2
+    */site-packages/pyramid_jinja2
+
+[report]
+show_missing = true
+precision = 2

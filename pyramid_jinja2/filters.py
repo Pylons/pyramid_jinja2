@@ -1,7 +1,7 @@
 from pyramid.url import resource_url, route_url, static_url
 from pyramid.url import route_path, static_path
 from pyramid.threadlocal import get_current_request
-from jinja2 import contextfilter
+from jinja2 import pass_context
 
 
 __all__ = [
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-@contextfilter
+@pass_context
 def resource_url_filter(ctx, model, *elements, **kw):
     """A filter from ``model`` to a string representing the absolute URL.
     This filter calls :py:func:`pyramid.url.resource_url`.
@@ -36,7 +36,7 @@ def resource_url_filter(ctx, model, *elements, **kw):
     return resource_url(model, request, *elements, **kw)
 
 
-@contextfilter
+@pass_context
 def model_url_filter(ctx, model, *elements, **kw):
     """A filter from ``model`` to a string representing the absolute URL.
     This filter calls :py:func:`pyramid.url.resource_url`.
@@ -51,7 +51,7 @@ def model_url_filter(ctx, model, *elements, **kw):
     return resource_url(model, request, *elements, **kw)
 
 
-@contextfilter
+@pass_context
 def model_path_filter(ctx, model, *elements, **kw):
     """A filter from ``model`` to a string representing the relative URL.
     This filter calls :py:meth:`pyramid.request.Request.resource_path`.
@@ -60,7 +60,7 @@ def model_path_filter(ctx, model, *elements, **kw):
     return request.resource_path(model, *elements, **kw)
 
 
-@contextfilter
+@pass_context
 def route_url_filter(ctx, route_name, *elements, **kw):
     """A filter from ``route_name`` to a string representing the absolute URL.
     This filter calls :py:func:`pyramid.url.route_url`.
@@ -76,7 +76,7 @@ def route_url_filter(ctx, route_name, *elements, **kw):
     return route_url(route_name, request, *elements, **kw)
 
 
-@contextfilter
+@pass_context
 def route_path_filter(ctx, route_name, *elements, **kw):
     """A filter from ``route_name`` to a string representing the relative URL.
     This filter calls :py:func:`pyramid.url.route_path`.
@@ -85,7 +85,7 @@ def route_path_filter(ctx, route_name, *elements, **kw):
     return route_path(route_name, request, *elements, **kw)
 
 
-@contextfilter
+@pass_context
 def static_url_filter(ctx, path, **kw):
     """A filter from ``path`` to a string representing the absolute URL.
     This filter calls :py:func:`pyramid.url.static_url`.
@@ -99,7 +99,7 @@ def static_url_filter(ctx, path, **kw):
     return static_url(path, request, **kw)
 
 
-@contextfilter
+@pass_context
 def static_path_filter(ctx, path, **kw):
     """A filter from ``path`` to a string representing the relative URL.
     This filter calls :py:func:`pyramid.url.static_path`.

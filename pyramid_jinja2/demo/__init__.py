@@ -14,34 +14,34 @@ def root_view(request):
     localizer = get_localizer(request)
     return {
         'pyramid_translated': localizer.translate(_('Hello World')),
-        'locale_name': get_locale_name(request)
-       }
+        'locale_name': get_locale_name(request),
+    }
 
 
 def app(global_settings, **settings):
     config = Configurator(settings=settings)
     config.include('pyramid_jinja2')
     config.add_route(name='root', pattern='/')
-    config.add_view(root_view,
-                    renderer='helloworld.jinja2')
+    config.add_view(root_view, renderer='helloworld.jinja2')
     config.add_translation_dirs('pyramid_jinja2.demo:locale/')
     return config.make_wsgi_app()
 
 
 class Mainer(object):
-
     import wsgiref.simple_server
+
     make_server = wsgiref.simple_server.make_server
 
     def main(self):
         port = 8080
-        httpd = self.make_server('', port, app({}, **{
-                    'DEBUG': True,
-                    'reload_templates': True,
-                    }))
+        app_config = {'DEBUG': True, 'reload_templates': True}
+        pyramid_app = app({}, **app_config)
+        httpd = self.make_server('', port, pyramid_app)
         # Serve until process is killed
         httpd.serve_forever()
 
+
 main = Mainer().main
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()  # pragma: nocover

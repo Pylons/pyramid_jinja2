@@ -9,7 +9,6 @@ from jinja2 import (
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.settings import asbool
 
-from .compat import string_types
 from .i18n import GetTextWrapper
 
 
@@ -30,7 +29,7 @@ def parse_named_assetspecs(input, maybe_dotted):
     """
     # input must be a string or dict
     result = {}
-    if isinstance(input, string_types):
+    if isinstance(input, str):
         for f in splitlines(input):
             name, impl = f.split('=', 1)
             result[name.strip()] = maybe_dotted(impl.strip())
@@ -41,7 +40,7 @@ def parse_named_assetspecs(input, maybe_dotted):
 
 
 def parse_multiline(extensions):
-    if isinstance(extensions, string_types):
+    if isinstance(extensions, str):
         extensions = list(splitlines(extensions))
     return extensions
 

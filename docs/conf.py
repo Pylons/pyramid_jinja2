@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # pyramid_jinja2 documentation build configuration file
 #
 # This file is execfile()d with the current directory set to its containing

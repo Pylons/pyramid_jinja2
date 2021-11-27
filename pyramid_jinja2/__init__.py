@@ -15,7 +15,6 @@ from pyramid.path import DottedNameResolver
 from zope.deprecation import deprecated
 from zope.interface import Interface
 
-from .compat import text_type
 from .settings import (
     parse_env_options_from_settings,
     parse_loader_options_from_settings,
@@ -59,13 +58,12 @@ class FileInfo(object):
             raise TemplateNotFound(self.filename)
         self._mtime = self.getmtime(self.filename)
 
-        data = ''
         try:
             data = f.read()
         finally:
             f.close()
 
-        if not isinstance(data, text_type):
+        if not isinstance(data, str):
             data = data.decode(self.encoding)
         self._contents = data
 
