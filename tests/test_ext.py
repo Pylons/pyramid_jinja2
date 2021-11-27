@@ -10,16 +10,15 @@ class TestExtensions(Base, unittest.TestCase):
         from pyramid_jinja2.settings import parse_env_options_from_settings
 
         options = {
-            'extensions': 'pyramid_jinja2.tests.extensions.TestExtension',
+            'extensions': 'tests.extensions.TestExtension',
         }
         settings = parse_env_options_from_settings(
             options, '', maybe_dotted, None)
         env = create_environment_from_options(settings, {})
         ext = env.extensions[
-            'pyramid_jinja2.tests.extensions.TestExtension']
-        import pyramid_jinja2.tests.extensions
-        self.assertEqual(ext.__class__,
-                         pyramid_jinja2.tests.extensions.TestExtension)
+            'tests.extensions.TestExtension']
+        from . import extensions
+        self.assertEqual(ext.__class__, extensions.TestExtension)
 
     def test_i18n(self):
         from pyramid_jinja2 import create_environment_from_options
@@ -30,10 +29,9 @@ class TestExtensions(Base, unittest.TestCase):
 
         self.assertTrue(hasattr(env, 'install_gettext_translations'))
 
-        self.config.add_translation_dirs('pyramid_jinja2.tests:locale/')
+        self.config.add_translation_dirs('tests:locale/')
         self.request.locale_name = 'en'
-        template = env.get_template(
-            'pyramid_jinja2.tests:templates/i18n.jinja2')
+        template = env.get_template('tests:templates/i18n.jinja2')
         context = {'var' : 'variables'}
         self.assertEqual(template.render(**context),
                          'some untranslated text here\nyay it worked!\n'

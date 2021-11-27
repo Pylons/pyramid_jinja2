@@ -11,32 +11,32 @@ class Test_parse_named_assetspecs(unittest.TestCase):
     def test_it_with_strings(self):
         from pyramid.path import DottedNameResolver
         import pyramid_jinja2
-        import pyramid_jinja2.tests
+        import tests
         resolver = DottedNameResolver()
         result = self._callFUT(
             '''
             foo = pyramid_jinja2
-            bar= pyramid_jinja2.tests
+            bar= tests
             ''',
             resolver.maybe_resolve,
         )
         self.assertEqual(result['foo'], pyramid_jinja2)
-        self.assertEqual(result['bar'], pyramid_jinja2.tests)
+        self.assertEqual(result['bar'], tests)
 
     def test_it_with_dict(self):
         from pyramid.path import DottedNameResolver
         import pyramid_jinja2
-        import pyramid_jinja2.tests
+        import tests
         resolver = DottedNameResolver()
         result = self._callFUT(
             {
                 'foo': 'pyramid_jinja2',
-                'bar': pyramid_jinja2.tests,
+                'bar': tests,
             },
             resolver.maybe_resolve,
         )
         self.assertEqual(result['foo'], pyramid_jinja2)
-        self.assertEqual(result['bar'], pyramid_jinja2.tests)
+        self.assertEqual(result['bar'], tests)
 
 
 class Test_parse_loader_options_from_settings(unittest.TestCase):
@@ -57,7 +57,7 @@ class Test_parse_loader_options_from_settings(unittest.TestCase):
                 'debug_templates': 'false',
                 'p.debug_templates': 'true',
                 'p.input_encoding': 'ascii',
-                'p.directories': 'pyramid_jinja2.tests:templates',
+                'p.directories': 'tests:templates',
             },
             'p.', None, None,
         )
@@ -149,7 +149,7 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
 
     def test_finalize(self):
         settings = {
-            'j2.finalize': 'pyramid_jinja2.tests.test_settings._fake_finalize',
+            'j2.finalize': 'tests.test_settings._fake_finalize',
         }
         opts = self._callFUT(settings, 'j2.')
         self.assertTrue(opts['finalize'] is _fake_finalize)

@@ -103,7 +103,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(environ.filters['dummy'], dummy_filter)
 
     def test_with_filters_string(self):
-        m = 'pyramid_jinja2.tests.test_it'
+        m = 'tests.test_it'
         self.config.registry.settings.update(
             {'jinja2.directories': self.templates_dir,
              'jinja2.filters': 'dummy=%s:dummy_filter' % m})
@@ -165,30 +165,27 @@ class SearchPathTests(object):
 
     def test_asset_tmpl_helloworld(self):
         from pyramid.renderers import render
-        result = render('pyramid_jinja2.tests:templates/helloworld.jinja2',
-                        {'a': 1})
+        result = render('tests:templates/helloworld.jinja2', {'a': 1})
         self.assertEqual(result, '\nHello föö')
 
     def test_asset_tmpl_extends(self):
         from pyramid.renderers import render
-        result = render('pyramid_jinja2.tests:templates/extends.jinja2',
-                        {'a': 1})
+        result = render('tests:templates/extends.jinja2', {'a': 1})
         self.assertEqual(result, '\nHello fööYo!')
 
     def test_asset_tmpl_extends_spec(self):
         from pyramid.renderers import render
-        result = render('pyramid_jinja2.tests:templates/extends_spec.jinja2',
-                        {'a': 1})
+        result = render('tests:templates/extends_spec.jinja2', {'a': 1})
         self.assertEqual(result, '\nHello fööYo!')
 
     def test_asset_tmpl_deep_sub_leaf(self):
         from pyramid.renderers import render
-        result = render('pyramid_jinja2.tests:templates/deep/sub/leaf.jinja2', {})
+        result = render('tests:templates/deep/sub/leaf.jinja2', {})
         self.assertEqual(result, 'deep-base sub-base sub-leaf')
 
     def test_asset_tmpl_deep_leaf(self):
         from pyramid.renderers import render
-        result = render('pyramid_jinja2.tests:templates/deep/leaf.jinja2', {})
+        result = render('tests:templates/deep/leaf.jinja2', {})
         self.assertEqual(
             result,
             'sub-nav\n\ndeep-formsdeep-base deep-leaf')
@@ -216,8 +213,7 @@ class SearchPathTests(object):
 class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
     def setUp(self):
         config = testing.setUp()
-        config.add_settings({'jinja2.directories':
-                             'pyramid_jinja2.tests:templates'})
+        config.add_settings({'jinja2.directories': 'tests:templates'})
         config.include('pyramid_jinja2')
         self.config = config
 
@@ -243,7 +239,7 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         from pyramid.renderers import render
         # this should pass as it will fallback to the new search path
         # and find it from there
-        self.config.add_jinja2_search_path('pyramid_jinja2.tests:')
+        self.config.add_jinja2_search_path('tests:')
         result = render('extends_relbase.jinja2', {'a': 1})
         self.assertEqual(result, '\nHello fööYo!')
 
@@ -251,15 +247,14 @@ class TestIntegrationWithSearchPath(SearchPathTests, unittest.TestCase):
         from pyramid.renderers import render
         # this should pass as it will fallback to the new search path
         # and find it from there
-        self.config.add_jinja2_search_path('pyramid_jinja2.tests:')
+        self.config.add_jinja2_search_path('tests:')
         result = render('templates/extends_relbase.jinja2', {'a': 1})
         self.assertEqual(result, '\nHello fööYo!')
 
     def test_recursive_tmpl(self):
         from pyramid.renderers import render
         self.config.add_jinja2_renderer('.html')
-        self.config.add_jinja2_search_path(
-            'pyramid_jinja2.tests:templates/recursive', name='.html')
+        self.config.add_jinja2_search_path('tests:templates/recursive', name='.html')
         result = render('admin/index.html', {})
         self.assertEqual(result, 'foo')
 
@@ -335,42 +330,42 @@ class Test_filters_and_tests(Base, unittest.TestCase):
 
     def test_set_single_filter(self):
         self.config.registry.settings['jinja2.filters'] = \
-                'my_filter = pyramid_jinja2.tests.test_it.my_test_func'
+                'my_filter = tests.test_it.my_test_func'
         self._assert_has_filter('my_filter', my_test_func)
 
     def test_set_single_test(self):
         self.config.registry.settings['jinja2.tests'] = \
-                'my_test = pyramid_jinja2.tests.test_it.my_test_func'
+                'my_test = tests.test_it.my_test_func'
         self._assert_has_test('my_test', my_test_func)
 
     def test_set_single_global(self):
         self.config.registry.settings['jinja2.globals'] = \
-                'my_test = pyramid_jinja2.tests.test_it.my_test_func'
+                'my_test = tests.test_it.my_test_func'
         self._assert_has_global('my_test', my_test_func)
 
     def test_set_multi_filters(self):
         self.config.registry.settings['jinja2.filters'] = \
-                'my_filter1 = pyramid_jinja2.tests.test_it.my_test_func\n' \
-                'my_filter2 = pyramid_jinja2.tests.test_it.my_test_func\n' \
-                'my_filter3 = pyramid_jinja2.tests.test_it.my_test_func'
+                'my_filter1 = tests.test_it.my_test_func\n' \
+                'my_filter2 = tests.test_it.my_test_func\n' \
+                'my_filter3 = tests.test_it.my_test_func'
         self._assert_has_filter('my_filter1', my_test_func)
         self._assert_has_filter('my_filter2', my_test_func)
         self._assert_has_filter('my_filter3', my_test_func)
 
     def test_set_multi_tests(self):
         self.config.registry.settings['jinja2.tests'] = \
-                'my_test1 = pyramid_jinja2.tests.test_it.my_test_func\n' \
-                'my_test2 = pyramid_jinja2.tests.test_it.my_test_func\n' \
-                'my_test3 = pyramid_jinja2.tests.test_it.my_test_func'
+                'my_test1 = tests.test_it.my_test_func\n' \
+                'my_test2 = tests.test_it.my_test_func\n' \
+                'my_test3 = tests.test_it.my_test_func'
         self._assert_has_test('my_test1', my_test_func)
         self._assert_has_test('my_test2', my_test_func)
         self._assert_has_test('my_test3', my_test_func)
 
     def test_set_multi_globals(self):
         self.config.registry.settings['jinja2.globals'] = \
-                'my_global1 = pyramid_jinja2.tests.test_it.my_test_func\n' \
-                'my_global2 = pyramid_jinja2.tests.test_it.my_test_func\n' \
-                'my_global3 = pyramid_jinja2.tests.test_it.my_test_func'
+                'my_global1 = tests.test_it.my_test_func\n' \
+                'my_global2 = tests.test_it.my_test_func\n' \
+                'my_global3 = tests.test_it.my_test_func'
         self._assert_has_global('my_global1', my_test_func)
         self._assert_has_global('my_global2', my_test_func)
         self._assert_has_global('my_global3', my_test_func)
@@ -380,10 +375,10 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         config = testing.setUp()
         config.include('pyramid_jinja2')
         config.add_settings({
-            'jinja2.directories': 'pyramid_jinja2.tests:templates',
-            'jinja2.tests': 'my_test = pyramid_jinja2.tests.test_it.my_test_func',
-            'jinja2.filters': 'my_filter = pyramid_jinja2.tests.test_it.my_test_func',
-            'jinja2.globals': 'my_global = pyramid_jinja2.tests.test_it.my_test_func'
+            'jinja2.directories': 'tests:templates',
+            'jinja2.tests': 'my_test = tests.test_it.my_test_func',
+            'jinja2.filters': 'my_filter = tests.test_it.my_test_func',
+            'jinja2.globals': 'my_global = tests.test_it.my_test_func'
         })
         config.add_jinja2_renderer('.jinja2')
         result = render('tests_and_filters.jinja2', {})
@@ -407,14 +402,14 @@ class Test_includeme(unittest.TestCase):
 
 class Test_add_jinja2_searchpath(unittest.TestCase):
     def test_it_relative_to_package(self):
-        import pyramid_jinja2.tests
+        import tests
         from pyramid_jinja2 import includeme
         import os
         config = testing.setUp()
         # hack because pyramid pre 1.6 doesn't configure testing configurator
         # with the correct package name
-        config.package = pyramid_jinja2.tests
-        config.package_name = 'pyramid_jinja2.tests'
+        config.package = tests
+        config.package_name = 'tests'
         config.add_settings({'jinja2.directories': 'foobar'})
         includeme(config)
         env = config.get_jinja2_environment()
@@ -521,13 +516,13 @@ class TestSmartAssetSpecLoader(unittest.TestCase):
 
     def test_get_source_spec(self):
         loader = self._makeOne()
-        asset = 'pyramid_jinja2.tests:templates/helloworld.jinja2'
+        asset = 'tests:templates/helloworld.jinja2'
         self.assertNotEqual(loader.get_source(None, asset), None)
 
     def test_get_source_legacy_spec(self):
         loader = self._makeOne()
         # make sure legacy prefixed asset spec based loading works
-        asset = 'asset:pyramid_jinja2.tests:templates/helloworld.jinja2'
+        asset = 'asset:tests:templates/helloworld.jinja2'
         self.assertNotEqual(loader.get_source(None, asset), None)
 
     def test_get_source_from_path(self):
@@ -544,8 +539,7 @@ class TestFileInfo(unittest.TestCase):
         from pyramid_jinja2 import FileInfo
         from pyramid.asset import abspath_from_asset_spec
 
-        filename = abspath_from_asset_spec('templates/helloworld.jinja2',
-                                           'pyramid_jinja2.tests')
+        filename = abspath_from_asset_spec('templates/helloworld.jinja2', 'tests')
 
         fi = FileInfo(filename)
         assert '_mtime' not in fi.__dict__

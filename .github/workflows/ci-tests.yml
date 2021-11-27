@@ -15,11 +15,11 @@ jobs:
         strategy:
             matrix:
                 py:
-                    - "3.6"
                     - "3.7"
                     - "3.8"
                     - "3.9"
-                    - "pypy3"
+                    - "3.10"
+                    - "pypy-3.7"
                 os:
                     - "ubuntu-latest"
                     - "windows-latest"
@@ -28,24 +28,12 @@ jobs:
                     - x64
                     - x86
 
-                include:
-                    # Only run coverage on ubuntu-latest, except on pypy3
-                    - os: "ubuntu-latest"
-                      pytest-args: "--cov"
-                    - os: "ubuntu-latest"
-                      py: "pypy3"
-                      pytest-args: ""
-
                 exclude:
                     # Linux and macOS don't have x86 python
                     - os: "ubuntu-latest"
                       architecture: x86
                     - os: "macos-latest"
                       architecture: x86
-                    # PyPy3 on Windows doesn't seem to work
-                    - os: "windows-latest"
-                      py: "pypy3"
-
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
@@ -57,19 +45,20 @@ jobs:
                   architecture: ${{ matrix.architecture }}
             - run: pip install tox
             - name: Running tox
-              run: tox -e py -- ${{ matrix.pytest-args }}
+              run: tox -e py
     coverage:
         runs-on: ubuntu-latest
         name: Validate coverage
         steps:
             - uses: actions/checkout@v2
-            - name: Setup python
+            - name: Setup python 3.10
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.9
+                  python-version: "3.10"
                   architecture: x64
+
             - run: pip install tox
-            - run: tox -e py39-coverage
+            - run: tox -e py310-cover,coverage
     docs:
         runs-on: ubuntu-latest
         name: Build the documentation
@@ -78,19 +67,19 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.9
+                  python-version: "3.10"
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
-#    lint:
-#        runs-on: ubuntu-latest
-#        name: Lint the package
-#        steps:
-#            - uses: actions/checkout@v2
-#            - name: Setup python
-#              uses: actions/setup-python@v2
-#              with:
-#                  python-version: 3.9
-#                  architecture: x64
-#            - run: pip install tox
-#            - run: tox -e lint
+    # lint:
+    #     runs-on: ubuntu-latest
+    #     name: Lint the package
+    #     steps:
+    #         - uses: actions/checkout@v2
+    #         - name: Setup python
+    #           uses: actions/setup-python@v2
+    #           with:
+    #               python-version: "3.10"
+    #               architecture: x64
+    #         - run: pip install tox
+    #         - run: tox -e lint

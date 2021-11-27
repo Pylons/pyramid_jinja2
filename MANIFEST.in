@@ -1,7 +1,21 @@
-recursive-include docs *
-recursive-include pyramid_jinja2 *
+graft src/pyramid_jinja2
+graft tests
+graft docs
+graft demo
+graft .github
 
-recursive-exclude docs *.pyc
-recursive-exclude pyramid_jinja2 *.pyc
+include README.rst
+include CHANGES.txt
+include LICENSE.txt
+include CONTRIBUTORS.txt
+include COPYRIGHT.txt
 
-include *.txt *.ini *.rst
+include pyproject.toml
+include setup.cfg
+include .coveragerc
+include tox.ini
+include rtd.txt
+
+prune docs/_build
+
+recursive-exclude * __pycache__ *.py[cod]

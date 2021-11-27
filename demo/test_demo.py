@@ -4,18 +4,18 @@ import pyramid.testing
 
 class DemoTests(unittest.TestCase):
     def test_root_view(self):
-        from pyramid_jinja2.demo import root_view
+        from demo import root_view
         m = pyramid.testing.DummyRequest()
         root_view(m)
         self.assertEqual(m.locale_name, 'fr')
 
     def test_app(self):
-        from pyramid_jinja2.demo import app
+        from demo import app
         webapp = app({})
         self.assertTrue(callable(webapp))
 
     def test_main(self):
-        from pyramid_jinja2.demo import Mainer
+        from demo import Mainer
 
         class MyMainer(Mainer):
             def serve_forever(self):
