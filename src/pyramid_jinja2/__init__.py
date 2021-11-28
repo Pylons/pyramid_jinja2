@@ -12,7 +12,7 @@ from pyramid.path import DottedNameResolver
 from zope.deprecation import deprecated
 from zope.interface import Interface
 
-from pyramid_jinja2.settings import (
+from .settings import (
     parse_env_options_from_settings,
     parse_loader_options_from_settings,
     parse_multiline,

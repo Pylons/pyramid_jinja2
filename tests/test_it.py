@@ -3,7 +3,7 @@ import unittest
 
 from pyramid import testing
 
-from tests.base import Base, Mock
+from .base import Base, Mock
 
 
 def dummy_filter(value):
