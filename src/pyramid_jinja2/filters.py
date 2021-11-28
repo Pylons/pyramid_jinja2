@@ -1,16 +1,14 @@
-from pyramid.url import resource_url, route_url, static_url
-from pyramid.url import route_path, static_path
-from pyramid.threadlocal import get_current_request
 from jinja2 import pass_context
-
+from pyramid.threadlocal import get_current_request
+from pyramid.url import resource_url, route_path, route_url, static_path, static_url
 
 __all__ = [
-    'resource_url_filter',
-    'model_url_filter',
-    'route_url_filter',
-    'route_path_filter',
-    'static_url_filter',
-    'static_path_filter',
+    "resource_url_filter",
+    "model_url_filter",
+    "route_url_filter",
+    "route_path_filter",
+    "static_url_filter",
+    "static_path_filter",
 ]
 
 
@@ -32,7 +30,7 @@ def resource_url_filter(ctx, model, *elements, **kw):
         </a>
 
     """
-    request = ctx.get('request') or get_current_request()
+    request = ctx.get("request") or get_current_request()
     return resource_url(model, request, *elements, **kw)
 
 
@@ -47,7 +45,7 @@ def model_url_filter(ctx, model, *elements, **kw):
         See :py:func:`pyramid_jinja2.filters.resource_url`
 
     """
-    request = ctx.get('request') or get_current_request()
+    request = ctx.get("request") or get_current_request()
     return resource_url(model, request, *elements, **kw)
 
 
@@ -56,7 +54,7 @@ def model_path_filter(ctx, model, *elements, **kw):
     """A filter from ``model`` to a string representing the relative URL.
     This filter calls :py:meth:`pyramid.request.Request.resource_path`.
     """
-    request = ctx.get('request') or get_current_request()
+    request = ctx.get("request") or get_current_request()
     return request.resource_path(model, *elements, **kw)
 
 
@@ -72,7 +70,7 @@ def route_url_filter(ctx, route_name, *elements, **kw):
         </a>
 
     """
-    request = ctx.get('request') or get_current_request()
+    request = ctx.get("request") or get_current_request()
     return route_url(route_name, request, *elements, **kw)
 
 
@@ -81,7 +79,7 @@ def route_path_filter(ctx, route_name, *elements, **kw):
     """A filter from ``route_name`` to a string representing the relative URL.
     This filter calls :py:func:`pyramid.url.route_path`.
     """
-    request = ctx.get('request') or get_current_request()
+    request = ctx.get("request") or get_current_request()
     return route_path(route_name, request, *elements, **kw)
 
 
@@ -95,7 +93,7 @@ def static_url_filter(ctx, path, **kw):
        <link rel="stylesheet" href="{{'yourapp:static/css/style.css'|static_url}}" />
 
     """
-    request = ctx.get('request') or get_current_request()
+    request = ctx.get("request") or get_current_request()
     return static_url(path, request, **kw)
 
 
@@ -104,5 +102,5 @@ def static_path_filter(ctx, path, **kw):
     """A filter from ``path`` to a string representing the relative URL.
     This filter calls :py:func:`pyramid.url.static_path`.
     """
-    request = ctx.get('request') or get_current_request()
+    request = ctx.get("request") or get_current_request()
     return static_path(path, request, **kw)

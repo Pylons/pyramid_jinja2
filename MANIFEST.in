@@ -5,7 +5,7 @@ graft demo
 graft .github
 
 include README.rst
-include CHANGES.txt
+include CHANGES.rst
 include LICENSE.txt
 include CONTRIBUTORS.txt
 include COPYRIGHT.txt
@@ -17,5 +17,6 @@ include tox.ini
 include rtd.txt
 
 prune docs/_build
+prune docs/_themes
 
 recursive-exclude * __pycache__ *.py[cod]
