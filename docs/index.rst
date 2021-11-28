@@ -43,7 +43,7 @@ All are completely equivalent:
    .. code-block:: python
 
         config = Configurator()
-        config.include('pyramid_jinja2')
+        config.include("pyramid_jinja2")
 
 #) Add ``pyramid_jinja2`` to the list of your ``pyramid.includes`` in your
    :file:`.ini` settings file.
@@ -123,9 +123,9 @@ Here's an example view configuration which uses an :term:`asset specification`:
 .. code-block:: python
    :linenos:
 
-   @view_config(renderer='mypackage:templates/foo.jinja2')
+   @view_config(renderer="mypackage:templates/foo.jinja2")
    def hello_world(request):
-       return {'a': 1}
+       return {"a": 1}
 
 Asset specifications have some significant benefits in Pyramid, as they can be
 fully overridden. An add-on package can ship with code that renders using
@@ -146,9 +146,9 @@ Let's look at an example:
 .. code-block:: python
    :linenos:
 
-   @view_config(renderer='templates/mytemplate.jinja2')
+   @view_config(renderer="templates/mytemplate.jinja2")
    def my_view(request):
-       return {'foo': 1, 'bar': 2}
+       return {"foo": 1, "bar": 2}
 
 Imagine that the above code is in a ``myapp.admin.views`` module. The template
 would be relative to that module on the filesystem, as shown below:
@@ -176,8 +176,9 @@ entire ``templates`` folder, may be overridden.
 .. code-block:: python
 
    config.override_asset(
-       to_override='myapp.admin.views:templates/mytemplate.jinja2',
-       override_with='yourapp:templates/sometemplate.jinja2')
+       to_override="myapp.admin.views:templates/mytemplate.jinja2",
+       override_with="yourapp:templates/sometemplate.jinja2",
+    )
 
 See :ref:`pyramid:overriding_assets_section` for more information.
 
@@ -195,9 +196,9 @@ follows:
 
 .. code-block:: python
 
-   @view_config(renderer='mytemplate.jinja2')
+   @view_config(renderer="mytemplate.jinja2")
    def my_view(request):
-       return {'foo': 1, 'bar': 2}
+       return {"foo": 1, "bar": 2}
 
 If ``mytemplate.jinja2`` is not found in the same directory as the module,
 then it will be searched for on the search path. We are now dependent on our
@@ -235,8 +236,8 @@ template names found on the search path. The search path will always be
 consulted if a template cannot be found relative to the parent
 template. For example, if you had a template named ``templates/child.jinja2``
 that wanted to extend ``templates/base.jinja2``, then it could use
-``{% extends 'base.jinja2' %}`` and locate the file relative to itself.
-Alternatively it could use ``{% extends 'templates/base.jinja2' %}`` to find
+``{% extends "base.jinja2" %}`` and locate the file relative to itself.
+Alternatively it could use ``{% extends "templates/base.jinja2" %}`` to find
 the template in a ``templates`` sub-folder rooted on the search path. The
 template-relative option will always override the search path.
 
@@ -284,8 +285,8 @@ extensions using the :func:`pyramid_jinja2.add_jinja2_renderer` directive.
 
 .. code-block:: python
 
-   config.include('pyramid_jinja2')
-   config.add_jinja2_renderer('.html')
+   config.include("pyramid_jinja2")
+   config.add_jinja2_renderer(".html")
 
 It would now be possible to use templates named ``foo.html`` and
 ``foo.jinja2``. Each renderer extension will use its own
@@ -295,9 +296,9 @@ runtime using the ``name`` parameter to the other directives such as
 
 .. code-block:: python
 
-   config.include('pyramid_jinja2')
-   config.add_jinja2_renderer('.html')
-   config.add_jinja2_search_path('myapp:templates', name='.html')
+   config.include("pyramid_jinja2")
+   config.add_jinja2_renderer(".html")
+   config.add_jinja2_search_path("myapp:templates", name=".html")
 
 It is also possible to set up different renderers that use different search
 paths, configuration settings, and environments if necessary. This technique
@@ -310,13 +311,13 @@ at a different group of settings.
 .. code-block:: python
 
    settings = {
-       'jinja2.directories': 'myapp:html_templates',
-       'mail.jinja2.directories': 'myapp:email_templates',
+       "jinja2.directories": "myapp:html_templates",
+       "mail.jinja2.directories": "myapp:email_templates",
    }
 
    config = Configurator(settings=settings)
-   config.include('pyramid_jinja2')
-   config.add_jinja2_renderer('.email', settings_prefix='mail.jinja2.')
+   config.include("pyramid_jinja2")
+   config.add_jinja2_renderer(".email", settings_prefix="mail.jinja2.")
 
 Now ``foo.email`` will be rendered using the ``mail.jinja2.*`` settings.
 
@@ -398,7 +399,7 @@ Possible values: ``true`` or ``false``.
    practice in a web setting where we want to prevent XSS attacks from
    rendering unsanitized user-generated content. To turn off escaping
    on a case-by-case basis, you may use the ``safe`` filter such as
-   ``{{ html_blob | safe }}``.
+   ``{{ html_blob|safe }}``.
 
 
 .. _setting_reload_templates:
@@ -765,8 +766,8 @@ sent with each request and set the appropriate language. For example:
         request = event.request
         # set locale depending on browser settings
         settings = request.registry.settings
-        locale = settings.get('pyramid.default_locale_name', 'en')
-        available = [loc['code'] for loc in AVAILABLE_LOCALES]
+        locale = settings.get("pyramid.default_locale_name", "en")
+        available = [loc["code"] for loc in AVAILABLE_LOCALES]
         if request.accept_language:
             accepted = request.accept_language
             locale = accepted.best_match(available, locale)

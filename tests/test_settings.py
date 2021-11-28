@@ -18,7 +18,7 @@ class Test_parse_named_assetspecs(unittest.TestCase):
         result = self._callFUT(
             """
             foo = pyramid_jinja2
-            bar= tests
+            bar = tests
             """,
             resolver.maybe_resolve,
         )
