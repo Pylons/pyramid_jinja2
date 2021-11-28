@@ -8,7 +8,7 @@ from jinja2 import (
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.settings import asbool
 
-from .i18n import GetTextWrapper
+from pyramid_jinja2.i18n import GetTextWrapper
 
 _JINJA2_ENVIRONMENT_DEFAULTS = {
     "autoescape": True,

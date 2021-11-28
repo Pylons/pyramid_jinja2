@@ -2,7 +2,7 @@ import unittest
 
 from pyramid.path import DottedNameResolver
 
-from .base import Base
+from pyramid_jinja2.tests.base import Base
 
 
 class TestExtensions(Base, unittest.TestCase):
@@ -16,7 +16,7 @@ class TestExtensions(Base, unittest.TestCase):
         settings = parse_env_options_from_settings(options, "", maybe_dotted, None)
         env = create_environment_from_options(settings, {})
         ext = env.extensions["tests.extensions.TestExtension"]
-        from . import extensions
+        from pyramid_jinja2.tests import extensions
 
         self.assertEqual(ext.__class__, extensions.TestExtension)
 

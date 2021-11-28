@@ -3,7 +3,7 @@ import unittest
 
 from pyramid import testing
 
-from .base import Base, Mock
+from pyramid_jinja2.tests.base import Base, Mock
 
 
 def dummy_filter(value):
@@ -337,8 +337,8 @@ class TestIntegrationReloading(unittest.TestCase):
             result = app.get("/").body
             self.assertEqual(result, b"foo")
 
-            time.sleep(1)  # need mtime to change and most systems
-            # have 1-second resolution
+            # need mtime to change and most systems have 1-second resolution
+            time.sleep(1)
             with open(path, "wb") as fp:
                 fp.write(b"bar")
 
@@ -370,21 +370,18 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         self.assertEqual(environ.globals[global_name], global_obj)
 
     def test_set_single_filter(self):
-        self.config.registry.settings[
-            "jinja2.filters"
-        ] = "my_filter = tests.test_it.my_test_func"
+        filters = "my_filter = tests.test_it.my_test_func"
+        self.config.registry.settings["jinja2.filters"] = filters
         self._assert_has_filter("my_filter", my_test_func)
 
     def test_set_single_test(self):
-        self.config.registry.settings[
-            "jinja2.tests"
-        ] = "my_test = tests.test_it.my_test_func"
+        filters = "my_test = tests.test_it.my_test_func"
+        self.config.registry.settings["jinja2.tests"] = filters
         self._assert_has_test("my_test", my_test_func)
 
     def test_set_single_global(self):
-        self.config.registry.settings[
-            "jinja2.globals"
-        ] = "my_test = tests.test_it.my_test_func"
+        filters = "my_test = tests.test_it.my_test_func"
+        self.config.registry.settings["jinja2.globals"] = filters
         self._assert_has_global("my_test", my_test_func)
 
     def test_set_multi_filters(self):
@@ -432,7 +429,7 @@ class Test_filters_and_tests(Base, unittest.TestCase):
         )
         config.add_jinja2_renderer(".jinja2")
         result = render("tests_and_filters.jinja2", {})
-        # my_test_func returns "True" - it will be render as True when usign
+        # my_test_func returns "True" - it will be rendered as True when used
         # as filter and will pass in tests
         self.assertEqual(result, "True is not False True")
         testing.tearDown()

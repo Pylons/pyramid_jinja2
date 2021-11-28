@@ -19,13 +19,13 @@ def resource_url_filter(ctx, model, *elements, **kw):
 
     Example::
 
-        <a href="{{'my_traversable_object'|resource_url}}">
+        <a href="{{ "my_traversable_object"|resource_url }}">
             See my object
         </a>
 
     You can also specify optional view name attached at the end of a path::
 
-        <a href="{{'my_traversable_object'|resource_url('edit')}}">
+        <a href="{{ "my_traversable_object"|resource_url("edit") }}">
             Edit my object
         </a>
 
@@ -65,7 +65,7 @@ def route_url_filter(ctx, route_name, *elements, **kw):
 
     Example::
 
-        <a href="{{'login'|route_url}}">
+        <a href="{{ "login"|route_url }}">
             Sign in
         </a>
 
@@ -90,7 +90,7 @@ def static_url_filter(ctx, path, **kw):
 
     Example::
 
-       <link rel="stylesheet" href="{{'yourapp:static/css/style.css'|static_url}}" />
+       <link rel="stylesheet" href="{{ "yourapp:static/css/style.css"|static_url }}" />
 
     """
     request = ctx.get("request") or get_current_request()

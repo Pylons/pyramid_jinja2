@@ -104,7 +104,7 @@ Backward Incompatible Changes
 
   The fix is to include ``pyramid_jinja2``::
 
-    config.include('pyramid_jinja2')
+    config.include("pyramid_jinja2")
 
 2.2 (2014-05-30)
 ================
@@ -128,7 +128,7 @@ Backward Incompatible Changes
   only automatic search path left is the one added by the default ``.jinja2``
   renderer created when including ``pyramid_jinja2``. [mmerickel]
 
-- Adjust the ``config.include('pyramid_jinja2')`` to add any packages from
+- Adjust the ``config.include("pyramid_jinja2")`` to add any packages from
   ``jinja2.directories`` **before** the default search path at the base of
   the app. Previously there was no way to override that search path.
   [mmerickel]
@@ -137,9 +137,9 @@ Backward Incompatible Changes
 ==================
 
 - The path of the child template is always considered when inheriting from
-  a base template. Therefore when doing ``render('templates/foo.jinja2')``
-  and ``foo.jinja2`` has an ``{% extends 'base.jinja2' %}``, the template
-  will be searched for as ``'templates/base.jinja2'`` on the search path.
+  a base template. Therefore when doing ``render("templates/foo.jinja2")``
+  and ``foo.jinja2`` has an ``{% extends "base.jinja2" %}``, the template
+  will be searched for as ``"templates/base.jinja2"`` on the search path.
   Previously the path of the child template was ignored when doing the
   lookup for the base, causing some very subtle and unrecoverable lookup
   errors when the child template was found relative to the caller instead
@@ -153,7 +153,7 @@ Backward Incompatible Changes
 ==================
 
 - #86: Fix a regression caused by the new support for extending a template
-  relative to itself. Using ``{% extends 'some_asset:spec.jinja2' %}`` was
+  relative to itself. Using ``{% extends "some_asset:spec.jinja2" %}`` was
   no longer working and is now fixed. [mmerickel]
 
 
@@ -260,7 +260,7 @@ Backward Incompatible Changes
   of the pyramid application.
   [Domen Kozar]
 
-- Add `jinja2.globals` setting to add global objects into 
+- Add `jinja2.globals` setting to add global objects into
   the template context
   [Eugene Fominykh]
 
