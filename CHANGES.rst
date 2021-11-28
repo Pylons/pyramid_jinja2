@@ -1,3 +1,18 @@
+unreleased
+==========
+
+- Drop Python 3.6 support.
+
+- Add Python 3.9 and 3.10 support.
+
+- Refactor project structure to make wheel distribution smaller.
+
+- Blackify the codebase.
+
+- Use the newer ``@jinja2.pass_context`` in favor of the deprecated
+  ``@jinja2.contextfilter``.
+  See https://github.com/Pylons/pyramid_jinja2/pull/159
+
 2.8 (2019-01-25)
 ================
 
