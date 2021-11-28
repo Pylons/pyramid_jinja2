@@ -4,14 +4,11 @@ import posixpath
 import sys
 
 from jinja2 import Environment as _Jinja2Environment
-
 from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
 from jinja2.utils import open_if_exists
-
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.path import DottedNameResolver
-
 from zope.deprecation import deprecated
 from zope.interface import Interface
 
@@ -21,10 +18,9 @@ from .settings import (
     parse_multiline,
 )
 
-
 ENV_CONFIG_PHASE = 0
 EXTRAS_CONFIG_PHASE = 1
-PARENT_RELATIVE_DELIM = '@@FROM_PARENT@@'
+PARENT_RELATIVE_DELIM = "@@FROM_PARENT@@"
 
 
 class IJinja2Environment(Interface):
@@ -33,7 +29,7 @@ class IJinja2Environment(Interface):
 
 class Environment(_Jinja2Environment):
     def join_path(self, uri, parent):
-        if os.path.isabs(uri) or ':' in uri:
+        if os.path.isabs(uri) or ":" in uri:
             # we have an asset spec or absolute path
             return uri
 
@@ -45,12 +41,12 @@ class FileInfo(object):
     open_if_exists = staticmethod(open_if_exists)
     getmtime = staticmethod(os.path.getmtime)
 
-    def __init__(self, filename, encoding='utf-8'):
+    def __init__(self, filename, encoding="utf-8"):
         self.filename = filename
         self.encoding = encoding
 
     def _delay_init(self):
-        if '_mtime' in self.__dict__:
+        if "_mtime" in self.__dict__:
             return
 
         f = self.open_if_exists(self.filename)
@@ -95,11 +91,11 @@ class _PackageFinder(object):
         f = None
         for t in self.inspect.stack():
             f = t[0]
-            name = f.f_globals.get('__name__')
+            name = f.f_globals.get("__name__")
             if name:
                 excluded = False
                 for pattern in excludes:
-                    if pattern[-1] == '.' and name.startswith(pattern):
+                    if pattern[-1] == "." and name.startswith(pattern):
                         excluded = True
                         break
                     elif name == pattern:
@@ -111,13 +107,13 @@ class _PackageFinder(object):
         if f is None:
             return None
 
-        pname = f.f_globals.get('__name__') or '__main__'
+        pname = f.f_globals.get("__name__") or "__main__"
         m = sys.modules[pname]
-        f = getattr(m, '__file__', '')
-        if (('__init__.py' in f) or ('__init__$py' in f)):  # empty at >>>
+        f = getattr(m, "__file__", "")
+        if ("__init__.py" in f) or ("__init__$py" in f):  # empty at >>>
             return m
 
-        pname = m.__name__.rsplit('.', 1)[0]
+        pname = m.__name__.rsplit(".", 1)[0]
 
         return sys.modules[pname]
 
@@ -126,16 +122,16 @@ _caller_package = _PackageFinder().caller_package
 
 
 class SmartAssetSpecLoader(FileSystemLoader):
-    '''A Jinja2 template loader that knows how to handle
+    """A Jinja2 template loader that knows how to handle
     asset specifications.
-    '''
+    """
 
-    def __init__(self, searchpath=(), encoding='utf-8', debug=False):
+    def __init__(self, searchpath=(), encoding="utf-8", debug=False):
         FileSystemLoader.__init__(self, searchpath, encoding)
         self.debug = debug
 
     def list_templates(self):
-        raise TypeError('this loader cannot iterate over all templates')
+        raise TypeError("this loader cannot iterate over all templates")
 
     def _get_absolute_source(self, template):
         filename = abspath_from_asset_spec(template)
@@ -144,7 +140,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
             return fi.contents, fi.filename, fi.uptodate
 
     def _relative_searchpath(self, chain):
-        """ Combine paths in the chain to construct search paths.
+        """Combine paths in the chain to construct search paths.
 
         The precedence is for the most-specific paths to be tested first,
         anchored at an absolute path or asset spec. From there, less-specific
@@ -161,14 +157,14 @@ class SmartAssetSpecLoader(FileSystemLoader):
         # the stack to always contain something join, but it allows the
         # later for-loops to fallback to the original search path by
         # joining to an empty string since os.path.join('', 'foo') == 'foo'
-        stack = ['']
+        stack = [""]
         for path in chain:
             is_abspath = os.path.isabs(path)
-            is_spec = not is_abspath and ':' in path
+            is_spec = not is_abspath and ":" in path
 
             if not is_abspath and is_spec:
-                ppkg, ppath = path.split(':', 1)
-                path = '{0}:{1}'.format(ppkg, posixpath.dirname(ppath))
+                ppkg, ppath = path.split(":", 1)
+                path = "{0}:{1}".format(ppkg, posixpath.dirname(ppath))
             else:
                 # this should split windows and posix paths
                 path = os.path.dirname(path)
@@ -189,7 +185,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
     def get_source(self, environment, template):
         # keep legacy asset: prefix checking that bypasses
         # source path checking altogether
-        if template.startswith('asset:'):
+        if template.startswith("asset:"):
             template = template[6:]
 
         # split the template into the chain of relative-imports
@@ -197,7 +193,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
         template, rel_chain = rel_chain[0], rel_chain[1:]
 
         # load the template directly if it's an absolute path or asset spec
-        if os.path.isabs(template) or ':' in template:
+        if os.path.isabs(template) or ":" in template:
             src = self._get_absolute_source(template)
             if src is not None:
                 return src
@@ -217,12 +213,12 @@ class SmartAssetSpecLoader(FileSystemLoader):
                     if src is not None:
                         return src
             # avoid doing "':' in" and then redundant "split"
-            parts = parent.split(':', 1)
+            parts = parent.split(":", 1)
             if len(parts) > 1:
                 # parent is an asset spec
                 ppkg, ppath = parts
                 ppath = posixpath.join(ppath, template)
-                uri = '{0}:{1}'.format(ppkg, ppath)
+                uri = "{0}:{1}".format(ppkg, ppath)
                 # avoid recursive includes
                 if uri not in rel_chain:
                     src = self._get_absolute_source(uri)
@@ -244,12 +240,13 @@ class SmartAssetSpecLoader(FileSystemLoader):
         # there should always be an exception because the rel_searchpath is
         # guaranteed to contain at least one element ('')
         searchpath = [p for p in rel_searchpath if p] + self.searchpath
-        message = '{0}; searchpath={1}'.format(template, searchpath)
+        message = "{0}; searchpath={1}".format(template, searchpath)
         raise TemplateNotFound(name=template, message=message)
 
 
 class Jinja2TemplateRenderer(object):
-    '''Renderer for a jinja2 template'''
+    """Renderer for a jinja2 template"""
+
     def __init__(self, template_loader):
         self.template_loader = template_loader
 
@@ -257,8 +254,9 @@ class Jinja2TemplateRenderer(object):
         try:
             system.update(value)
         except (TypeError, ValueError) as ex:
-            raise ValueError('renderer was passed non-dictionary '
-                             'as value: %s' % str(ex))
+            raise ValueError(
+                "renderer was passed non-dictionary " "as value: %s" % str(ex)
+            )
         template = self.template_loader()
         return template.render(system)
 
@@ -271,9 +269,9 @@ class Jinja2RendererFactory(object):
 
         def template_loader():
             # attempt to turn the name into a caller-relative asset spec
-            if ':' not in name and package is not None:
+            if ":" not in name and package is not None:
                 try:
-                    name_with_package = '%s:%s' % (package.__name__, name)
+                    name_with_package = "%s:%s" % (package.__name__, name)
                     return self.environment.get_template(name_with_package)
                 except TemplateNotFound:
                     pass
@@ -285,26 +283,28 @@ class Jinja2RendererFactory(object):
 
 def renderer_factory(info):
     registry = info.registry
-    env = registry.queryUtility(IJinja2Environment, name='.jinja2')
+    env = registry.queryUtility(IJinja2Environment, name=".jinja2")
     if env is None:
         raise ValueError(
-            'As of pyramid_jinja2 2.3, the use of the '
+            "As of pyramid_jinja2 2.3, the use of the "
             '"pyramid_jinja2.renderer_factory" requires that pyramid_jinja2 '
             'be configured via config.include("pyramid_jinja2") or the '
-            'equivalent "pyramid.includes" setting.')
+            'equivalent "pyramid.includes" setting.'
+        )
     factory = Jinja2RendererFactory()
     factory.environment = env
     return factory(info)
 
 
 deprecated(
-    'renderer_factory',
-    'The pyramid_jinja2.renderer_factory was deprecated in version 2.0 and '
-    'will be removed in the future. You should upgrade to the newer '
-    'config.add_jinja2_renderer() API.')
+    "renderer_factory",
+    "The pyramid_jinja2.renderer_factory was deprecated in version 2.0 and "
+    "will be removed in the future. You should upgrade to the newer "
+    "config.add_jinja2_renderer() API.",
+)
 
 
-def add_jinja2_search_path(config, searchpath, name='.jinja2', prepend=False):
+def add_jinja2_search_path(config, searchpath, name=".jinja2", prepend=False):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -323,6 +323,7 @@ def add_jinja2_search_path(config, searchpath, name='.jinja2', prepend=False):
     of the search path.
 
     """
+
     def register():
         env = get_jinja2_environment(config, name)
         searchpaths = parse_multiline(searchpath)
@@ -332,10 +333,11 @@ def add_jinja2_search_path(config, searchpath, name='.jinja2', prepend=False):
                 env.loader.searchpath.insert(0, path)
             else:
                 env.loader.searchpath.append(path)
+
     config.action(None, register, order=EXTRAS_CONFIG_PHASE)
 
 
-def add_jinja2_extension(config, ext, name='.jinja2'):
+def add_jinja2_extension(config, ext, name=".jinja2"):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -350,13 +352,15 @@ def add_jinja2_extension(config, ext, name='.jinja2'):
 
     """
     ext = config.maybe_dotted(ext)
+
     def register():
         env = get_jinja2_environment(config, name)
         env.add_extension(ext)
+
     config.action(None, register, order=EXTRAS_CONFIG_PHASE)
 
 
-def get_jinja2_environment(config, name='.jinja2'):
+def get_jinja2_environment(config, name=".jinja2"):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -388,19 +392,15 @@ def get_jinja2_environment(config, name='.jinja2'):
 def create_environment_from_options(env_opts, loader_opts):
     loader = SmartAssetSpecLoader(**loader_opts)
 
-    newstyle = env_opts.pop('newstyle', False)
-    gettext = env_opts.pop('gettext', None)
-    filters = env_opts.pop('filters', {})
-    tests = env_opts.pop('tests', {})
-    globals = env_opts.pop('globals', {})
+    newstyle = env_opts.pop("newstyle", False)
+    gettext = env_opts.pop("gettext", None)
+    filters = env_opts.pop("filters", {})
+    tests = env_opts.pop("tests", {})
+    globals = env_opts.pop("globals", {})
 
-    env = Environment(
-        loader=loader,
-        **env_opts
-    )
+    env = Environment(loader=loader, **env_opts)
 
-    env.install_gettext_callables(
-        gettext.gettext, gettext.ngettext, newstyle=newstyle)
+    env.install_gettext_callables(gettext.gettext, gettext.ngettext, newstyle=newstyle)
 
     env.filters.update(filters)
     env.tests.update(tests)
@@ -409,7 +409,7 @@ def create_environment_from_options(env_opts, loader_opts):
     return env
 
 
-def add_jinja2_renderer(config, name, settings_prefix='jinja2.', package=None):
+def add_jinja2_renderer(config, name, settings_prefix="jinja2.", package=None):
     """
     This function is added as a method of a :term:`Configurator`, and
     should not be called directly.  Instead it should be called like so after
@@ -451,8 +451,7 @@ def add_jinja2_renderer(config, name, settings_prefix='jinja2.', package=None):
 
         registry.registerUtility(env, IJinja2Environment, name=name)
 
-    config.action(
-        ('jinja2-renderer', name), register, order=ENV_CONFIG_PHASE)
+    config.action(("jinja2-renderer", name), register, order=ENV_CONFIG_PHASE)
 
 
 def includeme(config):
@@ -480,14 +479,14 @@ def includeme(config):
       used by the specified renderer.
 
     """
-    config.add_directive('add_jinja2_renderer', add_jinja2_renderer)
-    config.add_directive('add_jinja2_search_path', add_jinja2_search_path)
-    config.add_directive('add_jinja2_extension', add_jinja2_extension)
-    config.add_directive('get_jinja2_environment', get_jinja2_environment)
+    config.add_directive("add_jinja2_renderer", add_jinja2_renderer)
+    config.add_directive("add_jinja2_search_path", add_jinja2_search_path)
+    config.add_directive("add_jinja2_extension", add_jinja2_extension)
+    config.add_directive("get_jinja2_environment", get_jinja2_environment)
 
-    package = _caller_package(('pyramid', 'pyramid.', 'pyramid_jinja2'))
-    config.add_jinja2_renderer('.jinja2', package=package)
+    package = _caller_package(("pyramid", "pyramid.", "pyramid_jinja2"))
+    config.add_jinja2_renderer(".jinja2", package=package)
 
     # always insert default search path relative to package
-    default_search_path = '%s:' % (package.__name__,)
-    config.add_jinja2_search_path(default_search_path, name='.jinja2')
+    default_search_path = "%s:" % (package.__name__,)
+    config.add_jinja2_search_path(default_search_path, name=".jinja2")

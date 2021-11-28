@@ -3,7 +3,7 @@ from jinja2.ext import Extension
 
 
 class TestExtension(Extension):
-    tags = {'test_ext'}
+    tags = {"test_ext"}
 
     def parse(self, parser):
         return nodes.Const("This is test extension")  # pragma: nocover

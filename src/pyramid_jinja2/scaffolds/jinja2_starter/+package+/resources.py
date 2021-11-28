@@ -1,6 +1,7 @@
 class MyResource(object):
     pass
 
+
 root = MyResource()
 
 
