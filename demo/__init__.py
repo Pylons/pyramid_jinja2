@@ -23,7 +23,7 @@ def app(global_settings, **settings):
     config.include('pyramid_jinja2')
     config.add_route(name='root', pattern='/')
     config.add_view(root_view, renderer='helloworld.jinja2')
-    config.add_translation_dirs('pyramid_jinja2.demo:locale/')
+    config.add_translation_dirs('demo:locale/')
     return config.make_wsgi_app()
 
 

@@ -47,8 +47,8 @@ License Terms
 -------------
 
 Code committed to the Pylons Project source repository (Committed Code) must
-be governed by the Repoze Public License (http://repoze.org/LICENSE.txt, aka
-"the RPL") or another license acceptable to Agendaless Consulting.  Until
+be governed by the Repoze Public License (see LICENSE.txt, aka "the RPL")
+or another license acceptable to Agendaless Consulting.  Until
 Agendaless Consulting declares in writing an acceptable license other than
 the RPL, only the RPL shall be used.  A list of exceptions is detailed within
 the "Licensing Exceptions" section of this document, if one exists.
