@@ -3,7 +3,7 @@ import unittest
 
 from pyramid import testing
 
-from pyramid_jinja2.tests.base import Base, Mock
+from tests.base import Base, Mock
 
 
 def dummy_filter(value):
