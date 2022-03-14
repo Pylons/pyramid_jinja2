@@ -1,10 +1,14 @@
 2.9.1 (2022-03-12)
 ==================
 
+**This release has been yanked and is no longer available.**
+
 - Fix package metadata. No changes from 2.9.
 
 2.9 (2022-03-12)
 ================
+
+**This release has been yanked and is no longer available.**
 
 - Drop Python 3.6 support.
 
