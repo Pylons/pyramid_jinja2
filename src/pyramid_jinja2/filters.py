@@ -1,6 +1,11 @@
-from jinja2 import pass_context
 from pyramid.threadlocal import get_current_request
 from pyramid.url import resource_url, route_path, route_url, static_path, static_url
+
+try:
+    from jinja2 import pass_context
+except ImportError:
+    # jinja2 < 3.0 fallback
+    from jinja2 import contextfilter as pass_context
 
 __all__ = [
     "resource_url_filter",

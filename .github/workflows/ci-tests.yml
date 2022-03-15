@@ -58,6 +58,8 @@ jobs:
                     - "pyramid19"
                     - "pyramid110"
                     - "pyramid20"
+                    - "pyramid110-jinja2legacy"
+                    - "pyramid20-jinja2legacy"
         name: "Python: py39-${{ matrix.pyramid }}"
         runs-on: ubuntu-latest
         steps:
