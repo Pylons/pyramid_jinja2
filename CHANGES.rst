@@ -1,3 +1,12 @@
+unreleased
+==========
+
+- Support Jinja2 >= 3.0.
+
+- Only import ``jinja2.pass_context`` if available on Jinja2 >= 3.0, otherwise
+  fallback to ``jinja2.contextfilter``.
+  See https://github.com/Pylons/pyramid_jinja2/pull/164
+
 2.9.1 (2022-03-12)
 ==================
 
