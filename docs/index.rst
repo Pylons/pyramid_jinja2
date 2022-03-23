@@ -325,8 +325,9 @@ Now ``foo.email`` will be rendered using the ``mail.jinja2.*`` settings.
 Internalization (i18n)
 ----------------------
 
-When :term:`pyramid_jinja2` is included in a Pyramid application,
-:ref:`jinja2.ext.i18n <jinja2:i18n-extension>` is automatically activated.
+When :term:`pyramid_jinja2` is included in a Pyramid application, either
+:ref:`jinja2.ext.i18n <jinja2:i18n-extension>` or the extension configured by
+``jinja2.i18n_extension`` is automatically activated.
 
 Be sure to configure ``jinja2.i18n.domain`` according to ``setup.cfg`` domain
 settings. By default, ``jinja2.i18n.domain`` is set to the name of the
@@ -470,8 +471,18 @@ jinja2.extensions
 -----------------
 
 A list of extension objects, or a newline-delimited set of dotted import
-locations, where each line represents an extension. :ref:`jinja2.ext.i18n
-<jinja2:i18n-extension>` is automatically activated.
+locations, where each line represents an extension. Either :ref:`jinja2.ext.i18n
+<jinja2:i18n-extension>` or the i18n extension configured using
+``jinja2.i18n_extension`` is automatically activated.
+
+
+.. _setting_jinja2_i18n_extension:
+
+jinja2.i18n_extension
+---------------------
+
+The name of the i18n extension to activate. Defaults to
+:ref:`jinja2.ext.i18n <jinja2:i18n-extension>`.
 
 
 .. _setting_jinja2_i18n_domain:

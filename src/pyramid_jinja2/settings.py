@@ -136,8 +136,9 @@ def parse_env_options_from_settings(
 
     # get jinja2 extensions
     extensions = parse_multiline(sget("extensions", ""))
-    if "jinja2.ext.i18n" not in extensions:
-        extensions.append("jinja2.ext.i18n")
+    i18n_extension = sget("i18n_extension", "jinja2.ext.i18n")
+    if i18n_extension not in extensions:
+        extensions.append(i18n_extension)
     opts["extensions"] = extensions
 
     # get jinja2 bytecode caching settings and set up bytecaching
