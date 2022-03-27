@@ -205,6 +205,17 @@ class Test_parse_env_options_from_settings(unittest.TestCase):
         opts = self._callFUT(settings, "j2.")
         self.assertEqual(opts["undefined"], Undefined)
 
+    def test_default_extensions(self):
+        opts = self._callFUT({}, "j2.")
+        self.assertEqual(opts["extensions"], ["jinja2.ext.i18n"])
+
+    def test_override_i18n_extension(self):
+        settings = {
+            "j2.i18n_extension": "test.TestI18NExtension",
+        }
+        opts = self._callFUT(settings, "j2.")
+        self.assertEqual(opts["extensions"], ["test.TestI18NExtension"])
+
 
 # This is just a fake top level name that we can pass into maybe_dotted that
 # will resolve.

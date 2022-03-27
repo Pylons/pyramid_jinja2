@@ -1,3 +1,8 @@
+unreleased
+==========
+
+- Add ``jinja2.i18n_extension`` configuration setting.
+
 2.9.2 (2022-03-19)
 ==================
 
