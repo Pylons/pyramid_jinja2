@@ -1,7 +1,8 @@
-unreleased
-==========
+2.10 (2022-03-27)
+=================
 
 - Add ``jinja2.i18n_extension`` configuration setting.
+  See https://github.com/Pylons/pyramid_jinja2/pull/165
 
 2.9.2 (2022-03-19)
 ==================
