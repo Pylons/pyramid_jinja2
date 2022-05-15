@@ -719,7 +719,7 @@ class TestPackageFinder(unittest.TestCase):
         pf.inspect = MockInspect()
         self.assertEqual(pf.caller_package(), None)
 
-        import xml
+        import xml  # noqa F401
 
         pf.inspect.items = [(Mock(f_globals={"__name__": "xml"}),)]
 

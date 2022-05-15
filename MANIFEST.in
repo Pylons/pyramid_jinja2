@@ -13,6 +13,7 @@ include COPYRIGHT.txt
 include pyproject.toml
 include setup.cfg
 include .coveragerc
+include .flake8
 include tox.ini
 include rtd.txt
 
