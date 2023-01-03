@@ -3,6 +3,8 @@ Unreleased (2022-11-15)
 
 - Rename "master" git branch to "main"
 
+- Add Python 3.11 support.
+
 2.10 (2022-03-27)
 =================
 
