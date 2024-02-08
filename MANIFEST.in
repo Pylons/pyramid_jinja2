@@ -15,7 +15,7 @@ include setup.cfg
 include .coveragerc
 include .flake8
 include tox.ini
-include rtd.txt
+include .readthedocs.yaml
 
 prune docs/_build
 prune docs/_themes
