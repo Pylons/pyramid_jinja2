@@ -5,7 +5,7 @@ from jinja2 import (
     StrictUndefined,
     Undefined,
 )
-from pyramid.asset import abspath_from_asset_spec
+from pyramid.path import AssetResolver
 from pyramid.settings import asbool
 
 from .i18n import GetTextWrapper
@@ -67,8 +67,9 @@ def parse_loader_options_from_settings(settings, prefix, maybe_dotted, package):
     input_encoding = sget("input_encoding", "utf-8")
 
     # get jinja2 directories
+    resolve = AssetResolver(package).resolve
     directories = parse_multiline(sget("directories") or "")
-    directories = [abspath_from_asset_spec(d, package) for d in directories]
+    directories = [resolve(d).abspath() for d in directories]
 
     return dict(
         debug=debug,

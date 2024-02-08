@@ -1,6 +1,7 @@
 bookenv/
 /build
 .coverage
+.coverage.*
 coverage.xml
 dist/
 /env*
