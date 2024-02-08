@@ -7,8 +7,7 @@ from jinja2 import Environment as _Jinja2Environment
 from jinja2.exceptions import TemplateNotFound
 from jinja2.loaders import FileSystemLoader
 from jinja2.utils import open_if_exists
-from pyramid.asset import abspath_from_asset_spec
-from pyramid.path import DottedNameResolver
+from pyramid.path import AssetResolver, DottedNameResolver
 from zope.deprecation import deprecated
 from zope.interface import Interface
 
@@ -134,7 +133,7 @@ class SmartAssetSpecLoader(FileSystemLoader):
         raise TypeError("this loader cannot iterate over all templates")
 
     def _get_absolute_source(self, template):
-        filename = abspath_from_asset_spec(template)
+        filename = AssetResolver().resolve(template).abspath()
         fi = FileInfo(filename, self.encoding)
         if os.path.isfile(fi.filename):
             return fi.contents, fi.filename, fi.uptodate
@@ -327,8 +326,9 @@ def add_jinja2_search_path(config, searchpath, name=".jinja2", prepend=False):
     def register():
         env = get_jinja2_environment(config, name)
         searchpaths = parse_multiline(searchpath)
+        resolve = AssetResolver(config.package).resolve
         for folder in searchpaths:
-            path = abspath_from_asset_spec(folder, config.package)
+            path = resolve(folder).abspath()
             if prepend:
                 env.loader.searchpath.insert(0, path)
             else:
