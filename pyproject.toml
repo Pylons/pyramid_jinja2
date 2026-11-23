@@ -1,13 +1,86 @@
+[project]
+name = "pyramid_jinja2"
+version = "2.11.dev0"
+description = "Jinja2 template bindings for the Pyramid web framework"
+dynamic = ["readme"]
+
+license = "LicenseRef-Repoze-BSD-derived"
+license-files = ["LICENSE.txt"]
+authors = [
+  { name = "Rocky Burt", email = "pylons-discuss@googlegroups.com" },
+]
+maintainers = [
+  { name = "Pylons Project", email = "pylons-discuss@googlegroups.com" },
+]
+
+requires-python = ">=3.11"
+dependencies = [
+  "jinja2 >= 2.5.0, != 2.11.0, != 2.11.1, != 2.11.2",
+  "markupsafe",
+  "pyramid >= 1.3.0",  # pyramid.path.DottedNameResolver
+  "zope.deprecation",
+]
+
+keywords = ["jinja2", "pylons", "pyramid", "web", "wsgi"]
+classifiers = [
+  "Development Status :: 6 - Mature",
+  "Framework :: Pyramid",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[project.urls]
+Changelog = "https://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/changes.html"
+Documentation = "https://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/"
+Homepage = "https://github.com/Pylons/pyramid_jinja2"
+"Issue Tracker" = "https://github.com/Pylons/pyramid_jinja2/issues"
+
+[project.entry-points."pyramid.scaffold"]
+pyramid_jinja2_starter = "pyramid_jinja2.scaffolds:Jinja2ProjectTemplate"
+
+[dependency-groups]
+docs = [
+  "Sphinx >= 1.7.5",
+  "pylons-sphinx-themes >= 0.3",
+]
+lint = [
+  "black ~= 26.10.0",
+  "build",
+  "check-manifest",
+  "flake8",
+  "flake8-bugbear",
+  "isort",
+  "readme_renderer",
+  "twine",
+]
+testing = [
+  "WebTest",
+  "coverage",
+  "pytest >= 5.4.2",
+  "pytest-cov",
+]
+
 [build-system]
-requires = ["setuptools >= 41"]
+requires = ["setuptools >= 77"]  # SPDX license expressions
 build-backend = "setuptools.build_meta"
 
 [tool.black]
-target-version = ['py37', 'py38', 'py39', 'py310']
+target-version = ["py311", "py312", "py313", "py314", "py315"]
 exclude = '''
 /(
   \.git
   | .tox
+  | .venv
+  | build
+  | dist
 )/
 '''
 
@@ -23,3 +96,20 @@ line_length = 88
 force_sort_within_sections = true
 default_section = "THIRDPARTY"
 known_first_party = "pyramid_jinja2"
+
+[tool.pytest.ini_options]
+addopts = "-W always"
+python_files = "test_*.py"
+testpaths = [
+  "demo",
+  "tests",
+]
+
+[tool.check-manifest]
+ignore-bad-ideas = ["*.mo"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+readme = { file = ["README.rst", "CHANGES.rst"], content-type = "text/x-rst" }

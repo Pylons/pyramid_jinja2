@@ -16,7 +16,7 @@
 # sys.path.append(os.path.abspath("some/directory"))
 
 import datetime
-import pkg_resources
+import importlib.metadata
 import pylons_sphinx_themes
 
 # General configuration
@@ -44,7 +44,7 @@ copyright = "2011-%s, Agendaless Consulting" % thisyear
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = pkg_resources.get_distribution(project).version
+version = importlib.metadata.version(project)
 # The full version, including alpha/beta/rc tags.
 release = version
 
