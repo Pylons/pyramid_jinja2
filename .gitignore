@@ -17,3 +17,4 @@ pypyenv/
 .*.swp
 .tox/
 venv/
+uv.lock
