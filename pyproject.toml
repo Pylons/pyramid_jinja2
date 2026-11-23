@@ -1,6 +1,6 @@
 [project]
 name = "pyramid_jinja2"
-version = "2.11.dev0"
+version = "2.11"
 description = "Jinja2 template bindings for the Pyramid web framework"
 dynamic = ["readme"]
 
