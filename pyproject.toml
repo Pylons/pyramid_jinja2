@@ -108,6 +108,26 @@ testpaths = [
 [tool.check-manifest]
 ignore-bad-ideas = ["*.mo"]
 
+[tool.coverage.run]
+source = ["pyramid_jinja2", "tests"]
+omit = [
+  "*/tests/templates/*",
+]
+
+[tool.coverage.paths]
+source = [
+  "src/pyramid_jinja2",
+  "*/src/pyramid_jinja2",
+  "*/site-packages/pyramid_jinja2",
+]
+
+[tool.coverage.report]
+omit = [
+  "*/pyramid_jinja2/scaffolds/__init__.py",
+]
+show_missing = true
+precision = 2
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
